@@ -1,4 +1,9 @@
-2016-08-06  Molnar Karoly  <molnarkaroly@users.sourceforge.net>
+2016-08-07  Molnar Karoly  <molnarkaroly@users.sourceforge.net>
+  * libgputils/gpcoffgen.c:
+    Fixed this bug: "#289 1.5.0_RC1 void function should not return ..."
+    Thanks to ilovezfs for the report.
+
+2016-08-07  Molnar Karoly  <molnarkaroly@users.sourceforge.net>
   * doc/gputils.lyx, configure, configure.ac:
     Changed the gputils version from 1.4.7 to 1.5.0.
 
