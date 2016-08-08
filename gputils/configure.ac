@@ -48,7 +48,8 @@ AC_ARG_WITH(mplabx-path,
 
 # Checks for programs.
 AC_PROG_AWK
-AC_PROG_CC
+# Primary compiler the clang and secondary the gcc.
+AC_PROG_CC([clang gcc])
 AC_PROG_RANLIB
 AC_PROG_YACC
 AM_PROG_LEX
@@ -87,23 +88,23 @@ AC_CHECK_SIZEOF(long long)
 
 type_name()
 {
-  if expr "$ac_cv_sizeof_char" '==' "$1" >/dev/null; then
+  if expr "$ac_cv_sizeof_char" = "$1" >/dev/null; then
     echo "char"
     exit
   fi
-  if expr "$ac_cv_sizeof_short" '==' "$1" >/dev/null; then
+  if expr "$ac_cv_sizeof_short" = "$1" >/dev/null; then
     echo "short"
     exit
   fi
-  if expr "$ac_cv_sizeof_int" '==' "$1" >/dev/null; then
+  if expr "$ac_cv_sizeof_int" = "$1" >/dev/null; then
     echo "int"
     exit
   fi
-  if expr "$ac_cv_sizeof_long" '==' "$1" >/dev/null; then
+  if expr "$ac_cv_sizeof_long" = "$1" >/dev/null; then
     echo "long"
     exit
   fi
-  if expr "$ac_cv_sizeof_long_long" '==' "$1" >/dev/null; then
+  if expr "$ac_cv_sizeof_long_long" = "$1" >/dev/null; then
     echo "long long"
     exit
   fi
@@ -152,10 +153,10 @@ AC_CHECK_FUNCS([strcasecmp strncasecmp stricmp strnicmp strndup realpath])
 
 # Check for functions to compile into libiberty (getopt is always compiled).
 IBERTYOBJS=
-AC_CHECK_FUNC(vsnprintf, , [IBERTYOBJS="$IBERTYOBJS vasprintf.o vsnprintf.o"])
-AC_CHECK_FUNC(snprintf, , [IBERTYOBJS="$IBERTYOBJS snprintf.o"])
-AC_CHECK_FUNC(strndup, , [IBERTYOBJS="$IBERTYOBJS strndup.o"])
-AC_CHECK_FUNC(strverscmp, , [IBERTYOBJS="$IBERTYOBJS strverscmp.o"])
+AC_CHECK_FUNCS(vsnprintf, , [IBERTYOBJS="$IBERTYOBJS vasprintf.o vsnprintf.o"])
+AC_CHECK_FUNCS(snprintf, , [IBERTYOBJS="$IBERTYOBJS snprintf.o"])
+AC_CHECK_FUNCS(strndup, , [IBERTYOBJS="$IBERTYOBJS strndup.o"])
+AC_CHECK_FUNCS(strverscmp, , [IBERTYOBJS="$IBERTYOBJS strverscmp.o"])
 
 AM_CFLAGS=
 AM_LDFLAGS=
@@ -168,16 +169,21 @@ case "${host}" in
       AM_LDFLAGS="-Wl,-warn-common -Wl,-warn-once"
     fi
     ;;
-  *linux* )
-    if test "x$GCC" = "xyes"; then
-      AM_CFLAGS="-Wall -pedantic"
+  *darwin* )
+    if test "x$CC" = "xclang"; then
+      AM_CFLAGS="-Wall -pedantic -Wformat -Wtautological-compare -Wimplicit-function-declaration -Wformat-security"
       AM_LDFLAGS="-Wl,-warn-common -Wl,-warn-once"
     fi
     ;;
-  *sun* )
-    # sunos cc needs the -xCC flag for // comments
-    if test "x$GCC" != "xyes"; then
-      AM_CFLAGS="-xCC" 
+  *linux* )
+    if test "x$CC" = "xclang"; then
+      AM_CFLAGS="-Wall -pedantic -Wformat -Wtautological-compare -Wimplicit-function-declaration -Wformat-security"
+      AM_LDFLAGS="-Wl,-warn-common -Wl,-warn-once"
+    else
+      if test "x$GCC" = "xyes"; then
+        AM_CFLAGS="-Wall -pedantic -Wformat -Wimplicit-function-declaration -Wformat-security"
+        AM_LDFLAGS="-Wl,-warn-common -Wl,-warn-once"
+      fi
     fi
     ;;
   *mingw* )
@@ -186,6 +192,12 @@ case "${host}" in
     EXEEXT=".exe"
     if test "x$GCC" = "xyes"; then
       AM_CFLAGS="-Zcrtdll"
+    fi
+    ;;
+  *sun* )
+    # sunos cc needs the -xCC flag for // comments
+    if test "x$GCC" != "xyes"; then
+      AM_CFLAGS="-xCC" 
     fi
     ;;
 esac
@@ -205,7 +217,7 @@ CFLAGS="-DGPUTILS_SVN_VERSION=\$(AM_GPUTILS_SVN_VERSION)"
 
 # Host filesystem options.
 case "${host}" in
-  *mingw* | *-pc-os2_emx | *-pc-os2-emx | *djgpp* )
+  *mingw* | *-pc-os2_emx | *-pc-os2-emx | *djgpp*)
     AC_DEFINE(HAVE_DOS_BASED_FILE_SYSTEM, 1, 
       [Define if your host uses a DOS based file system.])
     ;;
@@ -287,7 +299,7 @@ $PACKAGE_NAME-$PACKAGE_VERSION is now configured for $canonical_host_type
   Host:                 $host
   Source directory:     $srcdir
   Installation prefix:  $prefix
-  C compiler:           $CC $CFLAGS
+  C compiler:           $CC $AM_CFLAGS $CFLAGS
   Location of MPLAB-X:  $DEFAULT_MPLABX_PATH
 
 ])

@@ -95,24 +95,24 @@ typedef struct pnode {
   } value;
 } pnode_t;
 
-#define PnIsConstant(Node)              ((Node)->tag == PTAG_CONSTANT)
-#define PnIsSymbol(Node)                ((Node)->tag == PTAG_SYMBOL)
-#define PnIsString(Node)                ((Node)->tag == PTAG_STRING)
-#define PnIsOffset(Node)                ((Node)->tag == PTAG_OFFSET)
-#define PnIsList(Node)                  ((Node)->tag == PTAG_LIST)
-#define PnIsBinOp(Node)                 ((Node)->tag == PTAG_BINOP)
-#define PnIsUnOp(Node)                  ((Node)->tag == PTAG_UNOP)
+#define PnIsConstant(Node)              (Node)->tag == PTAG_CONSTANT
+#define PnIsSymbol(Node)                (Node)->tag == PTAG_SYMBOL
+#define PnIsString(Node)                (Node)->tag == PTAG_STRING
+#define PnIsOffset(Node)                (Node)->tag == PTAG_OFFSET
+#define PnIsList(Node)                  (Node)->tag == PTAG_LIST
+#define PnIsBinOp(Node)                 (Node)->tag == PTAG_BINOP
+#define PnIsUnOp(Node)                  (Node)->tag == PTAG_UNOP
 
-#define PnConstant(Node)                ((Node)->value.constant)
-#define PnSymbol(Node)                  ((Node)->value.symbol)
-#define PnString(Node)                  ((Node)->value.string)
-#define PnOffset(Node)                  ((Node)->value.offset)
-#define PnListHead(Node)                ((Node)->value.list.head)
-#define PnListTail(Node)                ((Node)->value.list.tail)
-#define PnBinOpOp(Node)                 ((Node)->value.binop.op)
-#define PnBinOpP0(Node)                 ((Node)->value.binop.p0)
-#define PnBinOpP1(Node)                 ((Node)->value.binop.p1)
-#define PnUnOpOp(Node)                  ((Node)->value.unop.op)
-#define PnUnOpP0(Node)                  ((Node)->value.unop.p0)
+#define PnConstant(Node)                (Node)->value.constant
+#define PnSymbol(Node)                  (Node)->value.symbol
+#define PnString(Node)                  (Node)->value.string
+#define PnOffset(Node)                  (Node)->value.offset
+#define PnListHead(Node)                (Node)->value.list.head
+#define PnListTail(Node)                (Node)->value.list.tail
+#define PnBinOpOp(Node)                 (Node)->value.binop.op
+#define PnBinOpP0(Node)                 (Node)->value.binop.p0
+#define PnBinOpP1(Node)                 (Node)->value.binop.p1
+#define PnUnOpOp(Node)                  (Node)->value.unop.op
+#define PnUnOpP0(Node)                  (Node)->value.unop.p0
 
 #endif

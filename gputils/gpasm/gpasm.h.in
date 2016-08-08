@@ -42,11 +42,11 @@ Boston, MA 02111-1307, USA.  */
 
 #define MAX_PATHS                   100
 
-#define IN_MACRO_WHILE_DEFINITION   (state.mac_prev != NULL)
-#define IN_WHILE_DEFINITION         (IN_MACRO_WHILE_DEFINITION && (state.while_head != NULL))
-#define IN_MACRO_EXPANSION          (state.src_list.last->type == SRC_MACRO)
-#define IN_WHILE_EXPANSION          (state.src_list.last->type == SRC_WHILE)
-#define IN_FILE_EXPANSION           (state.src_list.last->type == SRC_FILE)
+#define IN_MACRO_WHILE_DEFINITION   state.mac_prev != NULL
+#define IN_WHILE_DEFINITION         IN_MACRO_WHILE_DEFINITION && (state.while_head != NULL)
+#define IN_MACRO_EXPANSION          state.src_list.last->type == SRC_MACRO
+#define IN_WHILE_EXPANSION          state.src_list.last->type == SRC_WHILE
+#define IN_FILE_EXPANSION           state.src_list.last->type == SRC_FILE
 
 enum gpasmValTypes {
   VAL_CONSTANT,

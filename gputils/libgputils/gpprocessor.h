@@ -306,17 +306,17 @@ extern const struct proc_class proc_class_pic16e;    /* enhanced 16 bit devices 
 #define PROC_CLASS_PIC16            (&proc_class_pic16)
 #define PROC_CLASS_PIC16E           (&proc_class_pic16e)
 
-#define IS_EEPROM8                  (state.device.class == PROC_CLASS_EEPROM8)
-#define IS_EEPROM16                 (state.device.class == PROC_CLASS_EEPROM16)
-#define IS_PIC12_CORE               (state.device.class == PROC_CLASS_PIC12)
-#define IS_PIC12E_CORE              (state.device.class == PROC_CLASS_PIC12E)
-#define IS_PIC12I_CORE              (state.device.class == PROC_CLASS_PIC12I)
-#define IS_SX_CORE                  (state.device.class == PROC_CLASS_SX)
-#define IS_PIC14_CORE               (state.device.class == PROC_CLASS_PIC14)
-#define IS_PIC14E_CORE              (state.device.class == PROC_CLASS_PIC14E)
-#define IS_PIC14EX_CORE             (state.device.class == PROC_CLASS_PIC14EX)
-#define IS_PIC16_CORE               (state.device.class == PROC_CLASS_PIC16)
-#define IS_PIC16E_CORE              (state.device.class == PROC_CLASS_PIC16E)
+#define IS_EEPROM8                  state.device.class == PROC_CLASS_EEPROM8
+#define IS_EEPROM16                 state.device.class == PROC_CLASS_EEPROM16
+#define IS_PIC12_CORE               state.device.class == PROC_CLASS_PIC12
+#define IS_PIC12E_CORE              state.device.class == PROC_CLASS_PIC12E
+#define IS_PIC12I_CORE              state.device.class == PROC_CLASS_PIC12I
+#define IS_SX_CORE                  state.device.class == PROC_CLASS_SX
+#define IS_PIC14_CORE               state.device.class == PROC_CLASS_PIC14
+#define IS_PIC14E_CORE              state.device.class == PROC_CLASS_PIC14E
+#define IS_PIC14EX_CORE             state.device.class == PROC_CLASS_PIC14EX
+#define IS_PIC16_CORE               state.device.class == PROC_CLASS_PIC16
+#define IS_PIC16E_CORE              state.device.class == PROC_CLASS_PIC16E
 
 #define MAX_NAMES                   3          /* Maximum number of names a processor can have. */
 #define MAX_BADROM                  (1 * 2)    /* Maximum number of BADROM ranges a processor can be initialized with. */

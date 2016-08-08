@@ -334,7 +334,7 @@ select_processor(const char *Name)
       state.stBuiltin = gp_sym_push_table(state.stBuiltin, true);
       opcode_init(2);   /* Processor-specific. */
 
-      if ((!IS_PIC16_CORE) && (!IS_PIC16E_CORE)) {
+      if (!(IS_PIC16_CORE) && !(IS_PIC16E_CORE)) {
         opcode_init(3);   /* Special pseudo ops for 12 and 14 bit devices. */
       }
 

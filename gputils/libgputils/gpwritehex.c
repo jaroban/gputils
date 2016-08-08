@@ -175,9 +175,9 @@ static void
 _write_i_mem(enum formats Hex_format, enum mode_flags_e Mode, unsigned int Core_mask)
 {
   MemBlock_t   *m;
-  unsigned int  i;
-  unsigned int  j;
-  unsigned int  maximum;
+  int           i;
+  int           j;
+  int           maximum;
   uint8_t       byte;
 
   m = memory;

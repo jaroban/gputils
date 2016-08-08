@@ -1,3 +1,20 @@
+2016-08-08  Molnar Karoly  <molnarkaroly@users.sourceforge.net>
+  * config.h.in, include/stdhdr.h, configure, configure.ac,
+    gpasm/directive.c, gpasm/evaluate.c, gpasm/gpasm.h.in,
+    gpasm/lst.c, gpasm/parse.y, gpasm/processor.c, gputils/gpvo.c,
+    libgputils/gpdis.c, libgputils/gpprocessor.c,
+    libgputils/gpprocessor.h, libgputils/gptypes.h,
+    libgputils/gpwritehex.c:
+    The default compiler changed from gcc to clang. I corrected
+    several warnings which are not indicated the gcc.
+
+  * gpasm/util.c, gputils/block.c, gputils/dump.c,
+    libgputils/gpcoffgen.c:
+    Fixed some hidden error. (The gcc 5.6.1 has not given mark.)
+
+  * include/libiberty.h:
+    Code formatting.
+
 2016-08-07  Molnar Karoly  <molnarkaroly@users.sourceforge.net>
   * libgputils/gpcoffgen.c:
     Fixed this bug: "#289 1.5.0_RC1 void function should not return ..."

@@ -53,8 +53,9 @@ read_directory(FILE *Code_file)
   DirBlockInfo *dbi;
   unsigned int  next_dir_block;
 
-  head = NULL;
-  tail = NULL;
+  next_dir_block = 0;
+  head           = NULL;
+  tail           = NULL;
   do {
     dbi = GP_Malloc(sizeof(DirBlockInfo));
 

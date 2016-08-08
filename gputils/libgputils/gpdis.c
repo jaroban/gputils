@@ -209,7 +209,7 @@ gp_disassemble_find_labels(MemBlock_t *M, unsigned int Byte_address, pic_process
   unsigned int      prog_max_org;
   unsigned int      value;
   unsigned int      src_page;
-  unsigned int      dst_org;
+  int               dst_org;
   uint16_t          opcode;
   const insn_t     *instruction;
   enum common_insn  icode;
@@ -276,7 +276,7 @@ GPUTILS_GCC_DIAG_OFF(switch)
 
 _class_lit8c12:
 
-        if ((prog_max_org > 0) && (dst_org >= 0) && (dst_org <= prog_max_org)) {
+        if ((prog_max_org > 0) && (dst_org <= prog_max_org)) {
           dest_byte_addr = gp_processor_byte_from_insn_c(class, dst_org);
           gp_mem_b_set_addr_type(M, Byte_address, W_ADDR_T_BRANCH_SRC, dest_byte_addr);
           gp_mem_b_set_addr_type(M, dest_byte_addr, W_ADDR_T_FUNC, 0);
@@ -300,7 +300,7 @@ _class_lit8c12:
         /* The value of the PCLATH is known. */
         dst_org |= (pclath & 0xff) << 8;
 
-        if ((prog_max_org > 0) && (dst_org >= 0) && (dst_org <= prog_max_org)) {
+        if ((prog_max_org > 0) && (dst_org <= prog_max_org)) {
           dest_byte_addr = gp_processor_byte_from_insn_c(class, dst_org);
           gp_mem_b_set_addr_type(M, Byte_address, W_ADDR_T_BRANCH_SRC, dest_byte_addr);
           gp_mem_b_set_addr_type(M, dest_byte_addr, W_ADDR_T_FUNC, 0);
@@ -364,7 +364,7 @@ _class_lit8c12:
 
 _class_lit9:
 
-        if ((prog_max_org > 0) && (dst_org >= 0) && (dst_org <= prog_max_org)) {
+        if ((prog_max_org > 0) && (dst_org <= prog_max_org)) {
           dest_byte_addr = gp_processor_byte_from_insn_c(class, dst_org);
           gp_mem_b_set_addr_type(M, Byte_address, W_ADDR_T_BRANCH_SRC, dest_byte_addr);
           gp_mem_b_set_addr_type(M, dest_byte_addr, W_ADDR_T_FUNC, 0);
@@ -390,7 +390,7 @@ _class_lit9:
 
 _class_lit11:
 
-        if ((prog_max_org > 0) && (dst_org >= 0) && (dst_org <= prog_max_org)) {
+        if ((prog_max_org > 0) && (dst_org <= prog_max_org)) {
           dest_byte_addr = gp_processor_byte_from_insn_c(class, dst_org);
           type = (icode == ICODE_CALL) ? W_ADDR_T_FUNC : W_ADDR_T_LABEL;
           gp_mem_b_set_addr_type(M, Byte_address, W_ADDR_T_BRANCH_SRC, dest_byte_addr);
@@ -1145,11 +1145,12 @@ GPUTILS_GCC_DIAG_OFF(switch)
       /* PIC16E movff */
       if ((class->i_memory_get(M, Byte_address + 2, &file2, NULL, NULL) == W_USED_ALL) &&
           ((file2 & PIC16E_BMSK_SEC_INSN_WORD) == PIC16E_BMSK_SEC_INSN_WORD)) {
-        args.first.val  = opcode & 0x0fff;
-        args.first.offs = 0;
-        args.second.val = file2 & 0x0fff;
-        args.first.arg  = gp_register_find_reg_name(Fstate->proc_regs, args.first.val);
-        args.second.arg = gp_register_find_reg_name(Fstate->proc_regs, args.second.val);
+        args.first.val   = opcode & 0x0fff;
+        args.first.offs  = 0;
+        args.second.val  = file2 & 0x0fff;
+        args.second.offs = 0;
+        args.first.arg   = gp_register_find_reg_name(Fstate->proc_regs, args.first.val);
+        args.second.arg  = gp_register_find_reg_name(Fstate->proc_regs, args.second.val);
 
         if (args.first.arg == NULL) {
           args.first.arg = gp_processor_find_sfr_name(class, args.first.val);
@@ -1842,7 +1843,7 @@ gp_disassemble(MemBlock_t *M, unsigned int Byte_address, proc_class_t Class, uns
   unsigned int      prog_max_org;
   unsigned int      type;
   const char       *dest_name;
-  unsigned int      org;
+  int               org;
   unsigned int      num_words = 1;
   uint16_t          file1;
   uint16_t          file2;
@@ -2044,7 +2045,7 @@ GPUTILS_GCC_DIAG_OFF(switch)
       if (Behavior & GPDIS_SHOW_ALL_BRANCH) {
         PRINT_ARG1_N(addr_digits, org);
       }
-      else if ((prog_max_org > 0) && (org >= 0) && (org <= prog_max_org)) {
+      else if ((prog_max_org > 0) && (org <= prog_max_org)) {
         /* The target address exist. */
         if (dest_name != NULL) {
           PRINT_ARG1_S(dest_name, 0);
@@ -2068,7 +2069,7 @@ GPUTILS_GCC_DIAG_OFF(switch)
       if (Behavior & GPDIS_SHOW_ALL_BRANCH) {
         PRINT_ARG1_N(addr_digits, org);
       }
-      else if ((prog_max_org > 0) && (org >= 0) && (org <= prog_max_org)) {
+      else if ((prog_max_org > 0) && (org <= prog_max_org)) {
         /* The target address exist. */
         if (dest_name != NULL) {
           PRINT_ARG1_S(dest_name, 0);
@@ -2092,7 +2093,7 @@ GPUTILS_GCC_DIAG_OFF(switch)
       if (Behavior & GPDIS_SHOW_ALL_BRANCH) {
         PRINT_ARG1_N(addr_digits, org);
       }
-      else if ((prog_max_org > 0) && (org >= 0) && (org <= prog_max_org)) {
+      else if ((prog_max_org > 0) && (org <= prog_max_org)) {
         /* The target address exist. */
         if (dest_name != NULL) {
           PRINT_ARG1_S(dest_name, 0);
@@ -2116,7 +2117,7 @@ GPUTILS_GCC_DIAG_OFF(switch)
       if (Behavior & GPDIS_SHOW_ALL_BRANCH) {
         PRINT_ARG1_N(addr_digits, org);
       }
-      else if ((prog_max_org > 0) && (org >= 0) && (org <= prog_max_org)) {
+      else if ((prog_max_org > 0) && (org <= prog_max_org)) {
         /* The target address exist. */
         PRINT_ARG1_N(addr_digits, org);
       }

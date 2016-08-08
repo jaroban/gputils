@@ -203,12 +203,12 @@ set_label(const char *Label, pnode_t *Parms)
   gpasmVal value = 0;
 
   if (asm_enabled()) {
-    if ((state.mode == MODE_RELOCATABLE) && !IN_MACRO_WHILE_DEFINITION &&
+    if ((state.mode == MODE_RELOCATABLE) && !(IN_MACRO_WHILE_DEFINITION) &&
         !(SECTION_FLAGS & (STYP_TEXT | STYP_RAM_AREA | STYP_BPACK)))
       gpmsg_verror(GPE_LABEL_IN_SECTION, NULL);
 
     value = do_or_append_insn("set", Parms);
-    if (!IN_MACRO_WHILE_DEFINITION) {
+    if (!(IN_MACRO_WHILE_DEFINITION)) {
       set_global(Label, value, VAL_VARIABLE, false, false);
     }
   }
@@ -230,8 +230,8 @@ next_line(int Value)
     lst_format_line(ctx->curr_src_line.line, Value);
   }
 
-  if (IN_WHILE_EXPANSION || IN_MACRO_EXPANSION) {
-    if (!IN_WHILE_DEFINITION && state.lst.expand &&
+  if ((IN_WHILE_EXPANSION) || (IN_MACRO_EXPANSION)) {
+    if (!(IN_WHILE_DEFINITION) && state.lst.expand &&
         (state.pass == 2) &&
         (state.lst.line.linetype != LTY_DOLIST_DIR) &&
         (state.lst.line.linetype != LTY_NOLIST_DIR)) {
@@ -258,12 +258,12 @@ next_line(int Value)
     }
   }
   else if (IN_FILE_EXPANSION) {
-    if (!IN_WHILE_DEFINITION && (state.pass == 2) &&
+    if (!(IN_WHILE_DEFINITION) && (state.pass == 2) &&
         (state.lst.line.linetype != LTY_DOLIST_DIR) &&
         (state.lst.line.linetype != LTY_NOLIST_DIR)) {
       lst_format_line(ctx->curr_src_line.line, Value);
 
-      if (!IN_MACRO_WHILE_DEFINITION) {
+      if (!(IN_MACRO_WHILE_DEFINITION)) {
         preproc_emit();
       }
     }
@@ -323,7 +323,7 @@ next_line(int Value)
 void
 yyerror(const char *Message)
 {
-  if (!IN_MACRO_WHILE_DEFINITION) {
+  if (!(IN_MACRO_WHILE_DEFINITION)) {
     /* throw error if not in macro definition */
     gpmsg_verror(GPE_PARSER, NULL, Message);
   }
@@ -539,7 +539,7 @@ line:
 
               state.mac_head = NULL;
             }
-            else if (!IN_MACRO_WHILE_DEFINITION) {
+            else if (!(IN_MACRO_WHILE_DEFINITION)) {
               /* Outside a macro definition, just define the label. */
               switch (state.lst.line.linetype) {
                 case LTY_SEC:
@@ -558,7 +558,7 @@ line:
                 case LTY_INSN:
                 case LTY_DATA:
                 case LTY_RES: {
-                  if ((state.mode == MODE_RELOCATABLE) && !IN_MACRO_WHILE_DEFINITION &&
+                  if ((state.mode == MODE_RELOCATABLE) && !(IN_MACRO_WHILE_DEFINITION) &&
                       !(SECTION_FLAGS & (STYP_TEXT | STYP_RAM_AREA | STYP_BPACK))) {
                     gpmsg_verror(GPE_LABEL_IN_SECTION, NULL);
                   }
@@ -633,7 +633,7 @@ decimal_ops: ERRORLEVEL | DEBUG_LINE;
 statement:
         '\n'
         {
-          if (!IN_MACRO_WHILE_DEFINITION) {
+          if (!(IN_MACRO_WHILE_DEFINITION)) {
             $$ = (IS_RAM_ORG) ? state.byte_addr :
                                 /* We want to have r as the value to assign to label. */
                                 gp_processor_insn_from_byte_p(state.processor, state.byte_addr);
@@ -709,7 +709,7 @@ statement:
           int number;
           int i;
 
-          if (!IN_MACRO_WHILE_DEFINITION) {
+          if (!(IN_MACRO_WHILE_DEFINITION)) {
             number = eval_fill_number($5);
 
             for (i = 0; i < number; i++) {
@@ -726,7 +726,7 @@ statement:
           int number;
           int i;
 
-          if (!IN_MACRO_WHILE_DEFINITION) {
+          if (!(IN_MACRO_WHILE_DEFINITION)) {
             number = eval_fill_number($6);
 
             for (i = 0; i < number; i++) {
@@ -740,7 +740,7 @@ statement:
         |
         CBLOCK expr '\n'
         {
-          if (!IN_MACRO_WHILE_DEFINITION) {
+          if (!(IN_MACRO_WHILE_DEFINITION)) {
             begin_cblock($2);
           }
           else {
@@ -760,7 +760,7 @@ statement:
         |
         CBLOCK '\n'
         {
-          if (!IN_MACRO_WHILE_DEFINITION) {
+          if (!(IN_MACRO_WHILE_DEFINITION)) {
             continue_cblock();
           }
           else {
@@ -806,7 +806,7 @@ const_line:
         |
         LABEL '\n'
         {
-          if (!IN_MACRO_WHILE_DEFINITION) {
+          if (!(IN_MACRO_WHILE_DEFINITION)) {
             state.lst.cblock_lst = state.cblock;
             cblock_expr(mk_symbol($1));
           }
@@ -817,7 +817,7 @@ const_line:
         |
         LABEL expr '\n'
         {
-          if (!IN_MACRO_WHILE_DEFINITION) {
+          if (!(IN_MACRO_WHILE_DEFINITION)) {
             state.lst.cblock_lst = state.cblock;
             cblock_expr_incr(mk_symbol($1), $2);
           }
@@ -839,14 +839,14 @@ const_def_list:
 const_def:
         cidentifier
         {
-          if (!IN_MACRO_WHILE_DEFINITION) {
+          if (!(IN_MACRO_WHILE_DEFINITION)) {
             cblock_expr($1);
           }
         }
         |
         cidentifier ':' expr
         {
-          if (!IN_MACRO_WHILE_DEFINITION) {
+          if (!(IN_MACRO_WHILE_DEFINITION)) {
             cblock_expr_incr($1, $3);
           }
         }

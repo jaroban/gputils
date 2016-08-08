@@ -807,6 +807,7 @@ _lsymbols_max_length(FILE *Code_file, const DirBlockInfo *Main_dir)
   unsigned int length;
   unsigned int max_length;
 
+  max_length  = 0;
   start_block = gp_getu16(&Main_dir->dir[COD_DIR_LSYMTAB]);
 
   if (start_block != 0) {

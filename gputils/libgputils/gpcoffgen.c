@@ -766,6 +766,7 @@ gp_coffgen_make_symbol_array(const gp_object_t *Object, int (*Cmp)(const void *,
 
   array = (gp_symbol_t **)GP_Malloc(Object->symbol_list.num_nodes * sizeof(gp_symbol_t *));
 
+  i      = 0;
   symbol = Object->symbol_list.first;
   while (symbol != NULL) {
     array[i] = symbol;

@@ -123,13 +123,29 @@ Boston, MA 02111-1307, USA.  */
 
 #ifndef HAVE_STRNCASECMP
   #ifdef HAVE_STRNICMP
-    #define strncasecmp strnicmp
+    #define strncasecmp         strnicmp
   #endif
+#endif
+
+#ifndef HAVE_VSNPRINTF
+/* No system vsnprintf and vasprintf: Use the one implemented in libiberty. */
+extern int vsnprintf(char *s, size_t n, const char *format, va_list args);
+extern int vasprintf(char **result, const char *format, va_list args);
+#endif
+
+#ifndef HAVE_SNPRINTF
+/* No system snprintf: Use the one implemented in libiberty. */
+extern int snprintf(char *s, size_t n, const char *format, ...);
 #endif
 
 #ifndef HAVE_STRNDUP
 /* No system strndup: Use the one implemented in libiberty. */
-char *strndup(const char *s, size_t n);
+extern char *strndup(const char *s, size_t n);
+#endif
+
+#ifndef HAVE_STRVERSCMP
+/* No system strverscmp: Use the one implemented in libiberty. */
+extern int strverscmp(const char *s1, const char *s2);
 #endif
 
 #include <time.h>
@@ -146,7 +162,7 @@ char *strndup(const char *s, size_t n);
   #define PATH_SEPARATOR_STR    "/"
 #endif
 
-#define GPUTILS_COPYRIGHT_STRING "Copyright (c) 1998-2016 gputils project"
+#define GPUTILS_COPYRIGHT_STRING        "Copyright (c) 1998-2016 gputils project"
 
 #if ((__GNUC__ * 100) + __GNUC_MINOR__) >= 402
   #define GPUTILS_GCC_STR(s)            #s

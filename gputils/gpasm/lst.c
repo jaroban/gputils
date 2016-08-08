@@ -42,8 +42,8 @@ Boston, MA 02111-1307, USA.  */
 #define STRINGIFY(s)                    _str(s)
 #define _str(s)                         #s
 
-#define IS_EEPROM                       (IS_EEPROM8 || IS_EEPROM16)
-#define IS_BYTE                         (IS_PIC16E_CORE || IS_EEPROM)
+#define IS_EEPROM                       ((IS_EEPROM8) || (IS_EEPROM16))
+#define IS_BYTE                         ((IS_PIC16E_CORE) || (IS_EEPROM))
 
 #define MEM_USED_CHAR                   'X'
 #define MEM_UNUSED_CHAR                 '-'
@@ -892,7 +892,7 @@ lst_memory_map(MemBlock_t *M)
       }
 
       if (row_is_used) {
-        if (state.show_full_addr && IS_PIC16E_CORE) {
+        if (state.show_full_addr && (IS_PIC16E_CORE)) {
           /* Gpasm mode: Print all address digits. */
           _lst_printf("%0*X :", addr_digits, (i + base));
         }
@@ -924,13 +924,13 @@ lst_memory_map(MemBlock_t *M)
   /* it seems that MPASM includes config bytes into program memory usage
    * count for 16 bit cores. See gpasm testsuite:
    * gpasm/testsuite/gpasm.mchip/listfiles/configX.lst */
-#define IS_PIC16  (IS_PIC16_CORE || IS_PIC16E_CORE)
+#define IS_PIC16        (IS_PIC16_CORE) || (IS_PIC16E_CORE)
 
   if (IS_EEPROM) {
     lst_line("Memory Bytes Used: %5i", gp_mem_b_used(state.i_memory));
   }
   else {
-    used = gp_processor_insn_from_byte_p(state.processor, ((!IS_PIC16) && (state.processor != NULL)) ?
+    used = gp_processor_insn_from_byte_p(state.processor, (!(IS_PIC16) && (state.processor != NULL)) ?
                         b_range_memory_used(state.i_memory, 0,
                                             gp_processor_byte_from_insn_c(state.device.class,
                                                                           state.processor->prog_mem_size)) :
@@ -973,7 +973,7 @@ lst_format_line(const char *Src_line, unsigned int Value)
   emitted       = 0;
   emitted_lines = 0;
   bytes_emitted = 0;
-  addr_fmt      = IS_PIC16E_CORE ? "%06X " : (IS_EEPROM ? "%04X " : "%04X   ");
+  addr_fmt      = (IS_PIC16E_CORE) ? "%06X " : (IS_EEPROM ? "%04X " : "%04X   ");
   pos           = 0;
   m             = state.i_memory;
 

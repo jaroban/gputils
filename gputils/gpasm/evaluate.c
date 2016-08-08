@@ -787,14 +787,14 @@ _same_section(const pnode_t *Pnode)
     Pnode = PnUnOpP0(Pnode);
   }
 
-  if (!PnIsBinOp(Pnode) || (PnBinOpOp(Pnode) != '-') || (eval_count_reloc(PnBinOpP0(Pnode)) != 1)) {
+  if (!(PnIsBinOp(Pnode)) || (PnBinOpOp(Pnode) != '-') || (eval_count_reloc(PnBinOpP0(Pnode)) != 1)) {
     return false;
   }
 
   p0 = PnBinOpP0(Pnode);
   p1 = PnBinOpP1(Pnode);
 
-  if (!PnIsSymbol(p0) || !PnIsSymbol(p1)) {
+  if (!(PnIsSymbol(p0)) || !(PnIsSymbol(p1))) {
     return false;
   }
 

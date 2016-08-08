@@ -434,7 +434,7 @@ _coff_type(unsigned int Type, char *Buffer, size_t Sizeof_buffer)
   }
 
   if (str != NULL) {
-    snprintf(Buffer, Sizeof_buffer, str);
+    snprintf(Buffer, Sizeof_buffer, "%s", str);
   }
   else {
     snprintf(Buffer, Sizeof_buffer, "unknown(%u)", Type);

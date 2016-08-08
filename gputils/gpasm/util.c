@@ -103,7 +103,7 @@ string_to_int(const char *String, int Radix)
   char  buf[80];
 
   value = _strtoi(String, &endptr, Radix);
-  if ((endptr == NULL) || ((ch = *endptr) != '\0')) {
+  if ((endptr != NULL) && ((ch = *endptr) != '\0')) {
     snprintf(buf, sizeof(buf),
              isprint(ch) ? "Illegal character '%c' in numeric constant." :
                            "Illegal character %#x in numeric constant.",

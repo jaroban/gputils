@@ -1730,7 +1730,7 @@ gp_processor_set_ibank(proc_class_t Class, unsigned int Num_banks, unsigned int 
 unsigned int
 gp_processor_retlw(proc_class_t Class)
 {
-  assert(Class->retlw >= 0);
+  assert(Class->retlw > 0);
   return Class->retlw;
 }
 
@@ -3037,20 +3037,20 @@ _find_insn_pic16e(proc_class_t Class, unsigned int Opcode)
 static int
 _core_sfr_cmp(const void *P0, const void *P1)
 {
-  const core_sfr_t *s0 = (const core_sfr_t *)P0;
-  const core_sfr_t *s1 = (const core_sfr_t *)P1;
-  unsigned int      address0 = s0->address;
-  unsigned int      address1 = s1->address;
+  const core_sfr_t *sfr0     = (const core_sfr_t *)P0;
+  const core_sfr_t *sfr1     = (const core_sfr_t *)P1;
+  unsigned int      address0 = sfr0->address;
+  unsigned int      address1 = sfr1->address;
 
   if (address0 < address1) {
     return -1;
   }
-  else if (address0 > address1) {
+
+  if (address0 > address1) {
     return 1;
   }
-  else {
-    return 0;
-  }
+
+  return 0;
 }
 
 /*------------------------------------------------------------------------------------------------*/

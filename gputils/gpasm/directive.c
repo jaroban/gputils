@@ -291,10 +291,10 @@ _check_write(uint16_t Value)
   class       = state.device.class;
   addr_digits = class->addr_digits;
 
-  if (IS_PIC16_CORE && (state.byte_addr > 0x1ffff)) {
+  if ((IS_PIC16_CORE) && (state.byte_addr > 0x1ffff)) {
     gpmsg_verror(GPE_ADDROVF, "Address{0x%0*X}", addr_digits, state.byte_addr);
   }
-  else if ((!IS_PIC16E_CORE) && ((state.byte_addr & 0x1ffff) == 0) && ((int)state.byte_addr > 0)) {
+  else if (!(IS_PIC16E_CORE) && ((state.byte_addr & 0x1ffff) == 0) && ((int)state.byte_addr > 0)) {
     /* We cast state.byte_addr to signed int on purpose to repeat a bug from
        MPASM 5.34 and pass tb.asm testcase. */
     gpmsg_error(GPE_ADDROVF, "Address wrapped around 0.");
@@ -438,10 +438,10 @@ _emit_byte(uint16_t Value, const char *Name)
     }
 
     if (!IS_RAM_ORG) {
-      if (IS_PIC16_CORE && (state.byte_addr > 0x1ffff)) {
+      if ((IS_PIC16_CORE) && (state.byte_addr > 0x1ffff)) {
         gpmsg_verror(GPE_ADDROVF, "Address{0x%0*X} > 0x1ffff", addr_digits, state.byte_addr);
       }
-      else if ((!IS_PIC16E_CORE) && ((state.byte_addr & 0x1ffff) == 0) && ((int)state.byte_addr > 0)) {
+      else if (!(IS_PIC16E_CORE) && ((state.byte_addr & 0x1ffff) == 0) && ((int)state.byte_addr > 0)) {
         gpmsg_error(GPE_ADDROVF, "Address wrapped around 0.");
       }
 
@@ -503,7 +503,7 @@ _off_or_on(pnode_t *Pnode)
   int had_error = false;
   int ret = false;
 
-  if (!PnIsSymbol(Pnode)) {
+  if (!(PnIsSymbol(Pnode))) {
     had_error = true;
   }
   else if (strcasecmp(PnSymbol(Pnode), "off") == 0) {
@@ -549,7 +549,7 @@ _emit_data(pnode_t *List, unsigned int Char_shift, const char *Name)
     if (PnIsString(p)) {
       pc = PnString(p);
 
-      if (IS_PIC16E_CORE && !(SECTION_FLAGS & (STYP_DATA | STYP_BPACK))) {
+      if ((IS_PIC16E_CORE) && !(SECTION_FLAGS & (STYP_DATA | STYP_BPACK))) {
         /* Special case of PIC16E strings in code. */
         for (n = 0; *pc != '\0'; ++n) {
           pc = convert_escape_chars(pc, &value);
@@ -647,7 +647,7 @@ static gp_boolean
 _macro_parms_simple(pnode_t *Parms)
 {
   while (Parms != NULL) {
-    if (!PnIsSymbol(PnListHead(Parms))) {
+    if (!(PnIsSymbol(PnListHead(Parms)))) {
       gpmsg_error(GPE_ILLEGAL_ARGU, "Illegal argument.");
       return false;
     }
@@ -808,7 +808,7 @@ _do_assume(gpasmVal Value, const char *Name, int Arity, pnode_t *Parms)
       else if (num_reloc != 1) {
         gpmsg_verror(GPE_UNRESOLVABLE, "\"%s\"", Name);
       }
-      else if (IS_PIC12E_CORE || IS_PIC12I_CORE) {
+      else if ((IS_PIC12E_CORE) || (IS_PIC12I_CORE)) {
         address            = _eval_update_reloc_value(p, RELOC_MOVLB, false);
         state.assumed_bank = gp_processor_bank_addr(proc, address);
       }
@@ -1052,7 +1052,7 @@ _do_bankisel(gpasmVal Value, const char *Name, int Arity, pnode_t *Parms)
     return Value;
   }
 
-  if (((!IS_PIC14_CORE) && (!IS_PIC14E_CORE) && (!IS_PIC14EX_CORE) && (!IS_PIC16_CORE)) ||
+  if ((!(IS_PIC14_CORE) && !(IS_PIC14E_CORE) && !(IS_PIC14EX_CORE) && !(IS_PIC16_CORE)) ||
       (state.processor->num_banks == 1)) {
     state.lst.line.linetype = LTY_NONE;
     if (!state.mpasm_compatible) {
@@ -1093,7 +1093,7 @@ _do_bankisel(gpasmVal Value, const char *Name, int Arity, pnode_t *Parms)
       else {
         eval_reloc_evaluate(p, RELOC_IBANKSEL, NULL, NULL, true);
 
-        if (IS_PIC14E_CORE || IS_PIC14EX_CORE) {
+        if ((IS_PIC14E_CORE) || (IS_PIC14EX_CORE)) {
           mask_end = state.processor->num_banks << PIC14_BANK_SHIFT;
           for (mask = 0x100; mask < mask_end; mask <<= 1) {
             _emit(0, Name);
@@ -1175,7 +1175,7 @@ _do_banksel(gpasmVal Value, const char *Name, int Arity, pnode_t *Parms)
       else if (num_reloc != 1) {
         gpmsg_verror(GPE_UNRESOLVABLE, "\"%s\"", Name);
       }
-      else if (IS_PIC12E_CORE || IS_PIC12I_CORE) {
+      else if ((IS_PIC12E_CORE) || (IS_PIC12I_CORE)) {
         address  = _eval_update_reloc_value(p, RELOC_MOVLB, true);
         bank     = gp_processor_bank_from_addr(class, address);
         bank_var = true;
@@ -1304,7 +1304,7 @@ _do_code_pack(gpasmVal Value, const char *Name, int Arity, pnode_t *Parms)
     return Value;
   }
 
-  if (!IS_PIC16E_CORE) {
+  if (!(IS_PIC16E_CORE)) {
     gpmsg_error(GPE_UNKNOWN, "code_pack is only supported on 16bit cores.");
     return Value;
   }
@@ -1414,7 +1414,7 @@ static MemBlock_t *
 _find_conf_sec_mem(unsigned int Ca)
 {
   const conf_mem_block_t *p;
-  int                     ba = (IS_PIC16_CORE || IS_PIC16E_CORE) ? Ca : (Ca - (Ca & 1));
+  int                     ba = ((IS_PIC16_CORE) || (IS_PIC16E_CORE)) ? Ca : (Ca - (Ca & 1));
 
   for (p = state.conf_sec_mem; p != NULL; p = p->next) {
     if (p->addr == ba) {
@@ -1432,7 +1432,7 @@ _add_conf_sec_mem(unsigned int Ca, gp_boolean New_config)
 {
   conf_mem_block_t *new = GP_Calloc(1, sizeof(conf_mem_block_t));
 
-  new->addr       = ((IS_PIC16_CORE || IS_PIC16E_CORE) && New_config) ? Ca : (Ca & ~1);
+  new->addr       = (((IS_PIC16_CORE) || (IS_PIC16E_CORE)) && New_config) ? Ca : (Ca & ~1);
   new->m          = gp_mem_i_create();
   new->new_config = New_config;
 
@@ -1558,7 +1558,7 @@ _do_config(gpasmVal Value, const char *Name, int Arity, pnode_t *Parms)
         gpmsg_warning(GPW_EXPECTED, "18cxxx devices should specify __CONFIG address.");
       }
 
-      if (IS_PIC14E_CORE || IS_PIC14EX_CORE) {
+      if ((IS_PIC14E_CORE) || (IS_PIC14EX_CORE)) {
         gpmsg_warning(GPW_EXPECTED, "Enhanced 16cxxx devices should specify __CONFIG address.");
       }
 
@@ -1603,7 +1603,7 @@ _do_config(gpasmVal Value, const char *Name, int Arity, pnode_t *Parms)
     else {
       /* Don't complain for 14 bit enhanced devices.
          Why are the config words 16 bits long in headers?? */
-      if ((!IS_PIC14E_CORE) && (!IS_PIC14EX_CORE)) {
+      if (!(IS_PIC14E_CORE) && !(IS_PIC14EX_CORE)) {
         if (value > class->core_mask) {
           gpmsg_vmessage(GPM_OUT_OF_RANGE, NULL, value);
           value &= class->core_mask;
@@ -1691,7 +1691,7 @@ _do_16_config(gpasmVal Value, const char *Name, int Arity, const pnode_t *Parms)
   }
 
   /* validate argument format */
-  if ((Parms == NULL) || !PnIsBinOp(Parms) || (PnBinOpOp(Parms) != '=')) {
+  if ((Parms == NULL) || !(PnIsBinOp(Parms)) || (PnBinOpOp(Parms) != '=')) {
     gpmsg_error(GPE_CONFIG_UNKNOWN, "Incorrect syntax. Use 'CONFIG KEY = VALUE'");
     return Value;
   }
@@ -1700,7 +1700,7 @@ _do_16_config(gpasmVal Value, const char *Name, int Arity, const pnode_t *Parms)
   k = PnBinOpP0(Parms);
   v = PnBinOpP1(Parms);
 
-  if (!PnIsSymbol(k) || (!PnIsSymbol(v) && !PnIsConstant(v))) {
+  if (!(PnIsSymbol(k)) || (!(PnIsSymbol(v)) && !(PnIsConstant(v)))) {
     gpmsg_error(GPE_CONFIG_UNKNOWN, "Incorrect syntax. Use 'CONFIG KEY = VALUE'");
     return Value;
   }
@@ -1708,7 +1708,7 @@ _do_16_config(gpasmVal Value, const char *Name, int Arity, const pnode_t *Parms)
   /* grab string representations */
   k_str = PnSymbol(k);
 
-  if (!PnIsConstant(v)) {
+  if (!(PnIsConstant(v))) {
     v_str = PnSymbol(v);
   }
   else {
@@ -1873,7 +1873,7 @@ _do_12_14_config(gpasmVal Value, const char *Name, int Arity, const pnode_t *Par
   }
 
   /* validate argument format */
-  if ((Parms == NULL) || !PnIsBinOp(Parms) || (PnBinOpOp(Parms) != '=')) {
+  if ((Parms == NULL) || !(PnIsBinOp(Parms)) || (PnBinOpOp(Parms) != '=')) {
     gpmsg_error(GPE_CONFIG_UNKNOWN, "Incorrect syntax. Use 'CONFIG KEY = VALUE'");
     return Value;
   }
@@ -1882,7 +1882,7 @@ _do_12_14_config(gpasmVal Value, const char *Name, int Arity, const pnode_t *Par
   k = PnBinOpP0(Parms);
   v = PnBinOpP1(Parms);
 
-  if (!PnIsSymbol(k) || (!PnIsSymbol(v) && !PnIsConstant(v))) {
+  if (!(PnIsSymbol(k)) || (!(PnIsSymbol(v)) && !(PnIsConstant(v)))) {
     gpmsg_error(GPE_CONFIG_UNKNOWN, "Incorrect syntax. Use 'CONFIG KEY = VALUE'");
     return Value;
   }
@@ -1890,7 +1890,7 @@ _do_12_14_config(gpasmVal Value, const char *Name, int Arity, const pnode_t *Par
   /* grab string representations */
   k_str = PnSymbol(k);
 
-  if (!PnIsConstant(v)) {
+  if (!(PnIsConstant(v))) {
     v_str = PnSymbol(v);
   }
   else {
@@ -1978,7 +1978,7 @@ _do_gpasm_config(gpasmVal Value, const char *Name, int Arity, pnode_t *Parms)
 
   if (state.mpasm_compatible) {
     /* The MPASM(X) compatible mode valid only for 16 bit devices. */
-    if ((!IS_PIC16_CORE) && (!IS_PIC16E_CORE)) {
+    if (!(IS_PIC16_CORE) && !(IS_PIC16E_CORE)) {
       snprintf(buf, sizeof(buf),
                "CONFIG Directive Error: Processor \"%s\" is invalid for CONFIG directive in MPASM(X) mode.",
                state.processor->names[2]);
@@ -1991,9 +1991,9 @@ _do_gpasm_config(gpasmVal Value, const char *Name, int Arity, pnode_t *Parms)
   }
   else {
     /* The gpasm compatible mode valid all PIC devices. */
-    if ((!IS_PIC16_CORE) && (!IS_PIC16E_CORE) &&
-        (!IS_PIC14_CORE) && (!IS_PIC14E_CORE) && (!IS_PIC14EX_CORE) &&
-        (!IS_PIC12_CORE) && (!IS_PIC12E_CORE) && (!IS_PIC12I_CORE)) {
+    if (!(IS_PIC16_CORE) && !(IS_PIC16E_CORE) &&
+        !(IS_PIC14_CORE) && !(IS_PIC14E_CORE) && !(IS_PIC14EX_CORE) &&
+        !(IS_PIC12_CORE) && !(IS_PIC12E_CORE) && !(IS_PIC12I_CORE)) {
       snprintf(buf, sizeof(buf),
                "CONFIG Directive Error: Processor \"%s\" is invalid for CONFIG directive.",
                state.processor->names[2]);
@@ -2005,7 +2005,7 @@ _do_gpasm_config(gpasmVal Value, const char *Name, int Arity, pnode_t *Parms)
   for (; Parms != NULL; Parms = PnListTail(Parms)) {
     p = PnListHead(Parms);
 
-    if (IS_PIC16_CORE || IS_PIC16E_CORE) {
+    if ((IS_PIC16_CORE) || (IS_PIC16E_CORE)) {
       _do_16_config(Value, Name, Arity, p);
     }
     else {
@@ -2038,7 +2038,7 @@ _do_da(gpasmVal Value, const char *Name, int Arity, pnode_t *Parms)
     return Value;
   }
 
-  char_shift = (IS_PIC14_CORE || IS_PIC14E_CORE || IS_PIC14EX_CORE) ? 7 : 8;
+  char_shift = ((IS_PIC14_CORE) || (IS_PIC14E_CORE) || (IS_PIC14EX_CORE)) ? 7 : 8;
 
   if ((state.mode == MODE_RELOCATABLE) && (SECTION_FLAGS & (STYP_DATA | STYP_BPACK))) {
     /* This is a data memory not program. */
@@ -2125,7 +2125,7 @@ _do_db(gpasmVal Value, const char *Name, int Arity, pnode_t *Parms)
 
   L = Parms;
 
-  if (IS_PIC16E_CORE || (SECTION_FLAGS & STYP_DATA)) {
+  if ((IS_PIC16E_CORE) || (SECTION_FLAGS & STYP_DATA)) {
     begin_byte_addr = state.byte_addr;
 
     for (; L != NULL; L = PnListTail(L)) {
@@ -2172,7 +2172,7 @@ _do_db(gpasmVal Value, const char *Name, int Arity, pnode_t *Parms)
         }
       }
     }
-  } /* if (IS_PIC16E_CORE || (SECTION_FLAGS & STYP_DATA)) */
+  } /* if ((IS_PIC16E_CORE) || (SECTION_FLAGS & STYP_DATA)) */
   else {
     v = 0;
     n = 0;
@@ -2228,7 +2228,7 @@ _do_db(gpasmVal Value, const char *Name, int Arity, pnode_t *Parms)
 
         ++n;
 
-        if (!PnIsString(p) || (*pc == '\0')) {
+        if (!(PnIsString(p)) || (*pc == '\0')) {
           L = PnListTail(L);
           break;
         }
@@ -2469,7 +2469,7 @@ _do_define(gpasmVal Value, const char *Name, int Arity, pnode_t *Parms)
     p = PnListHead(Parms);
     assert(PnIsString(p));
 
-    if (asm_enabled() && !IN_MACRO_WHILE_DEFINITION) {
+    if (asm_enabled() && !(IN_MACRO_WHILE_DEFINITION)) {
       if (gp_sym_get_symbol(state.stDefines, PnString(p)) != NULL) {
         gpmsg_verror(GPE_DUPLAB, NULL, PnString(p));
       }
@@ -2705,7 +2705,7 @@ _do_dtm(gpasmVal Value, const char *Name, int Arity, pnode_t *Parms)
   s = gp_sym_get_symbol(state.stBuiltin, "movlw");
   i = gp_sym_get_symbol_annotation(s);
 
-  if ((!IS_PIC14E_CORE) && (!IS_PIC14EX_CORE)) {
+  if (!(IS_PIC14E_CORE) && !(IS_PIC14EX_CORE)) {
     gpmsg_verror(GPE_ILLEGAL_DIR, NULL, Name);
   }
 
@@ -2843,7 +2843,7 @@ _do_endm(gpasmVal Value, const char *Name, int Arity, pnode_t *Parms)
   state.lst.line.linetype = LTY_DIR;
   state.preproc.do_emit   = false;
 
-  if (!IN_MACRO_WHILE_DEFINITION) {
+  if (!(IN_MACRO_WHILE_DEFINITION)) {
     gpmsg_verror(GPE_UNMATCHED_ENDM, NULL);
   }
   else {
@@ -2867,7 +2867,7 @@ _do_endw(gpasmVal Value, const char *Name, int Arity, pnode_t *Parms)
   state.lst.line.linetype = LTY_NOLIST_DIR;
   assert(state.mac_head == NULL);
 
-  if (!IN_MACRO_WHILE_DEFINITION) {
+  if (!(IN_MACRO_WHILE_DEFINITION)) {
     gpmsg_error(GPE_ILLEGAL_COND, "Illegal condition: \"ENDW\"");
   }
   else if (eval_maybe_evaluate(state.while_head->parms)) {
@@ -3535,7 +3535,7 @@ _do_16_idlocs(gpasmVal Value, const char *Name, int Arity, pnode_t *Parms)
     return Value;
   }
 
-  if (!IS_PIC16E_CORE) {
+  if (!(IS_PIC16E_CORE)) {
     gpmsg_error(GPE_IDLOCS_P16E, NULL);
     return Value;
   }
@@ -3753,7 +3753,7 @@ _do_ifdef(gpasmVal Value, const char *Name, int Arity, pnode_t *Parms)
     if (eval_enforce_arity(Arity, 1)) {
       p = PnListHead(Parms);
 
-      if (!PnIsSymbol(p)) {
+      if (!(PnIsSymbol(p))) {
         gpmsg_error(GPE_ILLEGAL_LABEL, "Illegal label.");
       }
       else if ((gp_sym_get_symbol(state.stDefines, PnSymbol(p)) != NULL) ||
@@ -3795,7 +3795,7 @@ _do_elifdef(gpasmVal Value, const char *Name, int Arity, pnode_t *Parms)
     if (eval_enforce_arity(Arity, 1)) {
       p = PnListHead(Parms);
 
-      if (!PnIsSymbol(p)) {
+      if (!(PnIsSymbol(p))) {
         gpmsg_error(GPE_ILLEGAL_LABEL, "Illegal label.");
       }
       else if ((gp_sym_get_symbol(state.stDefines, PnSymbol(p)) != NULL) ||
@@ -3830,7 +3830,7 @@ _do_ifndef(gpasmVal Value, const char *Name, int Arity, pnode_t *Parms)
     if (eval_enforce_arity(Arity, 1)) {
       p = PnListHead(Parms);
 
-      if (!PnIsSymbol(p)) {
+      if (!(PnIsSymbol(p))) {
         gpmsg_error(GPE_ILLEGAL_LABEL, "Illegal label.");
       }
       else if ((gp_sym_get_symbol(state.stDefines, PnSymbol(p)) == NULL) &&
@@ -3872,7 +3872,7 @@ _do_elifndef(gpasmVal Value, const char *Name, int Arity, pnode_t *Parms)
     if (eval_enforce_arity(Arity, 1)) {
       p = PnListHead(Parms);
 
-      if (!PnIsSymbol(p)) {
+      if (!(PnIsSymbol(p))) {
         gpmsg_error(GPE_ILLEGAL_LABEL, "Illegal label.");
       }
       else if ((gp_sym_get_symbol(state.stDefines, PnSymbol(p)) == NULL) &&
@@ -4323,7 +4323,7 @@ _do_org(gpasmVal Value, const char *Name, int Arity, pnode_t *Parms)
       if (state.mpasm_compatible ||
           ((gp_processor_is_config_org(state.processor, Value) < 0) &&
            (gp_processor_is_eeprom_org(state.processor, Value) < 0))) {
-        if (IS_PIC16E_CORE && (Value & 1)) {
+        if ((IS_PIC16E_CORE) && (Value & 1)) {
           gpmsg_verror(GPE_ORG_ODD, "Address{0x%0*X}", addr_digits, Value);
         }
       }
@@ -4378,9 +4378,9 @@ _do_pagesel(gpasmVal Value, const char *Name, int Arity, pnode_t *Parms, uint16_
   int            num_reloc;
   gp_boolean     use_wreg;
 
-  use_wreg = ((reloc_type == RELOC_PAGESEL_WREG) || IS_PIC16_CORE) ? true : false;
+  use_wreg = ((reloc_type == RELOC_PAGESEL_WREG) || (IS_PIC16_CORE)) ? true : false;
 
-  if (IS_EEPROM8 || IS_EEPROM16 || IS_PIC16E_CORE || (state.processor->num_pages == 1)) {
+  if ((IS_EEPROM8) || (IS_EEPROM16) || (IS_PIC16E_CORE) || (state.processor->num_pages == 1)) {
     state.lst.line.linetype = LTY_NONE;
     if (!state.mpasm_compatible) {
       gpmsg_vmessage(GPM_EXT_PAGE, NULL);
@@ -4427,7 +4427,7 @@ _do_pagesel(gpasmVal Value, const char *Name, int Arity, pnode_t *Parms, uint16_
         _emit(0x0000, Name);
         _emit(0x0000, Name);
       }
-      else if (IS_PIC14E_CORE || IS_PIC14EX_CORE) {
+      else if ((IS_PIC14E_CORE) || (IS_PIC14EX_CORE)) {
         if (!use_wreg) {
           eval_reloc_evaluate(p, RELOC_PAGESEL_MOVLP, NULL, NULL, true);
           _emit(PIC14E_INSN_MOVLP, Name);
@@ -4554,7 +4554,7 @@ _do_res(gpasmVal Value, const char *Name, int Arity, pnode_t *Parms)
       state.lst.line.linetype = LTY_RES;
 
       if (state.mode == MODE_ABSOLUTE) {
-        if (IS_PIC16E_CORE && ((count % 2) != 0)) {
+        if ((IS_PIC16E_CORE) && ((count % 2) != 0)) {
           gpmsg_verror(GPE_RES_ODD_PIC16EA, "res = %i", count);
         }
 
@@ -5175,7 +5175,7 @@ _check_16e_arg_types(const pnode_t *Parms, int Arity, unsigned int Types)
           }
         }
       }
-      else if ((AR_GET(Types, i) == AR_INDEX) && !PnIsOffset(PnListHead(p))) {
+      else if ((AR_GET(Types, i) == AR_INDEX) && !(PnIsOffset(PnListHead(p)))) {
         gpmsg_verror(GPE_MISSING_BRACKET, NULL);
         ret = false;
       }
@@ -5689,7 +5689,7 @@ _reg_addr_check(int Reg_address, const char *Reg_name, unsigned int Insn_flags, 
   bank_num  = gp_processor_bank_num(state.processor, Reg_address);
   reg_offs  = gp_processor_reg_offs(state.processor, Reg_address);
 
-  if (state.mpasm_compatible || IS_PIC16_CORE) {
+  if (state.mpasm_compatible || (IS_PIC16_CORE)) {
     /* Only so much can be done compatibility reasons. */
     if (bank_addr > 0) {
       if (Reg_name != NULL) {
@@ -6180,7 +6180,7 @@ do_insn(const char *Op_name, pnode_t *Parameters)
           if (FlagIsSet(state.obj.new_sect_flags, STYP_ABS) && eval_can_evaluate_value(p)) {
             int value = eval_evaluate(p);
 
-            if (IS_PIC14E_CORE || IS_PIC14EX_CORE) {
+            if ((IS_PIC14E_CORE) || (IS_PIC14EX_CORE)) {
               /* PC is 15 bits. Mpasm checks the maximum device address. */
               if (value & (~PIC14E_PC_MASK)) {
                 gpmsg_verror(GPE_OUT_OF_RANGE, "Address{0x%0*X} > 0x%0*X.",
@@ -8079,7 +8079,7 @@ opcode_init(int Stage)
 
   switch (Stage) {
     case 1: {
-      if (IS_PIC14E_CORE || IS_PIC14EX_CORE) {
+      if ((IS_PIC14E_CORE) || (IS_PIC14EX_CORE)) {
         /* The pageselw directive not supported on pic14 enhanced devices. */
         gp_sym_remove_symbol(state.stBuiltin, "pageselw");
       }
@@ -8112,7 +8112,7 @@ opcode_init(int Stage)
             gp_sym_annotate_symbol(sym, (void *)&op_sx_mode);
           }
         }
-        else if (IS_PIC12E_CORE || IS_PIC12I_CORE) {
+        else if ((IS_PIC12E_CORE) || (IS_PIC12I_CORE)) {
           gp_sym_remove_symbol(state.stBuiltin, "return");
           for (i = 0; i < num_op_16c5xx_enh; i++) {
             gp_sym_annotate_symbol(gp_sym_add_symbol(state.stBuiltin, op_16c5xx_enh[i].name),
