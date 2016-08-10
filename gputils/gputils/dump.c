@@ -694,7 +694,8 @@ dump_code(FILE *Code_file, const DirBlockInfo *Main_dir, pic_processor_t Process
         used_prev    = false;
         empty_signal = false;
         do {
-          used_act = used_map[i * WORD_SIZE];
+          num_words = 1;
+          used_act  = used_map[i * WORD_SIZE];
 
           if (used_act) {
             if (empty_signal) {

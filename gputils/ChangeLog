@@ -1,3 +1,12 @@
+2016-08-10  Molnar Karoly  <molnarkaroly@users.sourceforge.net>
+  * gpasm/gpasm.c,
+    gpasm/testsuite/test-regression,
+    gpasm/testsuite/regression/source/assume.asm:
+    Fixed the assume bug.
+
+  * gputils/dump.c:
+    bugfix
+
 2016-08-08  Molnar Karoly  <molnarkaroly@users.sourceforge.net>
   * config.h.in, include/stdhdr.h, configure, configure.ac,
     gpasm/directive.c, gpasm/evaluate.c, gpasm/gpasm.h.in,
@@ -6,7 +15,9 @@
     libgputils/gpprocessor.h, libgputils/gptypes.h,
     libgputils/gpwritehex.c:
     The default compiler changed from gcc to clang. I corrected
-    several warnings which are not indicated the gcc.
+    several warnings which are not indicated the gcc:
+    "#290 1.5.0_RC2 clang warnings (format, ..." and other warnings.
+    Thanks to ilovezfs for the report.
 
   * gpasm/util.c, gputils/block.c, gputils/dump.c,
     libgputils/gpcoffgen.c:

@@ -198,6 +198,23 @@ _set_global_constants(void)
 
 /*------------------------------------------------------------------------------------------------*/
 
+static void
+_setup_second_pass(symbol_table_t *Cmd_defines)
+{
+  state.pass++;
+  state.byte_addr          = 0;
+  state.assumed_bank       = __ACTIVE_BANK_INV;
+  state.device.id_location = 0;
+  state.cblock             = 0;
+  state.cblock_defined     = false;
+  /* Clean out defines for second pass. */
+  state.stDefines          = gp_sym_push_table(Cmd_defines, state.case_insensitive);
+  state.stMacros           = gp_sym_push_table(NULL, state.case_insensitive);
+  state.stMacroParams      = gp_sym_push_table(NULL, state.case_insensitive);
+}
+
+/*------------------------------------------------------------------------------------------------*/
+
 void
 init(void)
 {
@@ -918,9 +935,10 @@ assemble(void)
   char           *pc;
   symbol_table_t *cmd_defines;
 
-  /* store the command line defines to restore on second pass */
+  /* Store the command line defines to restore on second pass. */
   cmd_defines    = state.stDefines;
-  state.c_memory = state.i_memory = gp_mem_i_create();
+  state.c_memory = gp_mem_i_create();
+  state.i_memory = state.c_memory;
 
   if (state.base_file_name[0] == '\0') {
     gp_strncpy(state.base_file_name, state.src_file_name, sizeof(state.base_file_name));
@@ -934,10 +952,10 @@ assemble(void)
   /* Builtins are always case insensitive. */
   state.stBuiltin     = gp_sym_push_table(NULL, true);
   state.stDirective   = state.stBuiltin;
-  state.stMacros      = gp_sym_push_table(NULL, state.case_insensitive);
   state.stTop         = gp_sym_push_table(NULL, state.case_insensitive);
   state.stGlobal      = state.stTop;
   state.stDefines     = gp_sym_push_table(cmd_defines, state.case_insensitive);
+  state.stMacros      = gp_sym_push_table(NULL, state.case_insensitive);
   state.stMacroParams = gp_sym_push_table(NULL, state.case_insensitive);
   opcode_init(0);
 
@@ -955,16 +973,8 @@ assemble(void)
   yyparse();
   yylex_destroy();
 
-  state.pass++;
-  state.byte_addr          = 0;
-  state.device.id_location = 0;
-  state.cblock             = 0;
-  state.cblock_defined     = false;
-  state.preproc.do_emit    = true;
-  /* clean out defines for second pass */
-  state.stMacros           = gp_sym_push_table(NULL, state.case_insensitive);
-  state.stDefines          = gp_sym_push_table(cmd_defines, state.case_insensitive);
-  state.stMacroParams      = gp_sym_push_table(NULL, state.case_insensitive);
+  _setup_second_pass(cmd_defines);
+  state.preproc.do_emit = true;
   delete_variable_symbols(state.stTop);
 //  delete_processor_variable_symbols(state.stTop);
 
