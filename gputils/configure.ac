@@ -172,7 +172,6 @@ case "${host}" in
   *darwin* )
     if test "x$CC" = "xclang"; then
       AM_CFLAGS="-Wall -pedantic -Wformat -Wtautological-compare -Wimplicit-function-declaration -Wformat-security"
-      AM_LDFLAGS="-Wl,-warn-common -Wl,-warn-once"
     fi
     ;;
   *linux* )

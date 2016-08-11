@@ -1,3 +1,7 @@
+2016-08-11  Molnar Karoly  <molnarkaroly@users.sourceforge.net>
+  * configure, configure.ac:
+    Fixed a Darwin bug.
+
 2016-08-10  Molnar Karoly  <molnarkaroly@users.sourceforge.net>
   * gpasm/gpasm.c,
     gpasm/testsuite/test-regression,
