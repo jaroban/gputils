@@ -63,7 +63,7 @@ Boston, MA 02111-1307, USA.  */
     #define __PRI64_PREFIX	"l"
     #define __INT64_C(Cnt)	Cnt ## L
     #define __UINT64_C(Cnt)	Cnt ## UL
-  #else
+  #else /* (__WORDSIZE == 32) */
     #define __PRI64_PREFIX	"ll"
     #define __INT64_C(Cnt)	Cnt ## LL
     #define __UINT64_C(Cnt)	Cnt ## ULL
@@ -114,7 +114,283 @@ Boston, MA 02111-1307, USA.  */
   #define UINT32_MAX		(4294967295U)
   #define UINT64_MAX		(__UINT64_C(18446744073709551615))
 
+#endif /* HAVE_INTTYPES_H */
+
+#ifndef __INT8_FMTd__
+  #define __INT8_FMTd__		"hhd"
 #endif
+
+#ifndef __INT8_FMTi__
+  #define __INT8_FMTi__		"hhi"
+#endif
+
+#ifndef __UINT8_FMTo__
+  #define __UINT8_FMTo__	"hho"
+#endif
+
+#ifndef __UINT8_FMTu__
+  #define __UINT8_FMTu__	"hhu"
+#endif
+
+#ifndef __UINT8_FMTx__
+  #define __UINT8_FMTx__	"hhx"
+#endif
+
+#ifndef __UINT8_FMTX__
+  #define __UINT8_FMTX__	"hhX"
+#endif
+
+#ifndef __INT16_FMTd__
+  #define __INT16_FMTd__	"hd"
+#endif
+
+#ifndef __INT16_FMTi__
+  #define __INT16_FMTi__	"hi"
+#endif
+
+#ifndef __UINT16_FMTo__
+  #define __UINT16_FMTo__	"ho"
+#endif
+
+#ifndef __UINT16_FMTu__
+  #define __UINT16_FMTu__	"hu"
+#endif
+
+#ifndef __UINT16_FMTx__
+  #define __UINT16_FMTx__	"hx"
+#endif
+
+#ifndef __UINT16_FMTX__
+  #define __UINT16_FMTX__	"hX"
+#endif
+
+#ifndef __INT32_FMTd__
+  #define __INT32_FMTd__	"d"
+#endif
+
+#ifndef __INT32_FMTi__
+  #define __INT32_FMTi__	"i"
+#endif
+
+#ifndef __UINT32_FMTo__
+  #define __UINT32_FMTo__	"o"
+#endif
+
+#ifndef __UINT32_FMTu__
+  #define __UINT32_FMTu__	"u"
+#endif
+
+#ifndef __UINT32_FMTx__
+  #define __UINT32_FMTx__	"x"
+#endif
+
+#ifndef __UINT32_FMTX__
+  #define __UINT32_FMTX__	"X"
+#endif
+
+#if (__WORDSIZE == 64)
+
+  #ifndef __INT64_FMTd__
+    #define __INT64_FMTd__	"ld"
+  #endif
+
+  #ifndef __INT64_FMTi__
+    #define __INT64_FMTi__	"li"
+  #endif
+
+  #ifndef __UINT64_FMTo__
+    #define __UINT64_FMTo__	"lo"
+  #endif
+
+  #ifndef __UINT64_FMTu__
+    #define __UINT64_FMTu__	"lu"
+  #endif
+
+  #ifndef __UINT64_FMTx__
+    #define __UINT64_FMTx__	"lx"
+  #endif
+
+  #ifndef __UINT64_FMTX__
+    #define __UINT64_FMTX__	"lX"
+  #endif
+
+  #ifndef __OFF_FMTo__
+    #define __OFF_FMTo__	"lo"
+  #endif
+
+  #ifndef __OFF_FMTu__
+    #define __OFF_FMTu__	"lu"
+  #endif
+
+  #ifndef __OFF_FMTx__
+    #define __OFF_FMTx__	"lx"
+  #endif
+
+  #ifndef __OFF_FMTX__
+    #define __OFF_FMTX__	"lX"
+  #endif
+
+  #ifndef __SIZE_FMTo__
+    #define __SIZE_FMTo__	"lo"
+  #endif
+
+  #ifndef __SIZE_FMTu__
+    #define __SIZE_FMTu__	"lu"
+  #endif
+
+  #ifndef __SIZE_FMTx__
+    #define __SIZE_FMTx__	"lx"
+  #endif
+
+  #ifndef __SIZE_FMTX__
+    #define __SIZE_FMTX__	"lX"
+  #endif
+
+#else /* (__WORDSIZE == 32) */
+
+  #ifndef __INT64_FMTd__
+    #define __INT64_FMTd__	"lld"
+  #endif
+
+  #ifndef __INT64_FMTi__
+    #define __INT64_FMTi__	"lli"
+  #endif
+
+  #ifndef __UINT64_FMTo__
+    #define __UINT64_FMTo__	"llo"
+  #endif
+
+  #ifndef __UINT64_FMTu__
+    #define __UINT64_FMTu__	"llu"
+  #endif
+
+  #ifndef __UINT64_FMTx__
+    #define __UINT64_FMTx__	"llx"
+  #endif
+
+  #ifndef __UINT64_FMTX__
+    #define __UINT64_FMTX__	"llX"
+  #endif
+
+  #if (SIZEOF_OFF_T == 4)
+
+    #ifndef __OFF_FMTo__
+      #define __OFF_FMTo__	"lo"
+    #endif
+
+    #ifndef __OFF_FMTu__
+      #define __OFF_FMTu__	"lu"
+    #endif
+
+    #ifndef __OFF_FMTx__
+      #define __OFF_FMTx__	"lx"
+    #endif
+
+    #ifndef __OFF_FMTX__
+      #define __OFF_FMTX__	"lX"
+    #endif
+
+  #endif
+
+  #if (SIZEOF_OFF_T == 8)
+
+    #ifndef __OFF_FMTo__
+      #define __OFF_FMTo__	"llo"
+    #endif
+
+    #ifndef __OFF_FMTu__
+      #define __OFF_FMTu__	"llu"
+    #endif
+
+    #ifndef __OFF_FMTx__
+      #define __OFF_FMTx__	"llx"
+    #endif
+
+    #ifndef __OFF_FMTX__
+      #define __OFF_FMTX__	"llX"
+    #endif
+
+  #endif
+
+  #if (SIZEOF_SIZE_T == 4)
+
+    #ifndef __SIZE_FMTo__
+      #define __SIZE_FMTo__	"o"
+    #endif
+
+    #ifndef __SIZE_FMTu__
+      #define __SIZE_FMTu__	"u"
+    #endif
+
+    #ifndef __SIZE_FMTx__
+      #define __SIZE_FMTx__	"x"
+    #endif
+
+    #ifndef __SIZE_FMTX__
+      #define __SIZE_FMTX__	"X"
+    #endif
+
+  #endif
+
+  #if (SIZEOF_SIZE_T == 8)
+
+    #ifndef __SIZE_FMTo__
+      #define __SIZE_FMTo__	"llo"
+    #endif
+
+    #ifndef __SIZE_FMTu__
+      #define __SIZE_FMTu__	"llu"
+    #endif
+
+    #ifndef __SIZE_FMTx__
+      #define __SIZE_FMTx__	"llx"
+    #endif
+
+    #ifndef __SIZE_FMTX__
+      #define __SIZE_FMTX__	"llX"
+    #endif
+
+  #endif
+
+#endif
+
+#define INT8_FMTd		__INT8_FMTd__
+#define INT8_FMTi		__INT8_FMTi__
+#define UINT8_FMTo		__UINT8_FMTo__
+#define UINT8_FMTu		__UINT8_FMTu__
+#define UINT8_FMTx		__UINT8_FMTx__
+#define UINT8_FMTX		__UINT8_FMTX__
+
+#define INT16_FMTd		__INT16_FMTd__
+#define INT16_FMTi		__INT16_FMTi__
+#define UINT16_FMTo		__UINT16_FMTo__
+#define UINT16_FMTu		__UINT16_FMTu__
+#define UINT16_FMTx		__UINT16_FMTx__
+#define UINT16_FMTX		__UINT16_FMTX__
+
+#define INT32_FMTd		__INT32_FMTd__
+#define INT32_FMTi		__INT32_FMTi__
+#define UINT32_FMTo		__UINT32_FMTo__
+#define UINT32_FMTu		__UINT32_FMTu__
+#define UINT32_FMTx		__UINT32_FMTx__
+#define UINT32_FMTX		__UINT32_FMTX__
+
+#define INT64_FMTd		__INT64_FMTd__
+#define INT64_FMTi		__INT64_FMTi__
+#define UINT64_FMTo		__UINT64_FMTo__
+#define UINT64_FMTu		__UINT64_FMTu__
+#define UINT64_FMTx		__UINT64_FMTx__
+#define UINT64_FMTX		__UINT64_FMTX__
+
+#define OFF_FMTo		__OFF_FMTo__
+#define OFF_FMTu		__OFF_FMTu__
+#define OFF_FMTx		__OFF_FMTx__
+#define OFF_FMTX		__OFF_FMTX__
+
+#define SIZE_FMTo		__SIZE_FMTo__
+#define SIZE_FMTu		__SIZE_FMTu__
+#define SIZE_FMTx		__SIZE_FMTx__
+#define SIZE_FMTX		__SIZE_FMTX__
 
 #include <stdio.h>
 #include <assert.h>
