@@ -40,9 +40,11 @@ Boston, MA 02111-1307, USA.  */
   #include <inttypes.h>
 #else
 
+  #define __WORDSIZE		NATIVE_WORD_SIZE
+
   #ifdef TYPE_INT8
-    typedef signed   TYPE_INT8 int8_t;
-    typedef unsigned TYPE_INT8 uint8_t;
+    typedef signed   TYPE_INT8  int8_t;
+    typedef unsigned TYPE_INT8  uint8_t;
   #endif
   #ifdef TYPE_INT16
     typedef signed   TYPE_INT16 int16_t;
@@ -57,13 +59,45 @@ Boston, MA 02111-1307, USA.  */
     typedef unsigned TYPE_INT64 uint64_t;
   #endif
 
-  #if (NATIVE_WORD_SIZE == 64)
+  #if (__WORDSIZE == 64)
+    #define __PRI64_PREFIX	"l"
     #define __INT64_C(Cnt)	Cnt ## L
     #define __UINT64_C(Cnt)	Cnt ## UL
   #else
+    #define __PRI64_PREFIX	"ll"
     #define __INT64_C(Cnt)	Cnt ## LL
     #define __UINT64_C(Cnt)	Cnt ## ULL
   #endif
+
+  #define PRId8			"d"
+  #define PRId16		"d"
+  #define PRId32		"d"
+  #define PRId64		__PRI64_PREFIX "d"
+
+  #define PRIi8			"i"
+  #define PRIi16		"i"
+  #define PRIi32		"i"
+  #define PRIi64		__PRI64_PREFIX "i"
+
+  #define PRIo8			"o"
+  #define PRIo16		"o"
+  #define PRIo32		"o"
+  #define PRIo64		__PRI64_PREFIX "o"
+
+  #define PRIu8			"u"
+  #define PRIu16		"u"
+  #define PRIu32		"u"
+  #define PRIu64		__PRI64_PREFIX "u"
+
+  #define PRIx8			"x"
+  #define PRIx16		"x"
+  #define PRIx32		"x"
+  #define PRIx64		__PRI64_PREFIX "x"
+
+  #define PRIX8			"X"
+  #define PRIX16		"X"
+  #define PRIX32		"X"
+  #define PRIX64		__PRI64_PREFIX "X"
 
   #define INT8_MIN		(-128)
   #define INT16_MIN		(-32767-1)

@@ -225,7 +225,7 @@ gp_archive_add_member(gp_archive_t *Archive, const char *File_name, const char *
 
   snprintf(name, sizeof(name), "%s/", Object_name);
   snprintf(date, sizeof(date), "%il", timer);
-  snprintf(size, sizeof(size), "%lil", new_object->size);
+  snprintf(size, sizeof(size), "%"PRIi64"l", new_object->size);
 
   gp_arch_strncpy(new_member->header.ar_name, name,  sizeof(new_member->header.ar_name));
   gp_arch_strncpy(new_member->header.ar_date, date,  sizeof(new_member->header.ar_date));
