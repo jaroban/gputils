@@ -1,3 +1,9 @@
+2016-08-15  Molnar Karoly  <molnarkaroly@users.sourceforge.net>
+  * doc/gputils.lyx, gpasm/directive.c, gpasm/gpasm.c, gpasm/gpasm.h,
+    gpasm/processor.c, libgputils/gpcoff.h:
+    Fixed an assume bug.
+    New built-in variable: __ASSUMED_BANK_ADDR
+
 2016-08-12  Molnar Karoly  <molnarkaroly@users.sourceforge.net>
   * config.h.in, configure, configure.ac, include/stdhdr.h,
     libgputils/gparchive.c, libgputils/gpsystem.c:

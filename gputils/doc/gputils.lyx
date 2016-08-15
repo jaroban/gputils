@@ -82,7 +82,7 @@ James Bowman, Craig Franklin, David Barnett, Borut Ražem and Molnár Károly
 \end_layout
 
 \begin_layout Date
-2016 Aug 07
+2016 Aug 15
 \end_layout
 
 \begin_layout Standard
@@ -5155,8 +5155,8 @@ The last time selected (with BANKSEL directive, or MOVLB instruction) RAM
 \begin_inset Newline newline
 \end_inset
 
-– This value becomes invalid after the following instructions, in the (Enhanced
- and Regular) 12 bit and 14 bit core – PIC12XXX, PIC16XXX:
+– This value becomes invalid (__BANK_INV) after the following instructions,
+ in the (Enhanced and Regular) 12 bit and 14 bit core – PIC12XXX, PIC16XXX:
 \end_layout
 
 \begin_layout Standard
@@ -5165,8 +5165,8 @@ BRA, BRW, CALL, CALLW, GOTO, RESET, RETFIE, RETLW, RETURN, (SX: RETI, RETIW,
 \begin_inset Newline newline
 \end_inset
 
-– This value becomes invalid after the following instructions, in the Regular
- 16 bit core – PIC17XXX:
+– This value becomes invalid (__BANK_INV) after the following instructions,
+ in the Regular 16 bit core – PIC17XXX:
 \end_layout
 
 \begin_layout Standard
@@ -5174,19 +5174,68 @@ CALL, GOTO, LCALL, RETFIE, RETLW, RETURN
 \begin_inset Newline newline
 \end_inset
 
-– This value becomes invalid after the following instructions, in the Extended
- 16 bit core – PIC18XXX:
+– This value becomes invalid (__BANK_INV) after the following instructions,
+ in the Extended 16 bit core – PIC18XXX:
 \end_layout
 
 \begin_layout Standard
 BRA, CALL, CALLW, GOTO, RCALL, RESET, RETFIE, RETLW, RETURN, TRET
 \end_layout
 
-\begin_layout LyX-Code
-__ACTIVE_BANK_ADDR -- e.g.
- 0x20, 0x080, 0xE00, etc
+\begin_layout Standard
+Except: 
+\begin_inset Quotes eld
+\end_inset
+
+CALL label, FAST
+\begin_inset Quotes erd
+\end_inset
+
+ (The important thing is the presence of the 
+\begin_inset Quotes eld
+\end_inset
+
+FAST
+\begin_inset Quotes erd
+\end_inset
+
+ modifier.)
 \end_layout
 
+\begin_layout LyX-Code
+__ACTIVE_BANK_ADDR  -- e.g.
+ 0x20, 0x080, 0xE00, etc (may __BANK_INV also)
+\end_layout
+
+\begin_deeper
+\begin_layout Standard
+See also: BANKSEL (primarily in absolute mode)
+\end_layout
+
+\end_deeper
+\begin_layout LyX-Code
+
+\end_layout
+
+\begin_layout Standard
+The last time assumed (with ASSUME directive) RAM Bank.
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+__ASSUMED_BANK_ADDR -- e.g.
+ 0x20, 0x080, 0xE00, etc (may __BANK_INV also)
+\end_layout
+
+\begin_deeper
+\begin_layout Standard
+See also: ASSUME (primarily in absolute mode)
+\end_layout
+
+\end_deeper
 \begin_layout LyX-Code
 
 \end_layout
@@ -5199,7 +5248,7 @@ The last time selected (with PAGESEL or PAGESELW directive, or MOVLP instruction
 \begin_inset Newline newline
 \end_inset
 
-– This value becomes invalid after the following instructions:
+– This value becomes invalid (__PAGE_INV) after the following instructions:
 \end_layout
 
 \begin_layout Standard
@@ -5208,9 +5257,15 @@ CALL, CALLW, RESET
 
 \begin_layout LyX-Code
 __ACTIVE_PAGE_ADDR -- e.g.
- 0x400, 0x800, 0x2800, etc
+ 0x400, 0x800, 0x2800, etc (may __PAGE_INV also)
 \end_layout
 
+\begin_deeper
+\begin_layout Standard
+See also: PAGESEL (only in absolute mode)
+\end_layout
+
+\end_deeper
 \begin_layout Section
 Directives
 \end_layout

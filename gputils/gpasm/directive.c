@@ -767,6 +767,7 @@ _do_assume(gpasmVal Value, const char *Name, int Arity, pnode_t *Parms)
   int              address;
   int              num_reloc;
   char             buf[BUFSIZ];
+  gp_boolean       assume_var;
 
   if (state.processor == NULL) {
     gpmsg_verror(GPE_UNDEF_PROC, "\"%s\"", Name);
@@ -785,16 +786,19 @@ _do_assume(gpasmVal Value, const char *Name, int Arity, pnode_t *Parms)
 
   if (proc->num_banks == 1) {
     /* do nothing */
-    state.assumed_bank = 0;
+    set_global(__ASSUMED_BANK_ADDR, 0, VAL_VARIABLE, true, false);
     return Value;
   }
+
+  address    = __BANK_INV;
+  assume_var = false;
 
   if (eval_enforce_arity(Arity, 1)) {
     p = PnListHead(Parms);
 
     if (state.mode == MODE_ABSOLUTE) {
-      address            = eval_maybe_evaluate(p);
-      state.assumed_bank = gp_processor_bank_addr(proc, address);
+      address    = eval_maybe_evaluate(p);
+      assume_var = true;
     }
     else {
       /* state.mode == MODE_RELOCATABLE */
@@ -802,46 +806,51 @@ _do_assume(gpasmVal Value, const char *Name, int Arity, pnode_t *Parms)
 
       if (num_reloc == 0) {
         /* It is an absolute address, generate the banksel but no relocation. */
-        address            = eval_maybe_evaluate(p);
-        state.assumed_bank = gp_processor_bank_addr(proc, address);
+        address    = eval_maybe_evaluate(p);
+        assume_var = true;
       }
       else if (num_reloc != 1) {
         gpmsg_verror(GPE_UNRESOLVABLE, "\"%s\"", Name);
       }
       else if ((IS_PIC12E_CORE) || (IS_PIC12I_CORE)) {
-        address            = _eval_update_reloc_value(p, RELOC_MOVLB, false);
-        state.assumed_bank = gp_processor_bank_addr(proc, address);
+        address    = _eval_update_reloc_value(p, RELOC_NONE, false);
+        assume_var = true;
       }
       else if (IS_PIC14E_CORE) {
-        address            = _eval_update_reloc_value(p, RELOC_MOVLB, false);
-        state.assumed_bank = gp_processor_bank_addr(proc, address);
+        address    = _eval_update_reloc_value(p, RELOC_NONE, false);
+        assume_var = true;
       }
       else if (IS_PIC14EX_CORE) {
-        address            = _eval_update_reloc_value(p, RELOC_MOVLB, false);
-        state.assumed_bank = gp_processor_bank_addr(proc, address);
+        address    = _eval_update_reloc_value(p, RELOC_NONE, false);
+        assume_var = true;
       }
       else if (IS_PIC16_CORE) {
-        address            = _eval_update_reloc_value(p, RELOC_BANKSEL, false);
-        state.assumed_bank = gp_processor_bank_addr(proc, address);
+        address    = _eval_update_reloc_value(p, RELOC_NONE, false);
+        assume_var = true;
       }
       else if (IS_PIC16E_CORE) {
-        address            = _eval_update_reloc_value(p, RELOC_BANKSEL, false);
-        state.assumed_bank = gp_processor_bank_addr(proc, address);
+        address    = _eval_update_reloc_value(p, RELOC_NONE, false);
+        assume_var = true;
       }
       else {
         switch (proc->num_banks) {
           case 2:
-            address            = _eval_update_reloc_value(p, RELOC_BANKSEL, false);
-            state.assumed_bank = gp_processor_bank_addr(proc, address);
+            address    = _eval_update_reloc_value(p, RELOC_NONE, false);
+            assume_var = true;
             break;
 
           case 4:
-            address            = _eval_update_reloc_value(p, RELOC_BANKSEL, false);
-            state.assumed_bank = gp_processor_bank_addr(proc, address);
+            address    = _eval_update_reloc_value(p, RELOC_NONE, false);
+            assume_var = true;
             break;
         }
       }
     }
+  }
+
+  if (assume_var) {
+    address = gp_processor_bank_addr(proc, address);
+    set_global(__ASSUMED_BANK_ADDR, address, VAL_VARIABLE, true, false);
   }
 
   return Value;
@@ -1241,7 +1250,7 @@ _do_banksel(gpasmVal Value, const char *Name, int Arity, pnode_t *Parms)
       set_global(__ACTIVE_BANK_ADDR, address, VAL_VARIABLE, true, false);
     }
     else {
-      set_global(__ACTIVE_PAGE_ADDR, __ACTIVE_PAGE_INV, VAL_VARIABLE, true, false);
+      set_global(__ACTIVE_BANK_ADDR, __BANK_INV, VAL_VARIABLE, true, false);
     }
   }
 
@@ -4439,7 +4448,7 @@ _do_pagesel(gpasmVal Value, const char *Name, int Arity, pnode_t *Parms, uint16_
         }
       }
       else {
-        if (!use_wreg && (state.processor->num_pages == 2)) {
+        if ((!use_wreg) && (state.processor->num_pages == 2)) {
           eval_reloc_evaluate(p, RELOC_PAGESEL_BITS, NULL, NULL, true);
           _emit(0, Name);
         }
@@ -5534,8 +5543,8 @@ _reg_addr_check_reloc(int Reg_address, const char *Reg_name, unsigned int Insn_f
   int               bank_addr;
   insn_flags_t      i_flags;
   const variable_t *var;
-  int               bank_assume;
-  int               bank_assume_num;
+  int               bank_assumed;
+  int               bank_assumed_num;
 
   i_flags.u = Insn_flags;
 
@@ -5574,23 +5583,33 @@ _reg_addr_check_reloc(int Reg_address, const char *Reg_name, unsigned int Insn_f
             return;
           }
 
-          bank_assume = var->value;
-        }
-        else {
-          bank_assume = -1;
-        }
+          bank_assumed = var->value;
 
-        if (bank_assume >= 0) {
-          bank_assume     = gp_processor_bank_addr(state.processor, bank_assume);
-          bank_assume_num = gp_processor_bank_num(state.processor, bank_assume);
-          bank_addr       = gp_processor_bank_addr(state.processor, Reg_address);
+          if (bank_assumed < 0) {
+            /* The value of __ACTIVE_BANK_ADDR variable is invalid or has not been set. */
+            if ((var = get_global_constant(__ASSUMED_BANK_ADDR)) == NULL) {
+              gpmsg_verror(GPE_INTERNAL, NULL, "The \"" __ASSUMED_BANK_ADDR "\" variable not exists.");
+              return;
+            }
 
-          if (bank_assume != bank_addr) {
-            _msg_ram_bank(Reg_address, Reg_name, bank_assume_num);
+            bank_assumed = var->value;
           }
         }
         else {
-          _msg_ram_bank(Reg_address, Reg_name, -1);
+          bank_assumed = __BANK_INV;
+        }
+
+        if (bank_assumed >= 0) {
+          bank_assumed     = gp_processor_bank_addr(state.processor, bank_assumed);
+          bank_assumed_num = gp_processor_bank_num(state.processor, bank_assumed);
+          bank_addr        = gp_processor_bank_addr(state.processor, Reg_address);
+
+          if (bank_assumed != bank_addr) {
+            _msg_ram_bank(Reg_address, Reg_name, bank_assumed_num);
+          }
+        }
+        else {
+          _msg_ram_bank(Reg_address, Reg_name, __BANK_INV);
         }
       }
       break;
@@ -5603,7 +5622,7 @@ _reg_addr_check_reloc(int Reg_address, const char *Reg_name, unsigned int Insn_f
           _msg_access_nosel_def(Reg_address, Reg_name);
         }
         else {
-          _msg_ram_bank(Reg_address, Reg_name, -1);
+          _msg_ram_bank(Reg_address, Reg_name, __BANK_INV);
         }
       }
       else if (i_flags.bank == IFLAG_BANK_DEF_BANK) {
@@ -5644,8 +5663,8 @@ _reg_addr_check(int Reg_address, const char *Reg_name, unsigned int Insn_flags, 
   int               bank_addr;
   int               bank_num;
   int               reg_offs;
-  int               bank_assume;
-  int               bank_assume_num;
+  int               bank_assumed;
+  int               bank_assumed_num;
   int               word_digits;
   const variable_t *var;
   gp_boolean        need_bank_check;
@@ -5723,17 +5742,27 @@ _reg_addr_check(int Reg_address, const char *Reg_name, unsigned int Insn_flags, 
     return;
   }
 
-  bank_assume     = var->value;
+  bank_assumed = var->value;
+  if (bank_assumed < 0) {
+    /* The value of __ACTIVE_BANK_ADDR variable is invalid or has not been set. */
+    if ((var = get_global_constant(__ASSUMED_BANK_ADDR)) == NULL) {
+      gpmsg_verror(GPE_INTERNAL, NULL, "The \"" __ASSUMED_BANK_ADDR "\" variable not exists.");
+      return;
+    }
+
+    bank_assumed = var->value;
+  }
+
   need_bank_check = true;
 
   /* Check if we are in correct bank. Negative __ACTIVE_BANK_ADDR value means bank is not set yet. */
-  if (bank_assume >= 0) {
+  if (bank_assumed >= 0) {
     /* Necessary only the selected bank address. */
-    bank_assume     = gp_processor_bank_addr(state.processor, bank_assume);
-    bank_assume_num = gp_processor_bank_num(state.processor, bank_assume);
+    bank_assumed     = gp_processor_bank_addr(state.processor, bank_assumed);
+    bank_assumed_num = gp_processor_bank_num(state.processor, bank_assumed);
 
-    if ((!i_flags.isAccess) && (bank_assume != bank_addr)) {
-      _msg_ram_bank(Reg_address, Reg_name, bank_assume_num);
+    if ((!i_flags.isAccess) && (bank_assumed != bank_addr)) {
+      _msg_ram_bank(Reg_address, Reg_name, bank_assumed_num);
       need_bank_check = false;
     }
   }
@@ -5762,12 +5791,15 @@ do_insn(const char *Op_name, pnode_t *Parameters)
   int               file;            /* register file address, if applicable */
   unsigned int      bank_num;
   gpasmVal          r;               /* Return value. */
-  gp_boolean        is_btfsx = false;
+  gp_boolean        is_btfsx;
+  gp_boolean        is_fast_call;
   const insn_t     *ins;
   enum common_insn  icode;
   const char       *sym_name;
   const char       *str;
 
+  is_btfsx     = false;
+  is_fast_call = false;
   /* We want to have r as the value to assign to label. */
   class = state.device.class;
 
@@ -6505,6 +6537,7 @@ do_insn(const char *Op_name, pnode_t *Parameters)
               eval_enforce_arity(arity, 2);
           }
 
+          is_fast_call = (flag != 0) ? true : false;
           dest = eval_reloc_evaluate(p, RELOC_CALL, NULL, NULL, true);
           dest = gp_processor_byte_from_insn_c(class, dest) >> 1;
           _emit(ins->opcode | (flag << 8) | (dest & PIC16E_BMSK_BRANCH_LOWER), sym_name);
@@ -7826,20 +7859,13 @@ do_insn(const char *Op_name, pnode_t *Parameters)
       } /* switch (ins->class) */
 
       if ((!state.mpasm_compatible) && (!state.skipped_inst)) {
-        if (ins->inv_mask & INV_MASK_BANK) {
-          if (state.assumed_bank != __ACTIVE_BANK_INV) {
-            /* Sets the assumed bank. */
-            set_global(__ACTIVE_BANK_ADDR, state.assumed_bank, VAL_VARIABLE, true, false);
-          }
-          else {
-            /* Invalidates the selection of RAM Banks. */
-            set_global(__ACTIVE_BANK_ADDR, __ACTIVE_BANK_INV, VAL_VARIABLE, true, false);
-          }
+        if ((!is_fast_call) && FlagIsSet(ins->inv_mask, INV_MASK_BANK)) {
+          set_global(__ACTIVE_BANK_ADDR, __BANK_INV, VAL_VARIABLE, true, false);
         }
 
         if (ins->inv_mask & INV_MASK_PAGE) {
           /* Invalidates the selection of ROM Pages. */
-          set_global(__ACTIVE_PAGE_ADDR, __ACTIVE_PAGE_INV, VAL_VARIABLE, true, false);
+          set_global(__ACTIVE_PAGE_ADDR, __PAGE_INV, VAL_VARIABLE, true, false);
         }
       }
 

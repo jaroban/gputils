@@ -203,7 +203,6 @@ _setup_second_pass(symbol_table_t *Cmd_defines)
 {
   state.pass++;
   state.byte_addr          = 0;
-  state.assumed_bank       = __ACTIVE_BANK_INV;
   state.device.id_location = 0;
   state.cblock             = 0;
   state.cblock_defined     = false;
@@ -230,7 +229,6 @@ init(void)
   state.preproc.do_emit = true;
 
   state.maxram          = MAX_RAM - 1;
-  state.assumed_bank    = __ACTIVE_BANK_INV;
 
   state.cod_file        = OUT_NORMAL;
   state.dep_file        = OUT_SUPPRESS;

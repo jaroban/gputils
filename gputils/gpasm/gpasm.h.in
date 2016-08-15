@@ -31,10 +31,12 @@ Boston, MA 02111-1307, USA.  */
 #define __16bit_core_               "__16bit_core_"
 
 #define __ACTIVE_BANK_ADDR          "__ACTIVE_BANK_ADDR"
-#define __ACTIVE_BANK_INV           -1
+#define __BANK_INV                  -1
+
+#define __ASSUMED_BANK_ADDR         "__ASSUMED_BANK_ADDR"
 
 #define __ACTIVE_PAGE_ADDR          "__ACTIVE_PAGE_ADDR"
-#define __ACTIVE_PAGE_INV           -1
+#define __PAGE_INV                  -1
 
 #define WHILE_LOOP_COUNT_MAX        255
 
@@ -221,7 +223,6 @@ extern struct gpasm_state {
   gp_boolean     found_devid;           /* Config directive in source code. */
   gp_boolean     found_idlocs;          /* Idlocs directive in source code. */
   gp_boolean     found_end;             /* End directive in source code. */
-  int            assumed_bank;          /* Helper variable for bank selection. */
   int            maxram;                /* Highest legal data memory location. */
   int            maxrom;                /* Highest legal program memory location. */
   gp_bit_array_t badrom;                /* Nonzero indicates illegal memory. */

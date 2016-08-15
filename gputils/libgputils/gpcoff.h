@@ -139,6 +139,7 @@ struct __attribute__ ((packed)) reloc
 
 #define RELOC_SIZ               12
 
+#define RELOC_NONE              0
 /* relocation for the CALL instruction (first word only on 18cxx) */
 #define RELOC_CALL              1
 /* relocation for the GOTO instruction (first word only on 18cxx) */

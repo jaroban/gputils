@@ -31,16 +31,17 @@ Boston, MA 02111-1307, USA.  */
 /*------------------------------------------------------------------------------------------------*/
 
 static void
-_make_bank_constants(pic_processor_t Proc, int Num_of_banks)
+_make_bank_constants_and_variables(pic_processor_t Proc, int Num_of_banks)
 {
   int  bank_size;
   int  bank_addr;
   int  i;
   char name[64];
 
-  i = (Num_of_banks == 1) ? 0 : __ACTIVE_BANK_INV;
+  i = (Num_of_banks == 1) ? 0 : __BANK_INV;
 
   set_global(__ACTIVE_BANK_ADDR, i, VAL_VARIABLE, true, false);
+  set_global(__ASSUMED_BANK_ADDR, i, VAL_VARIABLE, true, false);
 
   if (Num_of_banks <= 0) {
     return;
@@ -72,14 +73,14 @@ _make_bank_constants(pic_processor_t Proc, int Num_of_banks)
 /*------------------------------------------------------------------------------------------------*/
 
 static void
-_make_page_constants(pic_processor_t Proc, int Num_of_pages)
+_make_page_constants_and_variables(pic_processor_t Proc, int Num_of_pages)
 {
   int  page_size;
   int  page_addr;
   int  i;
   char name[64];
 
-  i = (Num_of_pages == 1) ? 0 : __ACTIVE_PAGE_INV;
+  i = (Num_of_pages == 1) ? 0 : __PAGE_INV;
 
   set_global(__ACTIVE_PAGE_ADDR, i, VAL_VARIABLE, true, false);
 
@@ -178,10 +179,10 @@ select_processor(const char *Name)
             set_global("__PAGE_MASK",  class->page_mask,  VAL_CONSTANT, true, false);
             set_global("__PAGE_SHIFT", PIC12_PAGE_SHIFT,  VAL_CONSTANT, true, false);
             set_global("__PAGE_SIZE",  class->page_size,  VAL_CONSTANT, true, false);
-            set_global("__PAGE_INV",   __ACTIVE_PAGE_INV, VAL_CONSTANT, true, false);
+            set_global("__PAGE_INV",   __PAGE_INV,        VAL_CONSTANT, true, false);
 
-            _make_bank_constants(found, num_of_banks);
-            _make_page_constants(found, num_of_pages);
+            _make_bank_constants_and_variables(found, num_of_banks);
+            _make_page_constants_and_variables(found, num_of_pages);
           }
           else if (class == PROC_CLASS_SX) {
             set_global("__12_BIT",     1,                 VAL_CONSTANT, true, false);
@@ -189,10 +190,10 @@ select_processor(const char *Name)
             set_global("__PAGE_MASK",  class->page_mask,  VAL_CONSTANT, true, false);
             set_global("__PAGE_SHIFT", PIC12_PAGE_SHIFT,  VAL_CONSTANT, true, false);
             set_global("__PAGE_SIZE",  class->page_size,  VAL_CONSTANT, true, false);
-            set_global("__PAGE_INV",   __ACTIVE_PAGE_INV, VAL_CONSTANT, true, false);
+            set_global("__PAGE_INV",   __PAGE_INV,        VAL_CONSTANT, true, false);
 
-            _make_bank_constants(found, num_of_banks);
-            _make_page_constants(found, num_of_pages);
+            _make_bank_constants_and_variables(found, num_of_banks);
+            _make_page_constants_and_variables(found, num_of_pages);
           }
           else if (class == PROC_CLASS_PIC14) {
             set_global("__14_BIT",     1,                 VAL_CONSTANT, true, false);
@@ -200,10 +201,10 @@ select_processor(const char *Name)
             set_global("__PAGE_MASK",  class->page_mask,  VAL_CONSTANT, true, false);
             set_global("__PAGE_SHIFT", PIC14_PAGE_SHIFT,  VAL_CONSTANT, true, false);
             set_global("__PAGE_SIZE",  class->page_size,  VAL_CONSTANT, true, false);
-            set_global("__PAGE_INV",   __ACTIVE_PAGE_INV, VAL_CONSTANT, true, false);
+            set_global("__PAGE_INV",   __PAGE_INV,        VAL_CONSTANT, true, false);
 
-            _make_bank_constants(found, num_of_banks);
-            _make_page_constants(found, num_of_pages);
+            _make_bank_constants_and_variables(found, num_of_banks);
+            _make_page_constants_and_variables(found, num_of_pages);
           }
           else if ((class == PROC_CLASS_PIC14E) || (class == PROC_CLASS_PIC14EX)) {
             set_global("__14_BIT",        1,                    VAL_CONSTANT, true, false);
@@ -213,10 +214,10 @@ select_processor(const char *Name)
             set_global("__PAGE_SHIFT",    PIC14_PAGE_SHIFT,     VAL_CONSTANT, true, false);
             set_global("__PAGE_SIZE",     class->page_size,     VAL_CONSTANT, true, false);
             set_global("__PAGE512_SHIFT", PIC14E_PAGE512_SHIFT, VAL_CONSTANT, true, false);
-            set_global("__PAGE_INV",      __ACTIVE_PAGE_INV,    VAL_CONSTANT, true, false);
+            set_global("__PAGE_INV",      __PAGE_INV,           VAL_CONSTANT, true, false);
 
-            _make_bank_constants(found, num_of_banks);
-            _make_page_constants(found, num_of_pages);
+            _make_bank_constants_and_variables(found, num_of_banks);
+            _make_page_constants_and_variables(found, num_of_pages);
           }
           else if (class == PROC_CLASS_PIC16) {
             set_global("__16_BIT",     1,                 VAL_CONSTANT, true, false);
@@ -224,23 +225,23 @@ select_processor(const char *Name)
             set_global("__PAGE_MASK",  class->page_mask,  VAL_CONSTANT, true, false);
             set_global("__PAGE_SHIFT", PIC16_PAGE_SHIFT,  VAL_CONSTANT, true, false);
             set_global("__PAGE_SIZE",  class->page_size,  VAL_CONSTANT, true, false);
-            set_global("__PAGE_INV",   __ACTIVE_PAGE_INV, VAL_CONSTANT, true, false);
+            set_global("__PAGE_INV",   __PAGE_INV,        VAL_CONSTANT, true, false);
 
-            _make_bank_constants(found, num_of_banks);
-            _make_page_constants(found, num_of_pages);
+            _make_bank_constants_and_variables(found, num_of_banks);
+            _make_page_constants_and_variables(found, num_of_pages);
           }
           else if (class == PROC_CLASS_PIC16E) {
             set_global("__16_BIT",   1, VAL_CONSTANT, true, false);
             set_global("__EXTENDED", 1, VAL_CONSTANT, true, false);
 
-            _make_bank_constants(found, num_of_banks);
+            _make_bank_constants_and_variables(found, num_of_banks);
           }
 
           set_global("__BANK_BITS",  found->bank_bits,       VAL_CONSTANT, true, false);
           set_global("__BANK_MASK",  class->bank_mask,       VAL_CONSTANT, true, false);
           set_global("__BANK_SHIFT", class->bank_bits_shift, VAL_CONSTANT, true, false);
           set_global("__BANK_SIZE",  class->bank_size,       VAL_CONSTANT, true, false);
-          set_global("__BANK_INV",   __ACTIVE_BANK_INV,      VAL_CONSTANT, true, false);
+          set_global("__BANK_INV",   __BANK_INV,             VAL_CONSTANT, true, false);
 
           if ((pair = gp_processor_common_ram_exist(found)) != NULL) {
             set_global("__COMMON_RAM_START", pair[0], VAL_CONSTANT, true, false);
