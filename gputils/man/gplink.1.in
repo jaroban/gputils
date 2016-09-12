@@ -80,6 +80,15 @@ Linker script.
 .BR "\-t SIZE", " \-\-stack SIZE"
 Create a stack section.
 .TP
+.BR "\-S [0|1|2]", " \-\-strict [0|1|2]"
+Set the strict level of the missing symbol.
+.ti +4
+0: This is the default. No message.
+.ti +4
+1: Show warning message if there is missing symbol.
+.ti +4
+2: Show error message if there is missing symbol.
+.TP
 .BR "\-\-strict-options"
 If this is set, then an option may not be parameter of an another option.
 For example: -s --quiet

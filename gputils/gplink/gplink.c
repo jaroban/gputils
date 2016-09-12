@@ -40,7 +40,7 @@ struct gplink_state state;
 static gp_boolean   processor_mismatch_warning;
 static gp_boolean   enable_cinit_wanings;
 
-#define GET_OPTIONS "a:b:cCdf:hI:jlmo:O:p:qrs:t:u:vw"
+#define GET_OPTIONS "a:b:cCdf:hI:jlmo:O:p:qrs:S:t:u:vw"
 
 enum {
   OPT_MPLINK_COMPATIBLE = 0x100,
@@ -67,6 +67,7 @@ static struct option longopts[] =
   { "use-shared",         no_argument,       NULL, 'r' },
   { "script",             required_argument, NULL, 's' },
   { "stack",              required_argument, NULL, 't' },
+  { "strict",             required_argument, NULL, 'S' },
   { "strict-options",     no_argument,       NULL, OPT_STRICT_OPTIONS },
   { "macro",              required_argument, NULL, 'u' },
   { "version",            no_argument,       NULL, 'v' },
@@ -102,6 +103,10 @@ _show_usage(void)
   printf("  -r, --use-shared               Use shared memory if necessary.\n");
   printf("  -s FILE, --script FILE         Linker script.\n");
   printf("  -t SIZE, --stack SIZE          Create a stack section.\n");
+  printf("  -S [0|1|2], --strict [0|1|2]   Set the strict level of the missing symbol.\n"
+         "                                     0: This is the default. No message.\n"
+         "                                     1: Show warning message if there is missing symbol.\n"
+         "                                     2: Show error message if there is missing symbol.\n");
   printf("      --strict-options           If this is set, then an option may not be parameter\n"
          "                                   of an another option. For example: -s --quiet\n");
   printf("  -u, --macro symbol[=value]     Add macro value for script.\n");
@@ -382,6 +387,7 @@ _build_tables(void)
   const symbol_t        *sym;
   const char            *name;
   const gp_coffsymbol_t *var;
+  gp_boolean             need_exit;
 
   /* Create the object file symbol tables. */
   object = state.object;
@@ -435,16 +441,29 @@ _build_tables(void)
   /* All of the archives have been scanned. If there are still missing
      references, it is an error. */
   if (_count_missing() > 0) {
+    need_exit = false;
     for (i = 0; i < gp_sym_get_symbol_count(state.symbol.missing); ++i) {
       sym  = gp_sym_get_symbol_with_index(state.symbol.missing, i);
       name = gp_sym_get_symbol_name(sym);
       assert(name != NULL);
       var = (const gp_coffsymbol_t *)gp_sym_get_symbol_annotation(sym);
       assert(var != NULL);
-      gp_error("Missing definition for symbol \"%s\", required by \"%s\".", name, var->file->filename);
+
+      switch (state.strict_level) {
+        case 1:
+          gp_warning("Missing definition for symbol \"%s\", required by \"%s\".", name, var->file->filename);
+          break;
+
+        case 2:
+          gp_error("Missing definition for symbol \"%s\", required by \"%s\".", name, var->file->filename);
+          need_exit = true;
+          break;
+      }
     }
 
-    exit(1);
+    if (need_exit) {
+      exit(1);
+    }
   }
 }
 
@@ -557,6 +576,7 @@ _init(void)
   state.lst_file             = OUT_NORMAL;
   state.map_file             = OUT_SUPPRESS;
   state.obj_file             = OUT_SUPPRESS;
+  state.strict_level         = 0;
 
   /* set default output filename to be a.o, a.hex, a.cod, a.map */
   strncpy(state.base_file_name, "a", sizeof(state.base_file_name));
@@ -778,6 +798,15 @@ _process_args(int Argc, char *Argv[])
         }
 
         state.src_file_names_tail = fn;
+        break;
+      }
+
+      case 'S': {
+        state.strict_level = atoi(optarg);
+
+        if ((state.strict_level < 0) || (state.strict_level > 2)) {
+          gp_error("Invalid strict level: %d (Must be: 0, 1, 2)", state.strict_level);
+        }
         break;
       }
 
