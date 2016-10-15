@@ -1,3 +1,12 @@
+2016-10-15  Molnar Karoly  <molnarkaroly@users.sourceforge.net>
+  * doc/gputils.lyx:
+    Changed version from 1.5.0 to 1.5.1 .
+
+  * gpasm/directive.c:
+    Fixed bug: "#293 Error with -S2 flag and register in Access RAM"
+    More uniform warnings.
+    Thanks to "fseek" for the report.
+
 2016-09-12  Molnar Karoly  <molnarkaroly@users.sourceforge.net>
   * doc/gputils.lyx, gplink/gplink.c, gplink/gplink.h.in,
     man/gplink.1.in:
@@ -45,7 +54,7 @@
     The default compiler changed from gcc to clang. I corrected
     several warnings which are not indicated the gcc:
     "#290 1.5.0_RC2 clang warnings (format, ..." and other warnings.
-    Thanks to ilovezfs for the report.
+    Thanks to "ilovezfs" for the report.
 
   * gpasm/util.c, gputils/block.c, gputils/dump.c,
     libgputils/gpcoffgen.c:

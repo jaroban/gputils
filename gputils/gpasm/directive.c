@@ -5673,10 +5673,6 @@ _reg_addr_check(int Reg_address, const char *Reg_name, unsigned int Insn_flags, 
 
   /* Don't check address, the linker takes care of it. */
   if (state.mode == MODE_RELOCATABLE) {
-    if ((!i_flags.isReloc) && _core_sfr_or_common_ram(Reg_address)) {
-      return;
-    }
-
     _reg_addr_check_reloc(Reg_address, Reg_name, Insn_flags, Reloc_value, true);
     return;
   }
