@@ -5606,49 +5606,6 @@ fi
 done
 
 
-AM_CFLAGS=
-AM_LDFLAGS=
-
-# Options for the system on which the package will run.
-case "${host}" in
-  *cygwin* )
-    if test "x$GCC" = "xyes"; then
-      AM_CFLAGS="-Wall -pedantic"
-      AM_LDFLAGS="-Wl,-warn-common -Wl,-warn-once"
-    fi
-    ;;
-  *darwin* )
-    if test "x$CC" = "xclang"; then
-      AM_CFLAGS="-Wall -pedantic -Wformat -Wtautological-compare -Wimplicit-function-declaration -Wformat-security"
-    fi
-    ;;
-  *linux* )
-    if test "x$CC" = "xclang"; then
-      AM_CFLAGS="-Wall -pedantic -Wformat -Wtautological-compare -Wimplicit-function-declaration -Wformat-security"
-      AM_LDFLAGS="-Wl,-warn-common -Wl,-warn-once"
-    else
-      if test "x$GCC" = "xyes"; then
-        AM_CFLAGS="-Wall -pedantic -Wformat -Wimplicit-function-declaration -Wformat-security"
-        AM_LDFLAGS="-Wl,-warn-common -Wl,-warn-once"
-      fi
-    fi
-    ;;
-  *mingw* )
-    ;;
-  *-pc-os2_emx | *-pc-os2-emx )
-    EXEEXT=".exe"
-    if test "x$GCC" = "xyes"; then
-      AM_CFLAGS="-Zcrtdll"
-    fi
-    ;;
-  *sun* )
-    # sunos cc needs the -xCC flag for // comments
-    if test "x$GCC" != "xyes"; then
-      AM_CFLAGS="-xCC"
-    fi
-    ;;
-esac
-
 VERSION_MAJOR=`echo $PACKAGE_VERSION | $AWK 'BEGIN {FS="."} {print $1}'`
 VERSION_MINOR=`echo $PACKAGE_VERSION | $AWK 'BEGIN {FS="."} {print $2}'`
 VERSION_MICRO=`echo $PACKAGE_VERSION | $AWK 'BEGIN {FS="."} {print $3}'`
@@ -5676,11 +5633,53 @@ _ACEOF
 
 AM_GPUTILS_SVN_VERSION="\$(shell \$(top_srcdir)/get_cl_revision.sh \$(top_srcdir)/ChangeLog)"
 AM_PACKAGE_SVN_VERSION=`./get_cl_revision.sh ChangeLog`
-CFLAGS="-DGPUTILS_SVN_VERSION=\$(AM_GPUTILS_SVN_VERSION)"
+
+AM_CFLAGS="-DGPUTILS_SVN_VERSION=\$(AM_GPUTILS_SVN_VERSION)"
+AM_LDFLAGS=
+
+# Options for the system on which the package will run.
+case "${host}" in
+  *cygwin* )
+    if test "x$GCC" = "xyes"; then
+      AM_CFLAGS="$AM_CFLAGS -Wall -pedantic"
+      AM_LDFLAGS="-Wl,-warn-common -Wl,-warn-once"
+    fi
+    ;;
+  *darwin* )
+    if test "x$CC" = "xclang"; then
+      AM_CFLAGS="$AM_CFLAGS -Wall -pedantic -Wformat -Wtautological-compare -Wimplicit-function-declaration -Wformat-security"
+    fi
+    ;;
+  *linux* )
+    if test "x$CC" = "xclang"; then
+      AM_CFLAGS="$AM_CFLAGS -Wall -pedantic -Wformat -Wtautological-compare -Wimplicit-function-declaration -Wformat-security"
+      AM_LDFLAGS="-Wl,-warn-common -Wl,-warn-once"
+    else
+      if test "x$GCC" = "xyes"; then
+        AM_CFLAGS="$AM_CFLAGS -Wall -pedantic -Wformat -Wimplicit-function-declaration -Wformat-security"
+        AM_LDFLAGS="-Wl,-warn-common -Wl,-warn-once"
+      fi
+    fi
+    ;;
+  *mingw* )
+    ;;
+  *-pc-os2_emx | *-pc-os2-emx )
+    EXEEXT=".exe"
+    if test "x$GCC" = "xyes"; then
+      AM_CFLAGS="$AM_CFLAGS -Zcrtdll"
+    fi
+    ;;
+  *sun* )
+    # sunos cc needs the -xCC flag for // comments
+    if test "x$GCC" != "xyes"; then
+      AM_CFLAGS="$AM_CFLAGS -xCC"
+    fi
+    ;;
+esac
 
 # Host filesystem options.
 case "${host}" in
-  *mingw* | *-pc-os2_emx | *-pc-os2-emx | *djgpp*)
+  *mingw* | *-pc-os2_emx | *-pc-os2-emx | *djgpp* )
 
 $as_echo "#define HAVE_DOS_BASED_FILE_SYSTEM 1" >>confdefs.h
 
@@ -5695,7 +5694,7 @@ $as_echo "#define GPUTILS_DEBUG 1" >>confdefs.h
 fi
 
 if test x$enable_gdb_debuginfo = xyes; then
-  CFLAGS="$CFLAGS -ggdb"
+  AM_CFLAGS="$AM_CFLAGS -ggdb"
 fi
 
 if test x$enable_gputils_path = xyes; then
@@ -5704,11 +5703,7 @@ $as_echo "#define USE_DEFAULT_PATHS 1" >>confdefs.h
 
 fi
 
-LDFLAGS=
-
 # Substitute configuration variables.
-
-
 
 
 
@@ -7224,6 +7219,7 @@ $PACKAGE_NAME-$PACKAGE_VERSION is now configured for $canonical_host_type
   Source directory:     $srcdir
   Installation prefix:  $prefix
   C compiler:           $CC $AM_CFLAGS $CFLAGS
+  C linker:             $CC $AM_LDFLAGS
   Location of MPLAB-X:  $DEFAULT_MPLABX_PATH
 
 " >&5
@@ -7236,6 +7232,7 @@ $PACKAGE_NAME-$PACKAGE_VERSION is now configured for $canonical_host_type
   Source directory:     $srcdir
   Installation prefix:  $prefix
   C compiler:           $CC $AM_CFLAGS $CFLAGS
+  C linker:             $CC $AM_LDFLAGS
   Location of MPLAB-X:  $DEFAULT_MPLABX_PATH
 
 " >&6; }
