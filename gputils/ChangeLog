@@ -1,3 +1,8 @@
+2016-11-29  Molnar Karoly  <molnarkaroly@users.sourceforge.net>
+  * libgputils/gpdis.c:
+    Fixed this bug: "#297 gpdis.c:632: bad if test ?"
+    Thanks to dcb for the report.
+
 2016-10-15  Molnar Karoly  <molnarkaroly@users.sourceforge.net>
   * configure.ac, configure:
     Fixed bug: "#295 CFLAGS should not override environment"

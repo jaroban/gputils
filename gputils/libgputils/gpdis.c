@@ -627,7 +627,7 @@ _class_lit11:
       }
       else {
         /* PROC_CLASS_PIC14E or PROC_CLASS_PIC14EX */
-        if ((file1 == PIC14_REG_PCLATH) && ((tmp >= 3) || (tmp <= 6))) {
+        if ((file1 == PIC14_REG_PCLATH) && (tmp >= 3) && (tmp <= 6)) {
           tmp = 1 << tmp;
 
           if (icode == ICODE_BCF) {
