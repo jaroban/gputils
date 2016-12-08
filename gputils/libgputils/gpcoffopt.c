@@ -394,19 +394,22 @@ _sections_decrease_start_address(proc_class_t Class, const gp_section_t *Section
     section = section_array[i];
     /* Prevents the modification of sections on other pages. */
     if (section->address > Section->address) {
-      byte_address = section->address - Byte_offset;
-      insn_address = gp_processor_insn_from_byte_c(Class, byte_address);
-      gp_mem_b_move(section->data, section->address, byte_address, section->size);
-      section->address = byte_address;
+      /* We must not modify an absolute section. */
+      if (FlagIsClr(section->flags, STYP_ABS)) {
+        byte_address = section->address - Byte_offset;
+        insn_address = gp_processor_insn_from_byte_c(Class, byte_address);
+        gp_mem_b_move(section->data, section->address, byte_address, section->size);
+        section->address = byte_address;
 
-      symbol = section->symbol;
-      if (symbol != NULL) {
-        value_prev     = symbol->value;
-        symbol->value -= Insn_offset;
-        assert((gp_symvalue_t)insn_address == symbol->value);
+        symbol = section->symbol;
+        if (symbol != NULL) {
+          value_prev     = symbol->value;
+          symbol->value -= Insn_offset;
+          assert((gp_symvalue_t)insn_address == symbol->value);
+        }
+
+        _label_array_decrease_addresses(Class, section, value_prev, Insn_offset);
       }
-
-      _label_array_decrease_addresses(Class, section, value_prev, Insn_offset);
     }
   }
 }
@@ -424,14 +427,17 @@ _linenum_decrease_addresses(proc_class_t Class, gp_section_t *First_section,
 
   section = First_section;
   while (section != NULL) {
-    linenum = section->line_number_list.first;
-    while (linenum != NULL) {
-      /* Prevents the modification of linenumbers on other pages. */
-      if ((_page_addr_from_byte_addr(Class, linenum->address) == Relocation_page) &&
-          (linenum->address >= Start_address)) {
-        linenum->address -= Byte_offset;
+    /* We must not modify an absolute section. */
+    if (FlagIsClr(section->flags, STYP_ABS)) {
+      linenum = section->line_number_list.first;
+      while (linenum != NULL) {
+        /* Prevents the modification of linenumbers on other pages. */
+        if ((_page_addr_from_byte_addr(Class, linenum->address) == Relocation_page) &&
+            (linenum->address >= Start_address)) {
+          linenum->address -= Byte_offset;
+        }
+        linenum = linenum->next;
       }
-      linenum = linenum->next;
     }
     section = section->next;
   }

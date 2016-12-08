@@ -1,3 +1,8 @@
+2016-12-08  Molnar Karoly  <molnarkaroly@users.sourceforge.net>
+  * libgputils/gpcoffopt.c:
+    Fixed this bug: "#296 gplink optimize-banksel breaks config fuse."
+    Thanks to Yamada Tarou for the report.
+
 2016-11-29  Molnar Karoly  <molnarkaroly@users.sourceforge.net>
   * libgputils/gpdis.c:
     Fixed this bug: "#297 gpdis.c:632: bad if test ?"
