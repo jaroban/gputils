@@ -1,3 +1,8 @@
+2016-12-11  Molnar Karoly  <molnarkaroly@users.sourceforge.net>
+	* tools/device-help.pl:
+	  Changed website from http://gputils.sourceforge.net
+	  to https://gputils.sourceforge.io .
+
 2016-06-27  Molnar Karoly  <molnarkaroly@users.sourceforge.net>
 	* tools/device-manager.pl:
 	  Unified handling of RAM bank properties.

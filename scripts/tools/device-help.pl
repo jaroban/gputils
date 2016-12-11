@@ -54,7 +54,7 @@ my $PROGRAM = 'device-help.pl';
 
 my $verbose = 0;
 
-my $gputils_url = 'gputils.sourceforge.net';
+my $gputils_url = 'gputils.sourceforge.io';
 my $mplabx_url  = 'https://www.microchip.com/mplab/mplab-x-ide';
 
 my $gputils_path  = "$ENV{HOME}/svn_snapshots/gputils/gputils";
@@ -2282,7 +2282,7 @@ EOT
 sub print_source_info($)
   {
   my $Align = $_[0];
-  my $href1 = "<a href=\"http://${gputils_url}#Download\">gputils</a> source package";
+  my $href1 = "<a href=\"https://${gputils_url}#Download\">gputils</a> source package";
   my $href2 = "<a href=\"https://sourceforge.net/p/gputils/code/$svn_rev/\">$svn_rev</a>";
   my $time  = strftime('%F %T UTC', gmtime);
 
@@ -5025,7 +5025,7 @@ for (my $i = 0; $i < scalar(@ARGV); )
       {
       die "This option \"$opt\" requires a parameter.\n" if ($i > $#ARGV);
 
-      $remote_url = "http://$ARGV[$i++]/";
+      $remote_url = "https://$ARGV[$i++]/";
       }
 
     when (/^-(l|-list-file)$/o)
