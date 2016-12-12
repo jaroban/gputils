@@ -1,3 +1,8 @@
+2016-12-12  Molnar Karoly  <molnarkaroly@users.sourceforge.net>
+  * gpasm/gpasm.c:
+    Fixed this bug: "#298 GPASM command line help - bad printing"
+    Thanks to Philippe Paternotte for the report.
+
 2016-12-08  Molnar Karoly  <molnarkaroly@users.sourceforge.net>
   * libgputils/gpcoffopt.c:
     Fixed this bug: "#296 gplink optimize-banksel breaks config fuse."

@@ -151,9 +151,9 @@ _show_usage(void)
          "                                 (W or F and A or B) and the \"Undefined Processor\" messages.\n"
          "                                 The \"strict messages\" have higher priority than the warnings.\n"
          "                                 (See: -w [0|1|2]) [0]\n");
-  printf("                                     0: Is the default. No strict messages.\n"
+  printf("                                     0: Is the default. No strict messages.\n"
          "                                     1: Show warning messages if one of is missing.\n"
-         "                                     2: Show error messages if one of is missing.\n");
+         "                                     2: Show error messages if one of is missing.\n");
   printf("  -t, --sdcc-dev14-list          Help to the extension of the pic14devices.txt file\n"
          "                                 in the sdcc project. Using by itself, displays the all\n"
          "                                 '14', '14e' and '14f' devices. Along with the '-p'\n"
