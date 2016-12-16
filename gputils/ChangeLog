@@ -1,3 +1,11 @@
+2016-12-16  Molnar Karoly  <molnarkaroly@users.sourceforge.net>
+  * gpasm/directive.c:
+    Fixed this bug: "#299 GPASM unexpected error"
+    Thanks to Philippe Paternotte for the report.
+
+  * gpasm/evaluate.c, gpasm/util.c:
+    Fix a clang-3.7.0 and clang-3.8.0 bug. (Misleading warning.)
+
 2016-12-12  Molnar Karoly  <molnarkaroly@users.sourceforge.net>
   * gpasm/gpasm.c:
     Fixed this bug: "#298 GPASM command line help - bad printing"

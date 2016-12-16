@@ -6295,12 +6295,22 @@ do_insn(const char *Op_name, pnode_t *Parameters)
           int value;
           int fsr;
 
-          p   = PnListHead(Parameters);
-          fsr = eval_maybe_evaluate(p);
+          p    = PnListHead(Parameters);
+          fsr  = eval_maybe_evaluate(p);
+          file = -1;
 
-          if ((fsr == PIC14E_REG_FSR0) || (fsr == PIC14E_REG_FSR1)) {
-            fsr = (fsr == PIC14E_REG_FSR1) ? 0x40 : 0x00;
-            p   = PnListHead(PnListTail(Parameters));
+          if ((fsr == PIC14E_REG_INDF0) || (fsr == PIC14E_REG_INDF1)) {
+            file = (fsr == PIC14E_REG_INDF1) ? 0x40 : 0x00;
+          }
+
+          if (file < 0) {
+            if ((fsr == PIC14E_REG_FSR0) || (fsr == PIC14E_REG_FSR1)) {
+              file = (fsr == PIC14E_REG_FSR1) ? 0x40 : 0x00;
+            }
+          }
+
+          if (file >= 0) {
+            p = PnListHead(PnListTail(Parameters));
             /* the offset cannot be a relocatable address */
             value = eval_maybe_evaluate(p);
 
@@ -6311,10 +6321,10 @@ do_insn(const char *Op_name, pnode_t *Parameters)
               gpmsg_verror(GPE_OUT_OF_RANGE, "%ins > 31", value);
             }
 
-            _emit(ins->opcode | fsr | (value & 0x3f), sym_name);
+            _emit(ins->opcode | file | (value & 0x3f), sym_name);
           }
           else {
-            gpmsg_verror(GPE_OUT_OF_RANGE, "FSR = %ins.", fsr);
+            gpmsg_verror(GPE_OUT_OF_RANGE, "FSR = %ins, can be 0, 1, 4 or 6. (Internal conversion: 4->0, 6->1)", fsr);
           }
         }
 
@@ -7742,7 +7752,7 @@ do_insn(const char *Op_name, pnode_t *Parameters)
               _emit(opcode, sym_name);
             }
             else {
-              gpmsg_error(GPE_ILLEGAL_ARGU, "Illegal argument.");
+              gpmsg_verror(GPE_OUT_OF_RANGE, "INDF = %ins, can be 0, 1, 4 or 6. (Internal conversion: 4->0, 6->1)", fsr);
             }
             break;
           }
@@ -7785,7 +7795,7 @@ do_insn(const char *Op_name, pnode_t *Parameters)
               }
             }
             else {
-              gpmsg_error(GPE_ILLEGAL_ARGU, "Illegal argument.");
+              gpmsg_verror(GPE_OUT_OF_RANGE, "INDF = %ins, can be 0, 1, 4 or 6. (Internal conversion: 4->0, 6->1)", fsr);
             }
             break;
           }
@@ -7832,7 +7842,7 @@ do_insn(const char *Op_name, pnode_t *Parameters)
               }
             }
             else {
-              gpmsg_error(GPE_ILLEGAL_ARGU, "Illegal argument.");
+              gpmsg_verror(GPE_OUT_OF_RANGE, "INDF = %ins, can be 0, 1, 4 or 6. (Internal conversion: 4->0, 6->1)", fsr);
             }
 
             break;

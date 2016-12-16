@@ -1114,14 +1114,20 @@ pnode_symbol_name(const pnode_t *Pnode)
 /*------------------------------------------------------------------------------------------------*/
 
 gpasmVal
-pnode_symbol_value(const pnode_t *Pnode)
+pnode_symbol_value(const pnode_t* Pnode)
 {
-  const symbol_t   *sym;
-  const variable_t *var;
+  const char*       name;
+  const symbol_t*   sym;
+  const variable_t* var;
   int               addr;
 
   if (PnIsSymbol(Pnode)) {
+/*
+clang-3.7.0, 3.8.0 bug.
     if (strcmp(PnSymbol(Pnode), "$") == 0) {
+*/
+    name = PnSymbol(Pnode);
+    if ((name[0] == '$') && (name[1] == '\0')) {
       addr = (IS_RAM_ORG ? state.byte_addr :
                            gp_processor_insn_from_byte_p(state.processor, state.byte_addr));
       return addr;

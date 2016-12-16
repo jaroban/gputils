@@ -113,7 +113,11 @@ eval_can_evaluate(const pnode_t *Pnode)
       name = PnSymbol(Pnode);
 
       /* '$' means current org, which we can always evaluate */
+/*
+clang-3.7.0, 3.8.0 bug.
       if (strcmp(name, "$") == 0) {
+*/
+      if ((name[0] == '$') && (name[1] == '\0')) {
         return true;
       }
 
@@ -190,7 +194,11 @@ eval_can_evaluate_value(const pnode_t *Pnode)
       name = PnSymbol(Pnode);
 
       /* '$' means current org, which we can evaluate if section at absolute address. */
+/*
+clang-3.7.0, 3.8.0 bug.
       if (strcmp(name, "$") == 0) {
+*/
+      if ((name[0] == '$') && (name[1] == '\0')) {
         return (FlagIsSet(state.obj.new_sect_flags, STYP_ABS) ? true : false);
       }
 
@@ -251,21 +259,29 @@ eval_can_evaluate_value(const pnode_t *Pnode)
 static gp_boolean
 _is_program_segment(const pnode_t *Pnode)
 {
-  const symbol_t   *sym;
-  const variable_t *var;
+  const symbol_t*   sym;
+  const variable_t* var;
+  const char*       str;
 
-  if (PnIsSymbol(Pnode) && (strcmp(PnSymbol(Pnode), "$") != 0)) {
-    sym = gp_sym_get_symbol(state.stTop, PnSymbol(Pnode));
-    assert(sym != NULL);
+  if (PnIsSymbol(Pnode)) {
+    str = PnSymbol(Pnode);
+/*
+clang-3.7.0, 3.8.0 bug.
+    if (strcmp(str, "$") != 0) {
+*/
+    if ((str[0] != '$') || (str[1] != '\0')) {
+      sym = gp_sym_get_symbol(state.stTop, PnSymbol(Pnode));
+      assert(sym != NULL);
 
-    var = gp_sym_get_symbol_annotation(sym);
-    assert(var != NULL);
+      var = gp_sym_get_symbol_annotation(sym);
+      assert(var != NULL);
 
-    if (FlagIsSet(var->flags, VATRR_HAS_NO_VALUE)) {
-      msg_has_no_value(NULL, PnSymbol(Pnode));
+      if (FlagIsSet(var->flags, VATRR_HAS_NO_VALUE)) {
+        msg_has_no_value(NULL, PnSymbol(Pnode));
+      }
+
+      return ((var->type == VAL_ADDRESS) ? true : false);
     }
-
-    return ((var->type == VAL_ADDRESS) ? true : false);
   }
 
   return false;
@@ -295,7 +311,11 @@ eval_evaluate(const pnode_t *Pnode)
     case PTAG_SYMBOL: {
       name = PnSymbol(Pnode);
 
+/*
+clang-3.7.0, 3.8.0 bug.
       if (strcmp(name, "$") == 0) {
+*/
+      if ((name[0] == '$') && (name[1] == '\0')) {
         return (IS_RAM_ORG ? state.byte_addr :
                              gp_processor_insn_from_byte_p(state.processor, state.byte_addr));
       }
@@ -541,7 +561,11 @@ eval_count_reloc(const pnode_t *Pnode)
     case PTAG_SYMBOL: {
       name = PnSymbol(Pnode);
 
+/*
+clang-3.7.0, 3.8.0 bug.
       if (strcmp(name, "$") == 0) {
+*/
+      if ((name[0] == '$') && (name[1] == '\0')) {
         return 1;
       }
 
@@ -612,7 +636,11 @@ _add_reloc(const pnode_t *Pnode, int16_t Offset, uint16_t Type, gp_boolean Add_c
     case PTAG_SYMBOL: {
       name = PnSymbol(Pnode);
 
+/*
+clang-3.7.0, 3.8.0 bug.
       if (strcmp(name, "$") == 0) {
+*/
+      if ((name[0] == '$') && (name[1] == '\0')) {
         if (IS_RAM_ORG) {
           digits = state.device.class->word_digits;
           org    = state.byte_addr;
@@ -801,7 +829,11 @@ _same_section(const pnode_t *Pnode)
   name0 = PnSymbol(p0);
   name1 = PnSymbol(p1);
 
+/*
+clang-3.7.0, 3.8.0 bug.
   if (strcmp(name0, "$") == 0) {
+*/
+  if ((name0[0] == '$') && (name0[1] == '\0')) {
     section_num0 = state.obj.section_num;
   }
   else {
@@ -812,7 +844,11 @@ _same_section(const pnode_t *Pnode)
     section_num0 = var0->coff_section_num;
   }
 
+/*
+clang-3.7.0, 3.8.0 bug.
   if (strcmp(name1, "$") == 0) {
+*/
+  if ((name1[0] == '$') && (name1[1] == '\0')) {
     section_num1 = state.obj.section_num;
   }
   else {
