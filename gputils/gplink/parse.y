@@ -34,7 +34,7 @@ void yyerror(const char *Message)
 
 int yylex(void);
 
-/************************************************************************/
+/**************************************************************************************************/
 
 /* Some simple functions for building parse trees */
 
@@ -47,6 +47,8 @@ _mk_pnode(enum pnode_tag Tag)
   return new;
 }
 
+/*------------------------------------------------------------------------------------------------*/
+
 static pnode_t *
 _mk_constant(long Value)
 {
@@ -55,6 +57,8 @@ _mk_constant(long Value)
   PnConstant(new) = Value;
   return new;
 }
+
+/*------------------------------------------------------------------------------------------------*/
 
 static pnode_t *
 _mk_symbol(const char *String)
@@ -65,6 +69,8 @@ _mk_symbol(const char *String)
   return new;
 }
 
+/*------------------------------------------------------------------------------------------------*/
+
 /*
 static pnode_t *
 _mk_string(const char *String)
@@ -74,8 +80,9 @@ _mk_string(const char *String)
   PnString(new) = String;
   return new;
 }
-
 */
+
+/*------------------------------------------------------------------------------------------------*/
 
 static pnode_t *
 _mk_list(pnode_t *Head, pnode_t *Tail)
@@ -86,6 +93,8 @@ _mk_list(pnode_t *Head, pnode_t *Tail)
   PnListTail(new) = Tail;
   return new;
 }
+
+/*------------------------------------------------------------------------------------------------*/
 
 static pnode_t *
 _mk_2op(int Op, pnode_t *Pnode0, pnode_t *Pnode1)
@@ -98,6 +107,8 @@ _mk_2op(int Op, pnode_t *Pnode0, pnode_t *Pnode1)
   return new;
 }
 
+/*------------------------------------------------------------------------------------------------*/
+
 /*
 static pnode_t *
 _mk_1op(int Op, pnode_t *Pnode)
@@ -108,7 +119,6 @@ _mk_1op(int Op, pnode_t *Pnode)
   PnUnOpP0(new) = Pnode;
   return new;
 }
-
 */
 
 %}

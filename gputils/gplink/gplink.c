@@ -855,8 +855,6 @@ _process_args(int Argc, char *Argv[])
     pc = strrchr(Argv[optind], '.');
 
     if ((pc != NULL) && (strcasecmp(pc, ".lkr") == 0)) {
-      srcfns_t *fn;
-
       fn = GP_Malloc(sizeof(srcfns_t));
       fn->file_name = GP_Strdup(Argv[optind++]);
       fn->next      = NULL;

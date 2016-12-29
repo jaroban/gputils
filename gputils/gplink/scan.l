@@ -37,7 +37,24 @@ Boston, MA 02111-1307, USA.  */
 /* YY_UNPUT not used, suppress the warning */
 #define YY_NO_UNPUT
 
-static void _bad_char(const char *Character);
+//static void _bad_char(const char *Character);
+
+/*------------------------------------------------------------------------------------------------*/
+
+static void
+_bad_char(const char *Character)
+{
+  char complaint[80];
+
+  snprintf(complaint, sizeof(complaint),
+           isprint(*Character) ? "Illegal character '%c' in numeric constant." :
+                                 "Illegal character %#x in numeric constant.",
+           *Character);
+
+  script_error(complaint, NULL);
+}
+
+/*------------------------------------------------------------------------------------------------*/
 
 static inline size_t
 _input(char *Buf, size_t Max_size)
@@ -73,6 +90,8 @@ _input(char *Buf, size_t Max_size)
   }
 }
 
+/*------------------------------------------------------------------------------------------------*/
+
 static inline size_t
 _yyinput(char *Buf, size_t Max_size)
 {
@@ -102,7 +121,7 @@ SYM \/?([a-z0-9_.\\:]+\/?)+
                           if (close_file())
                             return LEXEOF;
                         }
-\"[^\"]*\"              {
+\"[^\"]*\"              { /* " */
                           yyleng -= 2;
                           yylval.s = GP_Strndup(yytext + 1, yyleng);
                           return STRING;
@@ -167,18 +186,7 @@ error([ \t].*)?         {
                         }
 %%
 
-static void
-_bad_char(const char *Character)
-{
-  char complaint[80];
-
-  snprintf(complaint, sizeof(complaint),
-           isprint(*Character) ? "Illegal character '%c' in numeric constant." :
-                                 "Illegal character %#x in numeric constant.",
-           *Character);
-
-  script_error(complaint, NULL);
-}
+/*------------------------------------------------------------------------------------------------*/
 
 void
 open_src(const char *Name, gp_boolean Is_include)
@@ -233,6 +241,8 @@ open_src(const char *Name, gp_boolean Is_include)
   new->last_char_is_nl = true;
   state.src = new;
 }
+
+/*------------------------------------------------------------------------------------------------*/
 
 gp_boolean
 close_file(void)

@@ -69,8 +69,8 @@ _get_symbol_from_table(const symbol_table_t *Table, hash128_t *Hash)
   size_t     mid;
   size_t     len;
 
-  assert(Table != NULL);
-  assert(Hash != NULL);
+  assert(!(Table == NULL));
+  assert(!(Hash == NULL));
 
   if ((Table->symbol_array == NULL) || (Table->num_symbol == 0)) {
     return NULL;
@@ -123,7 +123,7 @@ gp_sym_push_table(symbol_table_t *Table, gp_boolean Case_insensitive)
 symbol_table_t *
 gp_sym_pop_table(symbol_table_t *Table)
 {
-  assert(Table != NULL);
+  assert(!(Table == NULL));
 
   return Table->prev;
 }
@@ -133,7 +133,7 @@ gp_sym_pop_table(symbol_table_t *Table)
 void
 gp_sym_set_guest_table(symbol_table_t *Table_host, symbol_table_t *Table_guest)
 {
-  assert(Table_host != NULL);
+  assert(!(Table_host == NULL));
 
   Table_host->prev = Table_guest;
 }
@@ -143,7 +143,7 @@ gp_sym_set_guest_table(symbol_table_t *Table_host, symbol_table_t *Table_guest)
 symbol_table_t *
 gp_sym_get_guest_table(symbol_table_t *Table)
 {
-  assert(Table != NULL);
+  assert(!(Table == NULL));
 
   return Table->prev;
 }
@@ -161,8 +161,8 @@ gp_sym_add_symbol(symbol_table_t *Table, const char *Name)
   size_t      len;
   hash128_t   hash;
 
-  assert(Table != NULL);
-  assert(Name != NULL);
+  assert(!(Table == NULL));
+  assert(!(Name == NULL));
   assert(Table->num_symbol <= UINT32_MAX);
 
   if (Table->symbol_array == NULL) {
@@ -244,7 +244,7 @@ gp_sym_remove_symbol_with_index(symbol_table_t *Table, size_t Index)
   symbol_t  *sym;
   size_t     len;
 
-  assert(Table != NULL);
+  assert(!(Table == NULL));
 
   if ((Table->symbol_array == NULL) || (Table->num_symbol == 0)) {
     return false;
@@ -286,8 +286,8 @@ gp_sym_remove_symbol(symbol_table_t *Table, const char *Name)
   size_t     len;
   hash128_t  hash;
 
-  assert(Table != NULL);
-  assert(Name != NULL);
+  assert(!(Table == NULL));
+  assert(!(Name == NULL));
 
   if ((Table->symbol_array == NULL) || (Table->num_symbol == 0)) {
     return false;
@@ -329,7 +329,7 @@ gp_sym_remove_symbol(symbol_table_t *Table, const char *Name)
 size_t
 gp_sym_get_symbol_count(const symbol_table_t *Table)
 {
-  assert(Table != NULL);
+  assert(!(Table == NULL));
 
   return Table->num_symbol;
 }
@@ -344,8 +344,8 @@ gp_sym_get_symbol(const symbol_table_t *Table, const char *Name)
   gp_boolean  first;
   gp_boolean  prev_case;
 
-  assert(Table != NULL);
-  assert(Name != NULL);
+  assert(!(Table == NULL));
+  assert(!(Name == NULL));
 
   first     = true;
   prev_case = false;
@@ -380,8 +380,8 @@ gp_sym_get_symbol_len(const symbol_table_t *Table, const char *Name, size_t Len)
   gp_boolean  first;
   gp_boolean  prev_case;
 
-  assert(Table != NULL);
-  assert(Name != NULL);
+  assert(!(Table == NULL));
+  assert(!(Name == NULL));
 
   first     = true;
   prev_case = false;
@@ -411,8 +411,8 @@ gp_sym_get_symbol_len(const symbol_table_t *Table, const char *Name, size_t Len)
 symbol_t *
 gp_sym_get_symbol_with_index(const symbol_table_t *Table, size_t Index)
 {
-  assert(Table != NULL);
-  assert(Index < Table->num_symbol);
+  assert(!(Table == NULL));
+  assert(!(Index >= Table->num_symbol));
 
   return Table->symbol_array[Index];
 }
@@ -425,7 +425,7 @@ gp_sym_clone_symbol_array(const symbol_table_t *Table, symbol_compare_t Cmp)
   size_t           size;
   const symbol_t **array;
 
-  assert(Table != NULL);
+  assert(!(Table == NULL));
 
   if (Table->num_symbol == 0) {
     return NULL;
@@ -447,7 +447,7 @@ gp_sym_clone_symbol_array(const symbol_table_t *Table, symbol_compare_t Cmp)
 void
 gp_sym_annotate_symbol(symbol_t *Sym, void *Value)
 { 
-  assert(Sym != NULL);
+  assert(!(Sym == NULL));
 
   Sym->annotation = Value;
 }
@@ -457,7 +457,7 @@ gp_sym_annotate_symbol(symbol_t *Sym, void *Value)
 const char *
 gp_sym_get_symbol_name(const symbol_t *Sym)
 {
-  assert(Sym != NULL);
+  assert(!(Sym == NULL));
 
   return Sym->name;
 }
@@ -467,7 +467,7 @@ gp_sym_get_symbol_name(const symbol_t *Sym)
 void *
 gp_sym_get_symbol_annotation(const symbol_t *Sym)
 {
-  assert(Sym != NULL);
+  assert(!(Sym == NULL));
 
   return Sym->annotation;
 }

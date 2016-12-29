@@ -174,8 +174,11 @@ gp_cofflink_clean_table(gp_object_t *Object, symbol_table_t *Symbols)
   const gp_coffsymbol_t *var;
   const symbol_t        *sym;
   gp_symbol_t           *next;
+  int                    num_clean_errors;
 
   gp_debug("Cleaning symbol table.");
+
+  num_clean_errors = gp_real_num_errors();
 
   /* point all relocations to the symbol definitions */
   section = Object->section_list.first;
@@ -186,19 +189,27 @@ gp_cofflink_clean_table(gp_object_t *Object, symbol_table_t *Symbols)
 
       if (gp_coffgen_is_external_symbol(symbol)) {
         /* This is an external symbol defined elsewhere. */
-        sym    = gp_sym_get_symbol(Symbols, symbol->name);
-        assert(sym != NULL);
-        var    = (const gp_coffsymbol_t *)gp_sym_get_symbol_annotation(sym);
-        assert(var != NULL);
-        symbol = var->symbol;
-        assert(symbol != NULL);
-        relocation->symbol = symbol;
+        sym = gp_sym_get_symbol(Symbols, symbol->name);
+        if (sym == NULL) {
+          gp_error("Non-existent external symbol - \"%s\" - used in \"%s\" section.", symbol->name, section->name);
+        }
+        else {
+          var    = (const gp_coffsymbol_t *)gp_sym_get_symbol_annotation(sym);
+          assert(!(var == NULL));
+          symbol = var->symbol;
+          assert(!(symbol == NULL));
+          relocation->symbol = symbol;
+        }
       }
 
       relocation = relocation->next;
     }
 
     section = section->next;
+  }
+
+  if (gp_real_num_errors() > num_clean_errors) {
+    exit(1);
   }
 
   symbol = Object->symbol_list.first;

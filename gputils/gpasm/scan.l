@@ -554,7 +554,7 @@ a'{STR_QCHAR}'           {
                            char         *buf = GP_Malloc(len);
                            int           c = yytext[0];
                            gp_boolean    prev_esc = false;
-                           int           state = 0;
+                           int           _state = 0;
 
                            if (emit_comma) {
                              unput(c);
@@ -571,7 +571,7 @@ a'{STR_QCHAR}'           {
                            for (; ; ) {
                              switch (c) {
                              case ',':
-                               if (state != 0) {
+                               if (_state != 0) {
                                  goto no_esc;
                                }
 
@@ -579,7 +579,7 @@ a'{STR_QCHAR}'           {
                                goto skip_trailing;
 
                              case ';':
-                               if (state != 0) {
+                               if (_state != 0) {
                                  goto no_esc;
                                }
 
@@ -608,8 +608,8 @@ a'{STR_QCHAR}'           {
                              case '"':
                              case '\'':
                                /* escaping out of string doesn't have any special meaning */
-                               if ((state == 0) || ((state != 0) && !prev_esc)) {
-                                 state = (state == 0) ? c : ((state == c) ? 0 : state);
+                               if ((_state == 0) || ((_state != 0) && !prev_esc)) {
+                                 _state = (_state == 0) ? c : ((_state == c) ? 0 : _state);
                                }
                                /* fall through */
                              default:

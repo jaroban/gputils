@@ -303,7 +303,7 @@ _find_hv_macro_start(const char *String, const char **Start, const char **Body)
 {
   const char *ptr;
   char        ch;
-  int         state;
+  int         _state;
 
   if ((String == NULL) || (*String == '\0')) {
     return false;
@@ -313,7 +313,7 @@ _find_hv_macro_start(const char *String, const char **Start, const char **Body)
   do {
     *Start = NULL;
     *Body  = NULL;
-    state  = HVM_NONE;
+    _state = HVM_NONE;
     do {
       /* Find the beginner '#' character. */
       while (true) {
@@ -326,7 +326,7 @@ _find_hv_macro_start(const char *String, const char **Start, const char **Body)
           /* This is the beginner '#' character. */
           *Start = ptr;
           ++ptr;
-          state = HVM_BEGIN;
+          _state = HVM_BEGIN;
           break;
         }
 
@@ -360,11 +360,11 @@ _find_hv_macro_start(const char *String, const char **Start, const char **Body)
 
       if ((ch == 'v') || (ch == 'V')) {
         /* This a "v" macro. */
-        state = HVM_NAME;
+        _state = HVM_NAME;
         break;
       }
     } while (ch == ' ');
-  } while (state != HVM_NAME);
+  } while (_state != HVM_NAME);
 
   /* Find the '(' character. */
   while (true) {

@@ -217,7 +217,7 @@ _substitute_define(char *Buf, int Begin, int *End, int *Num, int Max_size, int L
   int         n_args;
   int         start1;
   int         end1;
-  int         state;
+  int         _state;
   gp_boolean  prev_esc;
   int         brackdepth;
   int         len;
@@ -244,7 +244,7 @@ _substitute_define(char *Buf, int Begin, int *End, int *Num, int Max_size, int L
       }
 
       for (; ; ) {
-        state      = 0;
+        _state     = 0;
         prev_esc   = false;
         brackdepth = 0;
 
@@ -252,7 +252,7 @@ _substitute_define(char *Buf, int Begin, int *End, int *Num, int Max_size, int L
         start1 = *End;
 
         while ((*End < *Num) &&
-               ((state != 0) ||
+               ((_state != 0) ||
                 (brackdepth != 0) ||
                 ((Buf[*End] != ',') &&
                  (Buf[*End] != ';') &&
@@ -260,27 +260,27 @@ _substitute_define(char *Buf, int Begin, int *End, int *Num, int Max_size, int L
                   (!bracket && (Buf[*End] != '\n')))))) {
           switch (Buf[*End]) {
             case '(': {
-              if (state == 0) {
+              if (_state == 0) {
                 ++brackdepth;
               }
               break;
             }
 
             case ')': {
-              if (state == 0) {
+              if (_state == 0) {
                 --brackdepth;
               }
               break;
             }
 
             case '\\':
-              prev_esc = (state != 0) ? !prev_esc : false;
+              prev_esc = (_state != 0) ? !prev_esc : false;
               break;
 
             case '"':
             case '\'':
               if (!prev_esc) {
-                state = (state == 0) ? Buf[*End] : ((state == Buf[*End]) ? 0 : state);
+                _state = (_state == 0) ? Buf[*End] : ((_state == Buf[*End]) ? 0 : _state);
               }
             default:
               prev_esc = false;
@@ -418,7 +418,7 @@ static gp_boolean
 _preprocess(char *Buf, int Begin, int *End, int *Num, int Max_size, substitute_func_t Substitute, int Level)
 {
   int        start;
-  int        state;             /* '"': in double quotes; '\'': in single quotes; ';': in comment */
+  int        _state;            /* '"': in double quotes; '\'': in single quotes; ';': in comment */
   gp_boolean prev_esc;          /* true: prev char was escape */
   int        in_hv;             /* in #v */
   gp_boolean number_start;      /* true: possible start of a x'nnn' formatted number */
@@ -435,7 +435,7 @@ _preprocess(char *Buf, int Begin, int *End, int *Num, int Max_size, substitute_f
   }
 
   start        = -1;
-  state        = 0;
+  _state       = 0;
   in_hv        = 0;
   prev_esc     = false;
   number_start = false;
@@ -447,7 +447,7 @@ _preprocess(char *Buf, int Begin, int *End, int *Num, int Max_size, substitute_f
   for (i = Begin; i < *End; ++i) {
     c = Buf[i];
 
-    if (state == 0) {
+    if (_state == 0) {
       if (c == '#') {
         in_hv = '#';
       }
@@ -517,12 +517,12 @@ _preprocess(char *Buf, int Begin, int *End, int *Num, int Max_size, substitute_f
 
     switch (c) {
       case '\\':
-        prev_esc = ((state == '"') || (state == '\'')) ? (!prev_esc) : false;
+        prev_esc = ((_state == '"') || (_state == '\'')) ? (!prev_esc) : false;
         break;
 
       case ';': {
-        if (state == 0) {
-          state = c;
+        if (_state == 0) {
+          _state = c;
         }
         prev_esc = false;
         break;
@@ -530,8 +530,8 @@ _preprocess(char *Buf, int Begin, int *End, int *Num, int Max_size, substitute_f
 
       case '"':
       case '\'':
-        if (!prev_esc && (state != ';')) {
-          state = (state == 0) ? c : ((state == c) ? 0 : state);
+        if (!prev_esc && (_state != ';')) {
+          _state = (_state == 0) ? c : ((_state == c) ? 0 : _state);
         }
       default:
         prev_esc = false;
@@ -609,7 +609,7 @@ static void
 _preprocess_hv_params(char *Buf, int Begin, int *End, int *Num, int Max_size)
 {
   int        start;
-  int        state;             /* '"': in double quotes; '\'': in single quotes; ';': in comment; '(' in #v argument */
+  int        _state;            /* '"': in double quotes; '\'': in single quotes; ';': in comment; '(' in #v argument */
   gp_boolean prev_esc;          /* true: prev char was escape */
   int        in_hv;             /* in #v */
   int        hv_parenth;        /* #v parenthesis nesting depth */
@@ -618,7 +618,7 @@ _preprocess_hv_params(char *Buf, int Begin, int *End, int *Num, int Max_size)
   int        prev_n;
 
   start      = -1;
-  state      = 0;
+  _state     = 0;
   prev_esc   = false;
   in_hv      = 0;
   hv_parenth = 0;
@@ -628,7 +628,7 @@ _preprocess_hv_params(char *Buf, int Begin, int *End, int *Num, int Max_size)
   for (i = Begin; i < *End; ++i) {
     c = Buf[i];
 
-    if (state == '(') {
+    if (_state == '(') {
       if (in_hv == '(') {
         start = i;
         in_hv = 0;
@@ -646,11 +646,11 @@ _preprocess_hv_params(char *Buf, int Begin, int *End, int *Num, int Max_size)
           _preprocess_hv(Buf, start, &i, Num, Max_size);
           *End += *Num - prev_n;
           start = -1;
-          state = 0;
+          _state = 0;
         }
       }
     }
-    else if (state == 0) {
+    else if (_state == 0) {
       if (c == '#') {
         in_hv = '#';
       }
@@ -660,14 +660,14 @@ _preprocess_hv_params(char *Buf, int Begin, int *End, int *Num, int Max_size)
       else if ((in_hv == 'v') && (c == '(')) {
         in_hv = '(';
         ++hv_parenth;
-        state = '(';
+        _state = '(';
       }
       else {
         in_hv = 0;
       }
     }
 
-    if (state == 0) {
+    if (_state == 0) {
       if ((start == -1) && _is_first_iden(c)) {
         start = i;
       }
@@ -675,12 +675,12 @@ _preprocess_hv_params(char *Buf, int Begin, int *End, int *Num, int Max_size)
 
     switch (c) {
       case '\\':
-        prev_esc = ((state == '"') || (state == '\'')) ? (!prev_esc) : false;
+        prev_esc = ((_state == '"') || (_state == '\'')) ? (!prev_esc) : false;
         break;
 
       case ';': {
-        if (state == 0) {
-          state = c;
+        if (_state == 0) {
+          _state = c;
         }
         prev_esc = false;
         break;
@@ -688,8 +688,8 @@ _preprocess_hv_params(char *Buf, int Begin, int *End, int *Num, int Max_size)
 
       case '"':
       case '\'':
-        if (!prev_esc && (state != ';')) {
-          state = (state == 0) ? c : ((state == c) ? 0 : state);
+        if (!prev_esc && (_state != ';')) {
+          _state = (_state == 0) ? c : ((_state == c) ? 0 : _state);
         }
       default:
         prev_esc = false;

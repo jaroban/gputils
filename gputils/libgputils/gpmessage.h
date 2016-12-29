@@ -35,4 +35,8 @@ extern void gp_warning(const char *Format, ...);
 extern void gp_message(const char *Format, ...);
 extern void gp_debug(const char *Format, ...);
 
+extern int gp_real_num_errors(void);
+extern int gp_real_num_warnings(void);
+extern int gp_real_num_messages(void);
+
 #endif

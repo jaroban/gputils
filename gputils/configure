@@ -5641,7 +5641,7 @@ AM_LDFLAGS=
 case "${host}" in
   *cygwin* )
     if test "x$GCC" = "xyes"; then
-      AM_CFLAGS="$AM_CFLAGS -Wall -pedantic"
+      AM_CFLAGS="$AM_CFLAGS -Wall -pedantic -Wimplicit-function-declaration -Wformat-security -Wlogical-op"
       AM_LDFLAGS="-Wl,-warn-common -Wl,-warn-once"
     fi
     ;;
@@ -5652,11 +5652,13 @@ case "${host}" in
     ;;
   *linux* )
     if test "x$CC" = "xclang"; then
-      AM_CFLAGS="$AM_CFLAGS -Wall -pedantic -Wformat -Wtautological-compare -Wimplicit-function-declaration -Wformat-security"
+      AM_CFLAGS="$AM_CFLAGS -Wall -pedantic -Wformat -Wtautological-compare -Wimplicit-function-declaration \
+-Wformat-security -Wlogical-op-parentheses -Wbitwise-op-parentheses -Wshift-op-parentheses -Wshift-overflow -Warray-bounds \
+-Warray-bounds-pointer-arithmetic -Wreturn-stack-address -Wshadow"
       AM_LDFLAGS="-Wl,-warn-common -Wl,-warn-once"
     else
       if test "x$GCC" = "xyes"; then
-        AM_CFLAGS="$AM_CFLAGS -Wall -pedantic -Wformat -Wimplicit-function-declaration -Wformat-security"
+        AM_CFLAGS="$AM_CFLAGS -Wall -pedantic -Wformat -Wimplicit-function-declaration -Wformat-security -Wlogical-op"
         AM_LDFLAGS="-Wl,-warn-common -Wl,-warn-once"
       fi
     fi

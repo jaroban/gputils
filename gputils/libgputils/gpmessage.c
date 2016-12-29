@@ -34,6 +34,10 @@ int gp_num_errors   = 0;
 int gp_num_warnings = 0;
 int gp_num_messages = 0;
 
+static int _real_num_errors   = 0;
+static int _real_num_warnings = 0;
+static int _real_num_messages = 0;
+
 /*------------------------------------------------------------------------------------------------*/
 
 void
@@ -41,6 +45,8 @@ gp_error(const char *Format, ...)
 {
   va_list args;
   char    buffer[BUFSIZ];
+
+  _real_num_errors++;
 
   if (gp_message_disable) {
     return;
@@ -67,6 +73,8 @@ gp_warning(const char *Format, ...)
   va_list args;
   char    buffer[BUFSIZ];
 
+  _real_num_warnings++;
+
   if (gp_message_disable) {
     return;
   }
@@ -91,6 +99,8 @@ gp_message(const char *Format, ...)
 {
   va_list args;
   char    buffer[BUFSIZ];
+
+  _real_num_messages++;
 
   if (gp_message_disable) {
     return;
@@ -130,4 +140,28 @@ gp_debug(const char *Format, ...)
   va_end(args);
 
   printf("debug: %s\n", buffer);
+}
+
+/*------------------------------------------------------------------------------------------------*/
+
+int
+gp_real_num_errors(void)
+{
+  return _real_num_errors;
+}
+
+/*------------------------------------------------------------------------------------------------*/
+
+int
+gp_real_num_warnings(void)
+{
+  return _real_num_warnings;
+}
+
+/*------------------------------------------------------------------------------------------------*/
+
+int
+gp_real_num_messages(void)
+{
+  return _real_num_messages;
 }

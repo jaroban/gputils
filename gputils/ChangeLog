@@ -1,3 +1,23 @@
+2016-12-29  Molnar Karoly  <molnarkaroly@users.sourceforge.net>
+  * configure, configure.ac:
+    More clang warning options.
+
+  * gpasm/preprocess.c, gpasm/scan.l, gpasm/util.c, gplink/gplink.c,
+    libgputils/gpdis.c:
+    Eliminated the compiler warnings.
+
+  * libgputils/gpcofflink.c:
+    More information about the missing symbols.
+    Bug: "#300 GPLINK fails with assertion error"
+    Thanks to James Dunne for the report.
+
+  * libgputils/gpmessage.c, libgputils/gpmessage.h:
+    New functions: gp_real_num_errors, gp_real_num_warnings and
+    gp_real_num_messages.
+
+  * gplink/parse.y, gplink/scan.l, libgputils/gpsym.c:
+    Code formatting.
+
 2016-12-16  Molnar Karoly  <molnarkaroly@users.sourceforge.net>
   * gpasm/directive.c:
     Fixed this bug: "#299 GPASM unexpected error"

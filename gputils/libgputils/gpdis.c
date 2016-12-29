@@ -2912,7 +2912,7 @@ _insn_class_pf:
         tmp   = opcode & 0x0003;
 
         if (Behavior & GPDIS_SHOW_NAMES) {
-          const char *reg = (Behavior & GPDIS_SHOW_FSRN) ? "FSR" : "INDF";
+          reg = (Behavior & GPDIS_SHOW_FSRN) ? "FSR" : "INDF";
 
           snprintf(&Buffer[length], Buffer_length - length, "%-*s%s%s%i%s", TABULATOR_SIZE, instruction->name,
                    op_pre[tmp], reg, file1, op_post[tmp]);
