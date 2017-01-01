@@ -761,11 +761,11 @@ _pic12_reg_eval(MemBlock_t *M, unsigned int Byte_address, gpdasm_fstate_t *Fstat
 
     if (args.first.arg != NULL) {
       if (reg1 == NULL) {
-        gp_debug("%s() -- The \"%s\" core SFR not exist in the register database!", __func__, args.first.arg);
+        gp_debug("%s.%s() -- The \"%s\" core SFR not exist in the register database!", __FILE__, __func__, args.first.arg);
         Fstate->need_sfr_equ = true;
       }
       else if (strcmp(args.first.arg, reg1->name) != 0) {
-        gp_debug("%s() -- These SFRs there is the same address: \"%s\", \"%s\"", __func__, args.first.arg, reg1->name);
+        gp_debug("%s.%s() -- These SFRs there is the same address: \"%s\", \"%s\"", __FILE__, __func__, args.first.arg, reg1->name);
         Fstate->need_sfr_equ = true;
       }
     }
@@ -817,11 +817,11 @@ _pic14_reg_eval(MemBlock_t *M, unsigned int Byte_address, gpdasm_fstate_t *Fstat
 
   if (args.first.arg != NULL) {
     if (reg1 == NULL) {
-      gp_debug("%s() -- The \"%s\" core SFR not exist in the register database!", __func__, args.first.arg);
+      gp_debug("%s.%s() -- The \"%s\" core SFR not exist in the register database!", __FILE__, __func__, args.first.arg);
       Fstate->need_sfr_equ = true;
     }
     else if (strcmp(args.first.arg, reg1->name) != 0) {
-      gp_debug("%s() -- These SFRs there is the same address: \"%s\", \"%s\"", __func__, args.first.arg, reg1->name);
+      gp_debug("%s.%s() -- These SFRs there is the same address: \"%s\", \"%s\"", __FILE__, __func__, args.first.arg, reg1->name);
       Fstate->need_sfr_equ = true;
     }
   }

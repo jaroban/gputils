@@ -479,9 +479,17 @@ _do_mode(gpasmVal Value, const char *Name, int Arity, pnode_t *Parms)
   if (eval_enforce_arity(Arity, 1)) {
     val = PnListHead(Parms);
 
-    if (PnIsConstant(val) && (PnConstant(val) > 0x1f)) {
-      gpmsg_vwarning(GPW_OUT_OF_RANGE, NULL);
-      PnConstant(val) &= 0x1f;
+    if (PnIsConstant(val) && (PnConstant(val) > 0x1F)) {
+      if (state.strict_level == 2) {
+        gpmsg_verror(GPE_OUT_OF_RANGE, "Bad value: %i (%#x) > Limit: 0x1F",
+                     PnConstant(val), PnConstant(val));
+      }
+      else {
+        gpmsg_vwarning(GPW_OUT_OF_RANGE, "Bad value: %i (%#x) > Limit: 0x1F",
+                       gp_find_highest_bit(0x1F), PnConstant(val), PnConstant(val));
+      }
+
+      PnConstant(val) &= 0x1F;
     }
 
     do_insn("movlw", Parms);

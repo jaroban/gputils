@@ -291,10 +291,10 @@ _check_write(uint16_t Value)
   class       = state.device.class;
   addr_digits = class->addr_digits;
 
-  if ((IS_PIC16_CORE) && (state.byte_addr > 0x1ffff)) {
-    gpmsg_verror(GPE_ADDROVF, "Address{0x%0*X}", addr_digits, state.byte_addr);
+  if ((IS_PIC16_CORE) && (state.byte_addr > 0x1FFFF)) {
+    gpmsg_verror(GPE_ADDROVF, "Bad address: 0x%0*X > Limit: 0x1FFFF", addr_digits, state.byte_addr);
   }
-  else if (!(IS_PIC16E_CORE) && ((state.byte_addr & 0x1ffff) == 0) && ((int)state.byte_addr > 0)) {
+  else if (!(IS_PIC16E_CORE) && ((state.byte_addr & 0x1FFFF) == 0) && ((int)state.byte_addr > 0)) {
     /* We cast state.byte_addr to signed int on purpose to repeat a bug from
        MPASM 5.34 and pass tb.asm testcase. */
     gpmsg_error(GPE_ADDROVF, "Address wrapped around 0.");
@@ -357,7 +357,7 @@ _check_write(uint16_t Value)
     }
 
     if (org > state.maxrom) {
-      (*msg)(code, "Address{0x%0*X} > MAXROM{0x%0*X}", addr_digits, org, addr_digits, state.maxrom);
+      (*msg)(code, "Bad address: 0x%0*X > MAXROM: 0x%0*X", addr_digits, org, addr_digits, state.maxrom);
     }
     else {
       /* check if current org is within a bad address range */
@@ -365,7 +365,7 @@ _check_write(uint16_t Value)
         start = 0;
         end   = 0;
         if (gp_bitarray_get_range_borders(&state.badrom, org, &start, &end)) {
-          (*msg)(code, "BADROM_START{0x%0*lX} <= Address{0x%0*X} <= BADROM_END{0x%0*lX}",
+          (*msg)(code, "BADROM_START: 0x%0*lX <= Bad address: 0x%0*X <= BADROM_END: 0x%0*lX",
                  addr_digits, start, addr_digits, org, addr_digits, end);
         }
         else {
@@ -420,6 +420,7 @@ static void
 _emit_byte(uint16_t Value, const char *Name)
 {
   proc_class_t  class;
+  unsigned int  core_mask;
   int           addr_digits;
   uint8_t       byte;
   uint16_t      word;
@@ -432,23 +433,33 @@ _emit_byte(uint16_t Value, const char *Name)
   if (state.pass == 2) {
     class       = state.device.class;
     addr_digits = class->addr_digits;
+    core_mask   = class->core_mask;
 
     if ((state.mode == MODE_RELOCATABLE) && (state.obj.section == NULL)) {
       gpmsg_verror(GPE_WRONG_SECTION, NULL);
     }
 
     if (!IS_RAM_ORG) {
-      if ((IS_PIC16_CORE) && (state.byte_addr > 0x1ffff)) {
-        gpmsg_verror(GPE_ADDROVF, "Address{0x%0*X} > 0x1ffff", addr_digits, state.byte_addr);
+      if ((IS_PIC16_CORE) && (state.byte_addr > 0x1FFFF)) {
+        gpmsg_verror(GPE_ADDROVF, "Bad address: 0x%0*X > Limit: 0x1FFFF", addr_digits, state.byte_addr);
       }
-      else if (!(IS_PIC16E_CORE) && ((state.byte_addr & 0x1ffff) == 0) && ((int)state.byte_addr > 0)) {
+      else if (!(IS_PIC16E_CORE) && ((state.byte_addr & 0x1FFFF) == 0) && ((int)state.byte_addr > 0)) {
         gpmsg_error(GPE_ADDROVF, "Address wrapped around 0.");
       }
 
-      if (Value > class->core_mask) {
-        word = Value & class->core_mask;
+      if (Value > core_mask) {
+        word = Value & core_mask;
 
-        gpmsg_vwarning(GPW_OUT_OF_RANGE, "%i (%#x) --> %i (%#x)", Value, Value, word, word);
+        if (state.strict_level == 2) {
+          gpmsg_verror(GPE_OUT_OF_RANGE, "Bad value: %i (%#x) > Limit: %i (%#x)",
+                       Value, Value, core_mask, core_mask);
+        }
+        else {
+          gpmsg_vwarning(GPW_OUT_OF_RANGE, "Bad value: %i (%#x) > Limit: %i (%#x) (Corrected value: %i (%#x))",
+                         gp_find_highest_bit(core_mask),
+                         Value, Value, core_mask, core_mask, word, word);
+        }
+
         Value = word;
       }
 
@@ -470,7 +481,7 @@ _emit_byte(uint16_t Value, const char *Name)
         }
 
         if (org > state.maxrom) {
-          (*msg)(code, "Address{0x%0*X} > MAXROM{0x%0*X}", addr_digits, org, addr_digits, state.maxrom);
+          (*msg)(code, "Bad address: 0x%0*X > MAXROM: 0x%0*X", addr_digits, org, addr_digits, state.maxrom);
         }
         else {
           /* Check if current org is within a bad address range. */
@@ -478,7 +489,7 @@ _emit_byte(uint16_t Value, const char *Name)
             start = 0;
             end   = 0;
             if (gp_bitarray_get_range_borders(&state.badrom, org, &start, &end)) {
-              (*msg)(code, "BADROM_START{0x%0*lX} <= Address{0x%0*X} <= BADROM_END{0x%0*lX}",
+              (*msg)(code, "BADROM_START: 0x%0*lX <= Bad address: 0x%0*X <= BADROM_END: 0x%0*lX",
                      addr_digits, start, addr_digits, org, addr_digits, end);
             }
             else {
@@ -908,26 +919,26 @@ _do_badram(gpasmVal Value, const char *Name, int Arity, pnode_t *Parms)
         if (start < 0) {
           if (!state.mpasm_compatible) {
             /* This is a ugly error, can not be disable this error message. */
-            gpmsg_verror(GPE_INVALID_RAM, "Start{%i} < 0", start);
+            gpmsg_verror(GPE_INVALID_RAM, "Bad start: %i < Limit: 0", start);
           }
           else {
-            gpmsg_vwarning(GPW_INVALID_RAM, "Start{%i} < 0", start);
+            gpmsg_vwarning(GPW_INVALID_RAM, "Bad start: %i < Limit: 0", start);
           }
         }
         else if (end < start) {
           if (!state.mpasm_compatible) {
             /* This is a ugly error, can not be disable this error message. */
-            gpmsg_verror(GPE_INVALID_RAM, "End{0x%0*X} < Start{0x%0*X}", addr_digits, end, addr_digits, start);
+            gpmsg_verror(GPE_INVALID_RAM, "End: 0x%0*X < Start: 0x%0*X", addr_digits, end, addr_digits, start);
           }
           else {
-            gpmsg_vwarning(GPW_INVALID_RAM, "Start{0x%0*X} > End{0x%0*X}", addr_digits, start, addr_digits, end);
+            gpmsg_vwarning(GPW_INVALID_RAM, "Start: 0x%0*X > End: 0x%0*X", addr_digits, start, addr_digits, end);
           }
         }
         else if (start > maxram) {
-          (*msg)(code, "Start{0x%0*X} > MAXRAM{0x%0*X}", addr_digits, start, addr_digits, maxram);
+          (*msg)(code, "Bad start: 0x%0*X > MAXRAM: 0x%0*X", addr_digits, start, addr_digits, maxram);
         }
         else if (end > maxram) {
-          (*msg)(code, "End{0x%0*X} > MAXRAM{0x%0*X}", addr_digits, end, addr_digits, maxram);
+          (*msg)(code, "Bad end: 0x%0*X > MAXRAM: 0x%0*X", addr_digits, end, addr_digits, maxram);
         }
         else {
           for (; start <= end; start++) {
@@ -941,7 +952,7 @@ _do_badram(gpasmVal Value, const char *Name, int Arity, pnode_t *Parms)
         loc = eval_evaluate(p);
 
         if ((loc < 0) || (loc > maxram)) {
-          (*msg)(code, "Address{%#x} > MAXRAM{%#x}", loc, maxram);
+          (*msg)(code, "Bad address: 0x%0*X > MAXRAM: 0x%0*X", addr_digits, loc, addr_digits, maxram);
         }
         else {
           state.badram[loc] = 1;
@@ -999,26 +1010,26 @@ _do_badrom(gpasmVal Value, const char *Name, int Arity, pnode_t *Parms)
         if (start < 0) {
           if (!state.mpasm_compatible) {
             /* This is a ugly error, can not be disable this error message. */
-            gpmsg_verror(GPE_INVALID_ROM, "Start{%i} < 0", start);
+            gpmsg_verror(GPE_INVALID_ROM, "Bad start: %i < Limit: 0", start);
           }
           else {
-            gpmsg_vwarning(GPW_INVALID_ROM, "Start{%i} < 0", start);
+            gpmsg_vwarning(GPW_INVALID_ROM, "Bad start: %i < Limit: 0", start);
           }
         }
         else if (end < start) {
           if (!state.mpasm_compatible) {
             /* This is a ugly error, can not be disable this error message. */
-            gpmsg_verror(GPE_INVALID_ROM, "End{0x%0*X} < Start{0x%0*X}", addr_digits, end, addr_digits, start);
+            gpmsg_verror(GPE_INVALID_ROM, "End: 0x%0*X < Start: 0x%0*X", addr_digits, end, addr_digits, start);
           }
           else {
-            gpmsg_vwarning(GPW_INVALID_ROM, "Start{0x%0*X} > End{0x%0*X}", addr_digits, start, addr_digits, end);
+            gpmsg_vwarning(GPW_INVALID_ROM, "Start: 0x%0*X > End: 0x%0*X", addr_digits, start, addr_digits, end);
           }
         }
         else if (start > state.maxrom) {
-          (*msg)(code, "Start{0x%0*X} > MAXROM{0x%0*X}", addr_digits, start, addr_digits, state.maxrom);
+          (*msg)(code, "Bad start: 0x%0*X > MAXROM: 0x%0*X", addr_digits, start, addr_digits, state.maxrom);
         }
         else if (end > state.maxrom) {
-          (*msg)(code, "End{0x%0*X} > MAXROM{0x%0*X}", addr_digits, end, addr_digits, state.maxrom);
+          (*msg)(code, "Bad end: 0x%0*X > MAXROM: 0x%0*X", addr_digits, end, addr_digits, state.maxrom);
         }
         else {
           if (!gp_bitarray_write_range(&state.badrom, start, end, true)) {
@@ -1032,7 +1043,7 @@ _do_badrom(gpasmVal Value, const char *Name, int Arity, pnode_t *Parms)
         start = eval_evaluate(p);
 
         if ((start < 0) || (start > state.maxrom)) {
-          (*msg)(code, "Address{%#x} > MAXROM{%#x}", start, state.maxrom);
+          (*msg)(code, "Bad address: 0x%0*X > MAXROM: 0x%0*X", addr_digits, start, addr_digits, state.maxrom);
         }
         else {
           if (!gp_bitarray_write(&state.badrom, start, true)) {
@@ -1594,14 +1605,19 @@ _do_config(gpasmVal Value, const char *Name, int Arity, pnode_t *Parms)
     value = eval_evaluate(p);
 
     if (IS_PIC16E_CORE) {
-      if (value > 0xff) {
-        gpmsg_vwarning(GPW_OUT_OF_RANGE, "%i (%#x) > 0xff", value, value);
+      if (value > 0xFF) {
+        if (state.strict_level == 2) {
+          gpmsg_verror(GPE_OUT_OF_RANGE, "Bad value: %i (%#x) > Limit: 0xFF", value, value);
+        }
+        else {
+          gpmsg_vwarning(GPW_OUT_OF_RANGE, "Bad value: %i (%#x) > Limit: 0xFF", gp_find_highest_bit(0xFF), value, value);
+        }
       }
 
       p_dev = gp_cfg_find_pic_multi_name(state.processor->names, ARRAY_SIZE(state.processor->names));
       if (p_dev != NULL) {
         /* We do this to also set the other byte in a word. */
-        _config_16_set_word_mem(config_mem, p_dev, ca, value, 0xff);
+        _config_16_set_word_mem(config_mem, p_dev, ca, value, 0xFF);
       }
       else {
         assert(0); /* this shouldn't happen */
@@ -2151,10 +2167,22 @@ _do_db(gpasmVal Value, const char *Name, int Arity, pnode_t *Parms)
         value = eval_reloc_evaluate(p, RELOC_LOW, NULL, NULL, true);
 
         if (value < 0) {
-          gpmsg_vwarning(GPW_OUT_OF_RANGE, "%i (%#x) < 0", value, value);
+          if (state.strict_level == 2) {
+            gpmsg_verror(GPE_OUT_OF_RANGE, "Bad value: %i (%#x) < Limit: 0", value, value);
+          }
+          else {
+            gpmsg_vwarning(GPW_OUT_OF_RANGE, "Bad value: %i (%#x) < Limit: 0",
+                           gp_find_highest_bit(0xFF), value, value);
+          }
         }
         else if (value > 0xFF) {
-          gpmsg_vwarning(GPW_OUT_OF_RANGE, "%i (%#x) > 0xff", value, value);
+          if (state.strict_level == 2) {
+            gpmsg_verror(GPE_OUT_OF_RANGE, "Bad value: %i (%#x) > Limit: 0xFF", value, value);
+          }
+          else {
+            gpmsg_vwarning(GPW_OUT_OF_RANGE, "Bad value: %i (%#x) > Limit: 0xFF",
+                           gp_find_highest_bit(0xFF), value, value);
+          }
         }
 
         _emit_byte(value, Name);
@@ -2203,10 +2231,22 @@ _do_db(gpasmVal Value, const char *Name, int Arity, pnode_t *Parms)
         }
 
         if (value < -128) {
-          gpmsg_vwarning(GPW_OUT_OF_RANGE, "%i (%#x) < -128", value, value);
+          if (state.strict_level == 2) {
+            gpmsg_verror(GPE_OUT_OF_RANGE, "Bad value: %i (%#x) < Limit: -128", value, value);
+          }
+          else {
+            gpmsg_vwarning(GPW_OUT_OF_RANGE, "Bad value: %i (%#x) < Limit: -128",
+                           gp_find_highest_bit(0xFF), value, value);
+          }
         }
-        else if (value > 0xFF) {
-          gpmsg_vwarning(GPW_OUT_OF_RANGE, "%i (%#x) > 0xff", value, value);
+        else if (value > 255) {
+          if (state.strict_level == 2) {
+            gpmsg_verror(GPE_OUT_OF_RANGE, "Bad value: %i (%#x) > Limit: 255", value, value);
+          }
+          else {
+            gpmsg_vwarning(GPW_OUT_OF_RANGE, "Bad value: %i (%#x) > Limit: 255",
+                           gp_find_highest_bit(0xFF), value, value);
+          }
         }
 
         value &= 0xFF;
@@ -2373,10 +2413,10 @@ _do_def(gpasmVal Value, const char *Name, int Arity, pnode_t *Parms)
             val = eval_maybe_evaluate(PnBinOpP1(p));
 
             if (val < 0) {
-              gpmsg_verror(GPE_OUT_OF_RANGE, "type{%i (%#x)} < 0", val, val);
+              gpmsg_verror(GPE_OUT_OF_RANGE, "Type: %i (%#x) < Limit: 0", val, val);
             }
-            else if (val > 0xffff) {
-              gpmsg_verror(GPE_OUT_OF_RANGE, "type{%i (%#x)} > 0xffff", val, val);
+            else if (val > 0xFFFF) {
+              gpmsg_verror(GPE_OUT_OF_RANGE, "Type: %i (%#x) > Limit: 0xFFFF", val, val);
             }
             else {
               new_type  = true;
@@ -2387,10 +2427,10 @@ _do_def(gpasmVal Value, const char *Name, int Arity, pnode_t *Parms)
             val = eval_maybe_evaluate(PnBinOpP1(p));
 
             if (val < -128) {
-              gpmsg_verror(GPE_OUT_OF_RANGE, "class{%i} < -128", val, val);
+              gpmsg_verror(GPE_OUT_OF_RANGE, "Class: %i < Limit: -128", val, val);
             }
             else if (val > 127) {
-              gpmsg_verror(GPE_OUT_OF_RANGE, "class{%i} > 127", val, val);
+              gpmsg_verror(GPE_OUT_OF_RANGE, "Class: %i > Limit: 127", val, val);
             }
             else {
               new_class  = true;
@@ -2566,8 +2606,8 @@ _do_dim(gpasmVal Value, const char *Name, int Arity, pnode_t *Parms)
       p   = PnListHead(Parms);
       val = eval_maybe_evaluate(p);
 
-      if (val & (~0xff)) {
-        gpmsg_verror(GPE_OUT_OF_RANGE, "%i (%#x) > 0xff", val, val);
+      if (val & (~0xFF)) {
+        gpmsg_verror(GPE_OUT_OF_RANGE, "Bad value: %i (%#x) > Limit: 0xFF", val, val);
         return Value;
       }
 
@@ -2616,10 +2656,10 @@ _do_direct(gpasmVal Value, const char *Name, int Arity, pnode_t *Parms)
     val = eval_maybe_evaluate(p);
 
     if (val < 0) {
-      gpmsg_verror(GPE_OUT_OF_RANGE, "%i (%#x) < 0", val, val);
+      gpmsg_verror(GPE_OUT_OF_RANGE, "Bad value: %i (%#x) < Limit: 0", val, val);
     }
     else if (val > WHILE_LOOP_COUNT_MAX) {
-      gpmsg_verror(GPE_OUT_OF_RANGE, "%i (%#x) > %u", val, val, WHILE_LOOP_COUNT_MAX);
+      gpmsg_verror(GPE_OUT_OF_RANGE, "Bad value: %i (%#x) > Limit: %u", val, val, WHILE_LOOP_COUNT_MAX);
     }
     else {
       direct_command = val;
@@ -2835,62 +2875,6 @@ _do_endif(gpasmVal Value, const char *Name, int Arity, pnode_t *Parms)
     state.astack = state.astack->upper;
     free(old);
   }
-
-  return Value;
-}
-
-/*------------------------------------------------------------------------------------------------*/
-
-static gpasmVal
-_do_endm(gpasmVal Value, const char *Name, int Arity, pnode_t *Parms)
-{
-  if (_check_processor_select(Name)) {
-    return Value;
-  }
-
-  assert(state.mac_head == NULL);
-  state.lst.line.linetype = LTY_DIR;
-  state.preproc.do_emit   = false;
-
-  if (!(IN_MACRO_WHILE_DEFINITION)) {
-    gpmsg_verror(GPE_UNMATCHED_ENDM, NULL);
-  }
-  else {
-    state.mac_prev = NULL;
-  }
-
-  state.mac_body = NULL;
-
-  return Value;
-}
-
-/*------------------------------------------------------------------------------------------------*/
-
-static gpasmVal
-_do_endw(gpasmVal Value, const char *Name, int Arity, pnode_t *Parms)
-{
-  if (_check_processor_select(Name)) {
-    return Value;
-  }
-
-  state.lst.line.linetype = LTY_NOLIST_DIR;
-  assert(state.mac_head == NULL);
-
-  if (!(IN_MACRO_WHILE_DEFINITION)) {
-    gpmsg_error(GPE_ILLEGAL_COND, "Illegal condition: \"ENDW\"");
-  }
-  else if (eval_maybe_evaluate(state.while_head->parms)) {
-    state.next_state = STATE_WHILE;
-    state.next_buffer.macro = state.while_head;
-  }
-  else if (state.pass == 2) {
-    macro_list(state.while_head->body);
-    state.preproc.do_emit = false;
-  }
-
-  state.mac_body = NULL;
-  state.mac_prev = NULL;
-  state.while_head = NULL;
 
   return Value;
 }
@@ -3438,12 +3422,12 @@ _do_idlocs(gpasmVal Value, const char *Name, int Arity, pnode_t *Parms)
 
     if (IS_PIC16E_CORE) {
       if (idreg < state.processor->idlocs_addrs[0]) {
-        gpmsg_verror(GPE_OUT_OF_RANGE, "Not a valid ID location. Address{0x%0*X} < IDLOCS_MIN{0x%0*X}",
+        gpmsg_verror(GPE_OUT_OF_RANGE, "Not a valid ID location. Bad address: 0x%0*X < IDLOCS_MIN: 0x%0*X",
                      addr_digits, idreg,
                      addr_digits, state.processor->idlocs_addrs[0]);
       }
       else if (idreg > state.processor->idlocs_addrs[1]) {
-        gpmsg_verror(GPE_OUT_OF_RANGE, "Not a valid ID location. Address{0x%0*X} > IDLOCS_MAX{0x%0*X}",
+        gpmsg_verror(GPE_OUT_OF_RANGE, "Not a valid ID location. Bad address: 0x%0*X > IDLOCS_MAX: 0x%0*X",
                      addr_digits, idreg,
                      addr_digits, state.processor->idlocs_addrs[1]);
       }
@@ -3451,9 +3435,9 @@ _do_idlocs(gpasmVal Value, const char *Name, int Arity, pnode_t *Parms)
         state.lst.line.linetype = LTY_CONFIG;
         state.lst.config_address = idreg;
 
-        if (val & ~0xff) {
+        if (val & ~0xFF) {
           v    = val;
-          val &= 0xff;
+          val &= 0xFF;
           snprintf(buf, sizeof(buf), "An ID Locations value too large. Last two hex digits used: 0x%X ==> 0x%02X", v, val);
           gpmsg_message(GPM_IDLOC, buf);
         }
@@ -3570,13 +3554,13 @@ _do_16_idlocs(gpasmVal Value, const char *Name, int Arity, pnode_t *Parms)
     m = (state.mode == MODE_RELOCATABLE) ? state.obj.section->data : state.c_memory;
 
     if (idreg < state.processor->idlocs_addrs[0]) {
-      gpmsg_verror(GPE_OUT_OF_RANGE, "Not a valid ID location. Address{0x%0*X} < IDLOCS_MIN{0x%0*X}",
+      gpmsg_verror(GPE_OUT_OF_RANGE, "Not a valid ID location. Bad address: 0x%0*X < IDLOCS_MIN: 0x%0*X",
                    addr_digits, idreg,
                    addr_digits, state.processor->idlocs_addrs[0]);
       return Value;
     }
     else if (idreg > state.processor->idlocs_addrs[1]) {
-      gpmsg_verror(GPE_OUT_OF_RANGE, "Not a valid ID location. Address{0x%0*X} > IDLOCS_MAX{0x%0*X}",
+      gpmsg_verror(GPE_OUT_OF_RANGE, "Not a valid ID location. Bad address: 0x%0*X > IDLOCS_MAX: 0x%0*X",
                    addr_digits, idreg,
                    addr_digits, state.processor->idlocs_addrs[1]);
       return Value;
@@ -3608,9 +3592,9 @@ constant:
           goto warning;
         }
 
-        if (val & ~0xff) {
+        if (val & ~0xFF) {
           v    = val;
-          val &= 0xff;
+          val &= 0xFF;
           snprintf(buf, sizeof(buf), "An ID Locations value too large. Last two hex digits used: 0x%X ==> 0x%02X", v, val);
           gpmsg_message(GPM_IDLOC, buf);
         }
@@ -3994,7 +3978,7 @@ _do_list(gpasmVal Value, const char *Name, int Arity, pnode_t *Parms)
           }
           else {
             snprintf(message, sizeof(message),
-                     "Argument out of range: Column_width{%i} <= LST_SRC_POS{%i}", value, LST_SRC_POS);
+                     "Argument out of range. Bad column width: %i <= LST_SRC_POS: %i", value, LST_SRC_POS);
             gpmsg_error(GPE_OUT_OF_RANGE, message);
           }
         }
@@ -4032,7 +4016,7 @@ _do_list(gpasmVal Value, const char *Name, int Arity, pnode_t *Parms)
               state.lst.lines_per_page = number;
             }
             else {
-              gpmsg_verror(GPE_OUT_OF_RANGE, "0 < n{%i} <= 6", number);
+              gpmsg_verror(GPE_OUT_OF_RANGE, "0 < Bad value: %i <= 6", number);
             }
           }
         }
@@ -4281,6 +4265,31 @@ _do_macro(gpasmVal Value, const char *Name, int Arity, pnode_t *Parms)
 /*------------------------------------------------------------------------------------------------*/
 
 static gpasmVal
+_do_endm(gpasmVal Value, const char *Name, int Arity, pnode_t *Parms)
+{
+  if (_check_processor_select(Name)) {
+    return Value;
+  }
+
+  assert(state.mac_head == NULL);
+  state.lst.line.linetype = LTY_DIR;
+  state.preproc.do_emit   = false;
+
+  if (!(IN_MACRO_WHILE_DEFINITION)) {
+    gpmsg_verror(GPE_UNMATCHED_ENDM, NULL);
+  }
+  else {
+    state.mac_prev = NULL;
+  }
+
+  state.mac_body = NULL;
+
+  return Value;
+}
+
+/*------------------------------------------------------------------------------------------------*/
+
+static gpasmVal
 _do_messg(gpasmVal Value, const char *Name, int Arity, pnode_t *Parms)
 {
   const pnode_t *p;
@@ -4333,7 +4342,7 @@ _do_org(gpasmVal Value, const char *Name, int Arity, pnode_t *Parms)
           ((gp_processor_is_config_org(state.processor, Value) < 0) &&
            (gp_processor_is_eeprom_org(state.processor, Value) < 0))) {
         if ((IS_PIC16E_CORE) && (Value & 1)) {
-          gpmsg_verror(GPE_ORG_ODD, "Address{0x%0*X}", addr_digits, Value);
+          gpmsg_verror(GPE_ORG_ODD, "Bad address: 0x%0*X", addr_digits, Value);
         }
       }
 
@@ -4564,7 +4573,7 @@ _do_res(gpasmVal Value, const char *Name, int Arity, pnode_t *Parms)
 
       if (state.mode == MODE_ABSOLUTE) {
         if ((IS_PIC16E_CORE) && ((count % 2) != 0)) {
-          gpmsg_verror(GPE_RES_ODD_PIC16EA, "res = %i", count);
+          gpmsg_verror(GPE_RES_ODD_PIC16EA, "Bad res value: %i", count);
         }
 
         count = gp_processor_byte_from_insn_c(class, count);
@@ -4739,10 +4748,10 @@ _do_type(gpasmVal Value, const char *Name, int Arity, pnode_t *Parms)
         value = eval_maybe_evaluate(p);
 
         if (value < 0) {
-          gpmsg_verror(GPE_OUT_OF_RANGE, "type{%i (%#x)} < 0", value, value);
+          gpmsg_verror(GPE_OUT_OF_RANGE, "Type: %i (%#x) < Limit: 0", value, value);
         }
-        else if (value > 0xffff) {
-          gpmsg_verror(GPE_OUT_OF_RANGE, "type{%i (%#x)} > 0xffff", value, value);
+        else if (value > 0xFFFF) {
+          gpmsg_verror(GPE_OUT_OF_RANGE, "Type: %i (%#x) > Limit: 0xFFFF", value, value);
         }
         else {
           coff_symbol->type = value;
@@ -5055,6 +5064,37 @@ _do_while(gpasmVal Value, const char *Name, int Arity, pnode_t *Parms)
 
 /*------------------------------------------------------------------------------------------------*/
 
+static gpasmVal
+_do_endw(gpasmVal Value, const char *Name, int Arity, pnode_t *Parms)
+{
+  if (_check_processor_select(Name)) {
+    return Value;
+  }
+
+  state.lst.line.linetype = LTY_NOLIST_DIR;
+  assert(state.mac_head == NULL);
+
+  if (!(IN_MACRO_WHILE_DEFINITION)) {
+    gpmsg_error(GPE_ILLEGAL_COND, "Illegal condition: \"ENDW\"");
+  }
+  else if (eval_maybe_evaluate(state.while_head->parms)) {
+    state.next_state = STATE_WHILE;
+    state.next_buffer.macro = state.while_head;
+  }
+  else if (state.pass == 2) {
+    macro_list(state.while_head->body);
+    state.preproc.do_emit = false;
+  }
+
+  state.mac_body   = NULL;
+  state.mac_prev   = NULL;
+  state.while_head = NULL;
+
+  return Value;
+}
+
+/*------------------------------------------------------------------------------------------------*/
+
 gp_boolean
 asm_enabled(void)
 {
@@ -5093,7 +5133,14 @@ _emit_check(unsigned int Insn, int Argument, int Mask, const char *Name)
 
   /* If there are bits that shouldn't be set then issue a warning. */
   if (test & (~Mask)) {
-    gpmsg_vwarning(GPW_OUT_OF_RANGE, "%i (%#x) => %i (%#x)", Argument, Argument, v, v);
+    if (state.strict_level == 2) {
+      gpmsg_verror(GPE_OUT_OF_RANGE, "Bad value: %i (%#x) > Limit: %i (%#x)",
+                   Argument, Argument, Mask, Mask);
+    }
+    else {
+      gpmsg_vwarning(GPW_OUT_OF_RANGE, "Bad value: %i (%#x) > Limit: %i (%#x) (Corrected value: %i (%#x))",
+                     gp_find_highest_bit(Mask), Argument, Argument, Mask, Mask, v, v);
+    }
   }
 
   _emit(Insn | v, Name);
@@ -5127,7 +5174,13 @@ static int
 _check_flag(int Flag)
 {
   if ((Flag != 0) && (Flag != 1)) {
-    gpmsg_vwarning(GPW_OUT_OF_RANGE, "%i (%#x)", Flag, Flag);
+    if (state.strict_level == 2) {
+      gpmsg_verror(GPE_OUT_OF_RANGE, "Bad value: %i (%#x) > Limit: 1", Flag, Flag);
+    }
+    else {
+      gpmsg_vwarning(GPW_OUT_OF_RANGE, "Bad value: %i (%#x) > Limit: 1 (Corrected value: %i)",
+                     gp_find_highest_bit(1), Flag, Flag, Flag & 0x1);
+    }
   }
 
   return (Flag & 0x1);
@@ -5173,7 +5226,7 @@ _check_16e_arg_types(const pnode_t *Parms, int Arity, unsigned int Types)
             val = eval_evaluate(p1);
 
             if ((val < 0) || (val > 0x5f)) {
-              snprintf(buf, sizeof(buf), "Argument out of range (%i (%#x) not between 0 and 95).", val, val);
+              snprintf(buf, sizeof(buf), "Argument out of range. Bad value: %i (%#x) (Not between 0 and 95.)", val, val);
               gpmsg_error(GPE_OUT_OF_RANGE, buf);
               ret = false;
             }
@@ -5681,21 +5734,21 @@ _reg_addr_check(int Reg_address, const char *Reg_name, unsigned int Insn_flags, 
 
   if (Reg_address > state.maxram) {
     if ((!state.mpasm_compatible) && (Reg_name != NULL)) {
-      gpmsg_vwarning(GPW_INVALID_RAM, "'%s' -- {0x%0*X} > MAXRAM{0x%0*X}", Reg_name,
+      gpmsg_vwarning(GPW_INVALID_RAM, "'%s' -- 0x%0*X > MAXRAM: 0x%0*X", Reg_name,
                      word_digits, Reg_address, word_digits, state.maxram);
     }
     else {
-      gpmsg_vwarning(GPW_INVALID_RAM, "Address{0x%0*X} > MAXRAM{0x%0*X}",
+      gpmsg_vwarning(GPW_INVALID_RAM, "Bad address: 0x%0*X > MAXRAM: 0x%0*X",
                      word_digits, Reg_address, word_digits, state.maxram);
     }
   }
   else if (state.badram[Reg_address]) {
     if ((!state.mpasm_compatible) && (Reg_name != NULL)) {
-      gpmsg_vwarning(GPW_INVALID_RAM, "'%s' -- {0x%0*X} in BADRAM", Reg_name,
+      gpmsg_vwarning(GPW_INVALID_RAM, "'%s' -- 0x%0*X in BADRAM", Reg_name,
                      word_digits, Reg_address);
     }
     else {
-      gpmsg_vwarning(GPW_INVALID_RAM, "Address{0x%0*X} in BADRAM",
+      gpmsg_vwarning(GPW_INVALID_RAM, "Bad address: 0x%0*X in BADRAM",
                      word_digits, Reg_address);
     }
   }
@@ -6112,7 +6165,8 @@ do_insn(const char *Op_name, pnode_t *Parameters)
 
             /* PC is 11 bits. Mpasm checks the maximum device address. */
             if (value & (~PIC12_PC_MASK)) {
-              gpmsg_verror(GPE_OUT_OF_RANGE, "Address{%#x} > %#x.", value, PIC12_PC_MASK);
+              gpmsg_verror(GPE_OUT_OF_RANGE, "Bad address: 0x%0*X > Limit: 0x%0*X",
+                           addr_digits, value, addr_digits, PIC12_PC_MASK);
             }
 
             if ((value & PIC12_PAGE_BITS) != (r & PIC12_PAGE_BITS)) {
@@ -6122,8 +6176,7 @@ do_insn(const char *Op_name, pnode_t *Parameters)
             }
 
             if (value & 0x100) {
-              gpmsg_verror(GPE_BAD_CALL_ADDR, "%ins (0x%0*X)", value,
-                           addr_digits, value);
+              gpmsg_verror(GPE_BAD_CALL_ADDR, "Bad address: %i (0x%0*X)", value, addr_digits, value);
             }
           }
 
@@ -6149,8 +6202,8 @@ do_insn(const char *Op_name, pnode_t *Parameters)
           value = eval_reloc_evaluate(p, RELOC_LOW, NULL, NULL, true);
 
           /* PC is 16 bits. Mpasm checks the maximum device address. */
-          if (value & (~0xffff)) {
-            gpmsg_verror(GPE_OUT_OF_RANGE, "Address{0x%0*X} > 0xffff.", addr_digits, value);
+          if (value & (~0xFFFF)) {
+            gpmsg_verror(GPE_OUT_OF_RANGE, "Bad address: 0x%0*X > Limit: 0xFFFF", addr_digits, value);
           }
 
           _emit(ins->opcode | (value & 0xff), sym_name);
@@ -6176,7 +6229,7 @@ do_insn(const char *Op_name, pnode_t *Parameters)
 
             /* PC is 11 bits. Mpasm checks the maximum device address. */
             if (value & (~PIC12_PC_MASK)) {
-              gpmsg_verror(GPE_OUT_OF_RANGE, "Address{0x%0*X} > 0x%0*X.",
+              gpmsg_verror(GPE_OUT_OF_RANGE, "Bad address: 0x%0*X > Limit: 0x%0*X",
                            addr_digits, value, addr_digits, PIC12_PC_MASK);
             }
 
@@ -6211,7 +6264,7 @@ do_insn(const char *Op_name, pnode_t *Parameters)
             if ((IS_PIC14E_CORE) || (IS_PIC14EX_CORE)) {
               /* PC is 15 bits. Mpasm checks the maximum device address. */
               if (value & (~PIC14E_PC_MASK)) {
-                gpmsg_verror(GPE_OUT_OF_RANGE, "Address{0x%0*X} > 0x%0*X.",
+                gpmsg_verror(GPE_OUT_OF_RANGE, "Bad address: 0x%0*X > Limit: 0x%0*X",
                              addr_digits, value, addr_digits, PIC14E_PC_MASK);
               }
 
@@ -6224,7 +6277,7 @@ do_insn(const char *Op_name, pnode_t *Parameters)
             else {
               /* PC is 13 bits.  mpasm checks the maximum device address. */
               if (value & (~PIC14_PC_MASK)) {
-                gpmsg_verror(GPE_OUT_OF_RANGE, "Address{0x%0*X} > 0x%0*X.",
+                gpmsg_verror(GPE_OUT_OF_RANGE, "Bad address: 0x%0*X > Limit: 0x%0*X",
                              addr_digits, value, addr_digits, PIC14_PC_MASK);
               }
 
@@ -6262,7 +6315,7 @@ do_insn(const char *Op_name, pnode_t *Parameters)
 
             /* PC is 16 bits.  mpasm checks the maximum device address. */
             if (value & (~PIC16_PC_MASK)) {
-              gpmsg_verror(GPE_OUT_OF_RANGE, "Address{0x%0*X} > 0x%0*X.",
+              gpmsg_verror(GPE_OUT_OF_RANGE, "Bad address: 0x%0*X > Limit: 0x%0*X",
                            addr_digits, value, addr_digits, PIC16_PC_MASK);
             }
 
@@ -6315,16 +6368,16 @@ do_insn(const char *Op_name, pnode_t *Parameters)
             value = eval_maybe_evaluate(p);
 
             if (value < -32) {
-              gpmsg_verror(GPE_OUT_OF_RANGE, "%ins < -32", value);
+              gpmsg_verror(GPE_OUT_OF_RANGE, "Bad offset: %i < Limit: -32", value);
             }
             else if (value > 31) {
-              gpmsg_verror(GPE_OUT_OF_RANGE, "%ins > 31", value);
+              gpmsg_verror(GPE_OUT_OF_RANGE, "Bad offset: %i > Limit: 31", value);
             }
 
             _emit(ins->opcode | file | (value & 0x3f), sym_name);
           }
           else {
-            gpmsg_verror(GPE_OUT_OF_RANGE, "FSR = %ins, can be 0, 1, 4 or 6. (Internal conversion: 4->0, 6->1)", fsr);
+            gpmsg_verror(GPE_OUT_OF_RANGE, "Bad FSR: %i, can be 0, 1, 4 or 6. (Internal conversion: 4->0, 6->1)", fsr);
           }
         }
 
@@ -6350,21 +6403,24 @@ do_insn(const char *Op_name, pnode_t *Parameters)
           fsr = eval_maybe_evaluate(p);
 
           if (fsr < 0) {
-            gpmsg_verror(GPE_OUT_OF_RANGE, "FSR{%ins} < 0.", fsr);
+            gpmsg_verror(GPE_OUT_OF_RANGE, "Bad FSR: %i < Limit: 0", fsr);
           }
           else if (fsr > 2) {
-            gpmsg_verror(GPE_OUT_OF_RANGE, "FSR{%ins} > 2.", fsr);
+            gpmsg_verror(GPE_OUT_OF_RANGE, "Bad FSR: %i > Limit: 2", fsr);
           }
 
           p     = PnListHead(PnListTail(Parameters));
           /* the offset cannot be a relocatable address */
           value = eval_maybe_evaluate(p);
 
-          if (value & (~0x3f)) {
-            gpmsg_verror(GPE_OUT_OF_RANGE, "%ins (%#x) > 0x3f", value, value);
+          if (value < 0) {
+            gpmsg_verror(GPE_OUT_OF_RANGE, "Bad offset: %i (%#x) < Limit: 0", value, value);
+          }
+          else if (value > 63) {
+            gpmsg_verror(GPE_OUT_OF_RANGE, "Bad offset: %i (%#x) > Limit: 63", value, value);
           }
 
-          _emit(ins->opcode | ((fsr & 0x3) << 6) | (value & 0x3f), sym_name);
+          _emit(ins->opcode | ((fsr & 0x3) << 6) | (value & 0x3F), sym_name);
         }
 
         break;
@@ -6390,7 +6446,7 @@ do_insn(const char *Op_name, pnode_t *Parameters)
             offset = eval_maybe_evaluate(p) - (r + 2);
 
             if (offset & 1) {
-              gpmsg_vwarning(GPW_WORD_ALIGNED, "Offset{%ins (%#x)}", offset, offset);
+              gpmsg_vwarning(GPW_WORD_ALIGNED, "Bad offset: %i (%#x)", offset, offset);
             }
           }
           else {
@@ -6458,7 +6514,7 @@ do_insn(const char *Op_name, pnode_t *Parameters)
             offset = eval_maybe_evaluate(p) - (r + 2);
 
             if (offset & 1) {
-              gpmsg_vwarning(GPW_WORD_ALIGNED, "%ins (%#x)", offset, offset);
+              gpmsg_vwarning(GPW_WORD_ALIGNED, "Bad offset: %i (%#x)", offset, offset);
             }
           }
           else {
@@ -6572,7 +6628,7 @@ do_insn(const char *Op_name, pnode_t *Parameters)
           file = eval_maybe_evaluate(p);
 
           if (file > 3) {
-            gpmsg_error(GPE_UNKNOWN, "FSR is out of range.");
+            gpmsg_verror(GPE_OUT_OF_RANGE, "Bad FSR: %i < Limit: 3", file);
           }
 
           p = PnListHead(PnListTail(Parameters));
@@ -6642,8 +6698,11 @@ do_insn(const char *Op_name, pnode_t *Parameters)
           file = eval_reloc_evaluate(p, RELOC_F, NULL, NULL, true);
           reg  = eval_reloc_evaluate(PnListHead(PnListTail(Parameters)), RELOC_P, NULL, NULL, true);
 
-          if (reg & ~0xf1f) {
-            gpmsg_vwarning(GPW_OUT_OF_RANGE, "(%#x & ~0xf1f) != 0", reg, reg);
+          if (reg < 0) {
+            gpmsg_verror(GPE_OUT_OF_RANGE, "Bad address: %i < Limit: 0", reg);
+          }
+          else if (reg > 31) {
+            gpmsg_verror(GPE_OUT_OF_RANGE, "Bad address: %i (%#x) > Limit: 31", reg, reg);
           }
 
           _reg_addr_check(file, str, IFLAG_NONE, -1);
@@ -6670,8 +6729,11 @@ do_insn(const char *Op_name, pnode_t *Parameters)
           file = eval_reloc_evaluate(p, RELOC_F, NULL, NULL, true);
           reg  = eval_reloc_evaluate(PnListHead(Parameters), RELOC_P, NULL, NULL, true);
 
-          if (reg & ~0xf1f) {
-            gpmsg_vwarning(GPW_OUT_OF_RANGE, "(%#x & ~0xf1f) != 0", reg, reg);
+          if (reg < 0) {
+            gpmsg_verror(GPE_OUT_OF_RANGE, "Bad address: %i < Limit: 0", reg);
+          }
+          else if (reg > 31) {
+            gpmsg_verror(GPE_OUT_OF_RANGE, "Bad address: %i (%#x) > Limit: 31", reg, reg);
           }
 
           _reg_addr_check(file, str, IFLAG_NONE, -1);
@@ -6872,6 +6934,7 @@ do_insn(const char *Op_name, pnode_t *Parameters)
       case INSN_CLASS_B5: {
         /* {PIC12x, SX} (bcf, bsf, btfsc, btfss) */
         int          bit;
+        int          k;
         insn_flags_t insn_flags;
         gp_boolean   is_reloc;
         gpasmVal     reloc_val;
@@ -6890,17 +6953,30 @@ do_insn(const char *Op_name, pnode_t *Parameters)
             insn_flags.isReloc = true;
           }
 
-          p    = PnListHead(PnListTail(Parameters));
-          bit  = eval_maybe_evaluate(p);
+          p   = PnListHead(PnListTail(Parameters));
+          bit = eval_maybe_evaluate(p);
+          k   = bit & 0x7;
 
           if (bit < 0) {
-            gpmsg_vwarning(GPW_OUT_OF_RANGE, "Bit{%ins} < 0.", bit);
+            if (state.strict_level == 2) {
+              gpmsg_verror(GPE_OUT_OF_RANGE, "Bad value: %i < Limit: 0", bit);
+            }
+            else {
+              gpmsg_vwarning(GPW_OUT_OF_RANGE, "Bad value: %i < Limit: 0 (Corrected value: %i)",
+                             gp_find_highest_bit(7), bit, k);
+            }
           }
           else if (bit > 7) {
-            gpmsg_vwarning(GPW_OUT_OF_RANGE, "Bit{%ins} > 7.", bit);
+            if (state.strict_level == 2) {
+              gpmsg_verror(GPE_OUT_OF_RANGE, "Bad value: %i (%#x) > Limit: 7", bit, bit);
+            }
+            else {
+              gpmsg_vwarning(GPW_OUT_OF_RANGE, "Bad value: %i (%#x) > Limit: 7 (Corrected value: %i)",
+                             gp_find_highest_bit(7), bit, bit, k);
+            }
           }
 
-          bit &= 7;
+          bit = k;
 
           if ((icode == ICODE_BTFSC) || (icode == ICODE_BTFSS)) {
             is_btfsx = true;
@@ -6937,6 +7013,7 @@ do_insn(const char *Op_name, pnode_t *Parameters)
       case INSN_CLASS_B8: {
         /* PIC16 (bcf, bsf, btfsc, btfss, btg) */
         int          bit;
+        int          k;
         insn_flags_t insn_flags;
         gp_boolean   is_reloc;
         gpasmVal     reloc_val;
@@ -6955,22 +7032,37 @@ do_insn(const char *Op_name, pnode_t *Parameters)
             insn_flags.isReloc = true;
           }
 
-          p    = PnListHead(PnListTail(Parameters));
-          bit  = eval_maybe_evaluate(p);
+          p   = PnListHead(PnListTail(Parameters));
+          bit = eval_maybe_evaluate(p);
+          k   = bit & 7;
 
           if (bit < 0) {
-            gpmsg_vwarning(GPW_OUT_OF_RANGE, "Bit{%ins} < 0.", bit);
+            if (state.strict_level == 2) {
+              gpmsg_verror(GPE_OUT_OF_RANGE, "Bad value: %i < Limit: 0", bit);
+            }
+            else {
+              gpmsg_vwarning(GPW_OUT_OF_RANGE, "Bad value: %i < Limit: 0 (Corrected value: %i)",
+                             gp_find_highest_bit(7), bit, k);
+            }
           }
           else if (bit > 7) {
-            gpmsg_vwarning(GPW_OUT_OF_RANGE, "Bit{%ins} > 7.", bit);
+            if (state.strict_level == 2) {
+              gpmsg_verror(GPE_OUT_OF_RANGE, "Bad value: %i (%#x) > Limit: 7", bit, bit);
+            }
+            else {
+              gpmsg_vwarning(GPW_OUT_OF_RANGE, "Bad value: %i (%#x) > Limit: 7 (Corrected value: %i)",
+                             gp_find_highest_bit(7), bit, bit, k);
+            }
           }
+
+          bit = k;
 
           if ((icode == ICODE_BTFSC) || (icode == ICODE_BTFSS)) {
             is_btfsx = true;
           }
 
           _reg_addr_check(file, str, insn_flags.u, reloc_val);
-          _emit(ins->opcode | ((bit & 7) << 8) | (file & PIC16_BMSK_FILE), sym_name);
+          _emit(ins->opcode | (bit << 8) | (file & PIC16_BMSK_FILE), sym_name);
         }
         break;
       }
@@ -7174,6 +7266,7 @@ do_insn(const char *Op_name, pnode_t *Parameters)
 
         if (eval_enforce_arity(arity, 2)) {
           int          bit;
+          int          k;
           insn_flags_t insn_flags;
           gp_boolean   is_reloc;
           gpasmVal     reloc_val;
@@ -7186,17 +7279,30 @@ do_insn(const char *Op_name, pnode_t *Parameters)
             insn_flags.isReloc = true;
           }
 
-          p    = PnListHead(PnListTail(Parameters));
-          bit  = eval_maybe_evaluate(p);
+          p   = PnListHead(PnListTail(Parameters));
+          bit = eval_maybe_evaluate(p);
+          k   = bit & 7;
 
           if (bit < 0) {
-            gpmsg_vwarning(GPW_OUT_OF_RANGE, "Bit{%ins} < 0.", bit);
+            if (state.strict_level == 2) {
+              gpmsg_verror(GPE_OUT_OF_RANGE, "Bad value: %i < Limit: 0", bit);
+            }
+            else {
+              gpmsg_vwarning(GPW_OUT_OF_RANGE, "Bad value: %i < Limit: 0 (Corrected value: %i)",
+                             gp_find_highest_bit(7), bit, k);
+            }
           }
           else if (bit > 7) {
-            gpmsg_vwarning(GPW_OUT_OF_RANGE, "Bit{%ins} > 7.", bit);
+            if (state.strict_level == 2) {
+              gpmsg_verror(GPE_OUT_OF_RANGE, "Bad value: %i (%#x) > Limit: 7", bit, bit);
+            }
+            else {
+              gpmsg_vwarning(GPW_OUT_OF_RANGE, "Bad value: %i (%#x) > Limit: 7 (Corrected value: %i)",
+                             gp_find_highest_bit(7), bit, bit, k);
+            }
           }
 
-          bit &= 7;
+          bit = k;
 
           if ((icode == ICODE_BTFSC) || (icode == ICODE_BTFSS)) {
             is_btfsx = true;
@@ -7339,6 +7445,7 @@ do_insn(const char *Op_name, pnode_t *Parameters)
         /* PIC16E (bcf, bsf, btfsc, btfss, btg) */
         const pnode_t *par;
         int            bit;
+        int            k;
         int            a;
         insn_flags_t   insn_flags;
         gp_boolean     is_reloc;
@@ -7430,20 +7537,35 @@ do_insn(const char *Op_name, pnode_t *Parameters)
 
         p   = PnListHead(PnListTail(Parameters));
         bit = eval_maybe_evaluate(p);
+        k   = bit & 7;
 
         if (bit < 0) {
-          gpmsg_vwarning(GPW_OUT_OF_RANGE, "Bit{%ins} < 0.", bit);
+          if (state.strict_level == 2) {
+            gpmsg_verror(GPE_OUT_OF_RANGE, "Bad value: %i < Limit: 0", bit);
+          }
+          else {
+            gpmsg_vwarning(GPW_OUT_OF_RANGE, "Bad value: %i < Limit: 0 (Corrected value: %i)",
+                           gp_find_highest_bit(7), bit, k);
+          }
         }
         else if (bit > 7) {
-          gpmsg_vwarning(GPW_OUT_OF_RANGE, "Bit{%ins} > 7.", bit);
+          if (state.strict_level == 2) {
+            gpmsg_verror(GPE_OUT_OF_RANGE, "Bad value: %i (%#x) > Limit: 7", bit, bit);
+          }
+          else {
+            gpmsg_vwarning(GPW_OUT_OF_RANGE, "Bad value: %i (%#x) > Limit: 7 (Corrected value: %i)",
+                           gp_find_highest_bit(7), bit, bit, k);
+          }
         }
+
+        bit = k;
 
         if ((icode == ICODE_BTFSC) || (icode == ICODE_BTFSS)) {
           is_btfsx = true;
         }
 
         _reg_addr_check(file, str, insn_flags.u, reloc_val);
-        _emit(ins->opcode | (a << 8) | ((bit & 7) << 9) | (file & PIC16_BMSK_FILE), sym_name);
+        _emit(ins->opcode | (a << 8) | (bit << 9) | (file & PIC16_BMSK_FILE), sym_name);
         break;
       }
 
@@ -7752,7 +7874,7 @@ do_insn(const char *Op_name, pnode_t *Parameters)
               _emit(opcode, sym_name);
             }
             else {
-              gpmsg_verror(GPE_OUT_OF_RANGE, "INDF = %ins, can be 0, 1, 4 or 6. (Internal conversion: 4->0, 6->1)", fsr);
+              gpmsg_verror(GPE_OUT_OF_RANGE, "Bad INDF: %i, can be 0, 1, 4 or 6. (Internal conversion: 4->0, 6->1)", fsr);
             }
             break;
           }
@@ -7795,7 +7917,7 @@ do_insn(const char *Op_name, pnode_t *Parameters)
               }
             }
             else {
-              gpmsg_verror(GPE_OUT_OF_RANGE, "INDF = %ins, can be 0, 1, 4 or 6. (Internal conversion: 4->0, 6->1)", fsr);
+              gpmsg_verror(GPE_OUT_OF_RANGE, "Bad INDF: %i, can be 0, 1, 4 or 6. (Internal conversion: 4->0, 6->1)", fsr);
             }
             break;
           }
@@ -7824,15 +7946,15 @@ do_insn(const char *Op_name, pnode_t *Parameters)
                   k  = eval_maybe_evaluate(p3); /* Index */
 
                   if (k < -32) {
-                    gpmsg_verror(GPE_OUT_OF_RANGE, "Index{%ins} < -32.", k);
+                    gpmsg_verror(GPE_OUT_OF_RANGE, "Bad offset: %i < Limit: -32", k);
                   }
                   else if (k > 31) {
-                    gpmsg_verror(GPE_OUT_OF_RANGE, "Index{%ins} > 31.", k);
+                    gpmsg_verror(GPE_OUT_OF_RANGE, "Bad offset: %i > Limit: 31", k);
                   }
                   else {
                     /* New opcode for indexed indirect. */
                     opcode = ((icode == ICODE_MOVIW) ? PIC14E_INSN_MOVIW_IDX : PIC14E_INSN_MOVWI_IDX) | file;
-                    _emit(opcode | (k & 0x3f), sym_name);
+                    _emit(opcode | (k & 0x3F), sym_name);
                   }
                   break;
                 }
@@ -7842,7 +7964,7 @@ do_insn(const char *Op_name, pnode_t *Parameters)
               }
             }
             else {
-              gpmsg_verror(GPE_OUT_OF_RANGE, "INDF = %ins, can be 0, 1, 4 or 6. (Internal conversion: 4->0, 6->1)", fsr);
+              gpmsg_verror(GPE_OUT_OF_RANGE, "Bad INDF: %i, can be 0, 1, 4 or 6. (Internal conversion: 4->0, 6->1)", fsr);
             }
 
             break;

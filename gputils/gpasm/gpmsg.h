@@ -195,7 +195,7 @@ enum GPM_codes {
 #define GMSG_MSG_LEVEL0_MAX     GPM_UNKNOWN
 
 #define GMSG_MSG_LEVEL1_MIN     GPM_ACC_DEF
-#define GMSG_MSG_LEVEL1_MAX     GPM_EXT_PAGE2
+#define GMSG_MSG_LEVEL1_MAX     GPM_EXT_PAGE
 
 extern void gpmsg_init(void);
 extern void gpmsg_close(void);
@@ -203,18 +203,18 @@ extern void gpmsg_close(void);
 extern void gpmsg_add_code(int Code);
 extern void gpmsg_add_code_range(int Code0, int Code1);
 
-extern void gpmsg_error(int Code, const char *Message);
-extern void gpmsg_warning(int Code, const char *Message);
-extern void gpmsg_message(int Code, const char *Message);
+extern void gpmsg_error(int Code, const char* Message);
+extern void gpmsg_warning(int Code, const char* Message);
+extern void gpmsg_message(int Code, const char* Message);
 
-extern void gpmsg_verror(int Code, const char *Message, ...);
-extern void gpmsg_vwarning(int Code, const char *Message, ...);
-extern void gpmsg_vmessage(int Code, const char *Message, ...);
+extern void gpmsg_verror(int Code, const char* Message, ...);
+extern void gpmsg_vwarning(int Code, const char* Message, ...);
+extern void gpmsg_vmessage(int Code, const char* Message, ...);
 
 /* Alternate message functions. Only the prototypes are provided, the user
    must link their own function into gpasm. */
-extern void gpmsg_user_error(int Code, const char *Message);
-extern void gpmsg_user_warning(int Code, const char *Message);
-extern void gpmsg_user_message(int Code, const char *Message);
+extern void gpmsg_user_error(int Code, const char* Message);
+extern void gpmsg_user_warning(int Code, const char* Message);
+extern void gpmsg_user_message(int Code, const char* Message);
 
 #endif /* __GPMSG_H__ */

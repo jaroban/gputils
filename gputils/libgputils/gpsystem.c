@@ -397,8 +397,8 @@ gp_malloc(size_t Size, const char *File, size_t Line, const char *Func)
   }
 
   if ((m = malloc(Size)) == NULL) {
-    fprintf(stderr, "%s() -- Could not allocate %"SIZE_FMTu" bytes of memory. {%s.LINE-%"SIZE_FMTu", %s()}\n",
-            __func__, Size, File, Line, Func);
+    fprintf(stderr, "%s.%s() -- Could not allocate %"SIZE_FMTu" bytes of memory. {%s.LINE-%"SIZE_FMTu", %s()}\n",
+            __FILE__, __func__, Size, File, Line, Func);
     exit(1);
   }
 
@@ -417,8 +417,8 @@ gp_calloc(size_t Nmemb, size_t Size, const char *File, size_t Line, const char *
   }
 
   if ((m = calloc(Nmemb, Size)) == NULL) {
-    fprintf(stderr, "%s() -- Could not allocate %"SIZE_FMTu" bytes of memory. {%s.LINE-%"SIZE_FMTu", %s()}\n",
-            __func__, Nmemb * Size, File, Line, Func);
+    fprintf(stderr, "%s.%s() -- Could not allocate %"SIZE_FMTu" bytes of memory. {%s.LINE-%"SIZE_FMTu", %s()}\n",
+            __FILE__, __func__, Nmemb * Size, File, Line, Func);
     exit(1);
   }
 
@@ -438,8 +438,8 @@ gp_realloc(void *Mem, size_t Size, const char *File, size_t Line, const char *Fu
   }
 
   if ((m = realloc(Mem, Size)) == NULL) {
-    fprintf(stderr, "%s() -- Could not reallocate %"SIZE_FMTu" bytes of memory. {%s.LINE-%"SIZE_FMTu", %s()}\n",
-            __func__, Size, File, Line, Func);
+    fprintf(stderr, "%s.%s() -- Could not reallocate %"SIZE_FMTu" bytes of memory. {%s.LINE-%"SIZE_FMTu", %s()}\n",
+            __FILE__, __func__, Size, File, Line, Func);
     exit(1);
   }
 
@@ -456,8 +456,8 @@ gp_strdup(const char *String, const char *File, size_t Line, const char *Func)
   assert(String != NULL);
 
   if ((s = strdup(String)) == NULL) {
-    fprintf(stderr, "%s(\"%s\") -- Could not allocate string {%s.LINE-%"SIZE_FMTu", %s()}, error: %s.\n",
-            __func__, String, File, Line, Func, strerror(errno));
+    fprintf(stderr, "%s.%s(\"%s\") -- Could not allocate string {%s.LINE-%"SIZE_FMTu", %s()}, error: %s.\n",
+            __FILE__, __func__, String, File, Line, Func, strerror(errno));
     exit(1);
   }
 
@@ -474,8 +474,8 @@ gp_strndup(const char *String, size_t Length, const char *File, size_t Line, con
   assert(String != NULL);
 
   if ((s = strndup(String, Length)) == NULL) {
-    fprintf(stderr, "%s(\"%s\", %"SIZE_FMTu") -- Could not allocate string {%s.LINE-%"SIZE_FMTu", %s()}, error: %s.\n",
-            __func__, String, Length, File, Line, Func, strerror(errno));
+    fprintf(stderr, "%s.%s(\"%s\", %"SIZE_FMTu") -- Could not allocate string {%s.LINE-%"SIZE_FMTu", %s()}, error: %s.\n",
+            __FILE__, __func__, String, Length, File, Line, Func, strerror(errno));
     exit(1);
   }
 
@@ -858,8 +858,8 @@ gp_exit_if_arg_an_option(const struct option *Options, int Opt_max_index, int Op
   }
 
   if (Opt_index >= Opt_max_index) {
-    fprintf(stderr, "%s() -- Fatal error: opt_index == %i (Only valid if opt_index < %i.)\n",
-            __func__, Opt_index, Opt_max_index);
+    fprintf(stderr, "%s.%s() -- Fatal error: opt_index == %i (Only valid if opt_index < %i.)\n",
+            __FILE__, __func__, Opt_index, Opt_max_index);
     exit(1);
   }
 

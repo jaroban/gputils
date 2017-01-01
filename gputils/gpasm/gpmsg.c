@@ -36,7 +36,7 @@ typedef struct message_code {
   }                    type;
   int                  value0;
   int                  value1;
-  struct message_code *next;
+  struct message_code* next;
 } message_code_t;
 
 typedef enum {
@@ -45,15 +45,15 @@ typedef enum {
   MSG_TYPE_MESSAGE
 } err_type_t;
 
-static message_code_t *message_codes_list      = NULL;
-static message_code_t *message_codes_list_last = NULL;
+static message_code_t* message_codes_list      = NULL;
+static message_code_t* message_codes_list_last = NULL;
 
 /*------------------------------------------------------------------------------------------------*/
 
 static gp_boolean
 _check_code(int Code)
 {
-  const message_code_t *ec;
+  const message_code_t* ec;
   int                   v0;
   int                   v1;
   gp_boolean            print;
@@ -97,8 +97,8 @@ _check_code(int Code)
 static void
 _free_message_codes(void)
 {
-  message_code_t *ec;
-  message_code_t *next;
+  message_code_t* ec;
+  message_code_t* next;
 
   ec = message_codes_list;
   while (ec != NULL) {
@@ -110,7 +110,7 @@ _free_message_codes(void)
 
 /*------------------------------------------------------------------------------------------------*/
 
-static const char *
+static const char*
 _get_error(int Code)
 {
   switch (Code) {
@@ -249,14 +249,14 @@ _get_error(int Code)
 
 /*------------------------------------------------------------------------------------------------*/
 
-static const char *
+static const char*
 _get_warning(int Code)
 {
   switch (Code) {
     case GPW_SYM_NOT_DEFINED:
       return "Symbol not previously defined: \"%s\"";
     case GPW_OUT_OF_RANGE:
-      return "Argument out of range. Least significant bits used.";
+      return "Argument out of range. The %u least significant bits are usable.";
     case GPW_OP_COLUMN_ONE:
       return "Found opcode in column 1: \"%s\"";
     case GPW_DIR_COLUMN_ONE:
@@ -321,7 +321,7 @@ _get_warning(int Code)
 
 /*------------------------------------------------------------------------------------------------*/
 
-static const char *
+static const char*
 _get_message(int Code)
 {
   switch (Code) {
@@ -372,12 +372,12 @@ _get_message(int Code)
 /*------------------------------------------------------------------------------------------------*/
 
 static void
-_verr(err_type_t Err_type, int Code, const char *Message, va_list Ap)
+_verr(err_type_t Err_type, int Code, const char* Message, va_list Ap)
 {
   va_list                 ap0;
-  const char             *type;
-  const char             *gap;
-  const source_context_t *src;
+  const char*             type;
+  const char*             gap;
+  const source_context_t* src;
 
   src = state.src_list.last;
   if ((src != NULL) && state.macro_dereference) {
@@ -436,11 +436,11 @@ _verr(err_type_t Err_type, int Code, const char *Message, va_list Ap)
 /*------------------------------------------------------------------------------------------------*/
 
 static void
-_err(err_type_t Err_type, int Code, const char *Message)
+_err(err_type_t Err_type, int Code, const char* Message)
 {
-  const char             *type;
-  const char             *gap;
-  const source_context_t *src = state.src_list.last;
+  const char*             type;
+  const char*             gap;
+  const source_context_t* src = state.src_list.last;
 
   if ((src != NULL) && state.macro_dereference) {
     while ((src != NULL) && (src->type == SRC_MACRO)) {
@@ -536,7 +536,7 @@ gpmsg_close(void)
 void
 gpmsg_add_code(int Code)
 {
-  message_code_t *new;
+  message_code_t* new;
 
   if ((Code <= -(GMSG_ERR_LEVEL0_MIN)) && (Code >= -(GMSG_ERR_LEVEL0_MAX))) {
     gpmsg_vwarning(GPW_DISABLE_ERROR, NULL);
@@ -570,7 +570,7 @@ gpmsg_add_code(int Code)
 void
 gpmsg_add_code_range(int Code0, int Code1)
 {
-  message_code_t *new;
+  message_code_t* new;
   int             t;
 
   if (Code0 > Code1) {
@@ -608,7 +608,7 @@ gpmsg_add_code_range(int Code0, int Code1)
 /*------------------------------------------------------------------------------------------------*/
 
 void
-gpmsg_error(int Code, const char *Message)
+gpmsg_error(int Code, const char* Message)
 {
   if (state.pass != 2) {
     return;
@@ -630,10 +630,10 @@ gpmsg_error(int Code, const char *Message)
 /*------------------------------------------------------------------------------------------------*/
 
 void
-gpmsg_verror(int Code, const char *Message, ...)
+gpmsg_verror(int Code, const char* Message, ...)
 {
   va_list     ap;
-  const char *msg;
+  const char* msg;
   char        buf[BUFSIZ];
 
   if (state.pass != 2) {
@@ -663,7 +663,7 @@ gpmsg_verror(int Code, const char *Message, ...)
 /*------------------------------------------------------------------------------------------------*/
 
 void
-gpmsg_warning(int Code, const char *Message)
+gpmsg_warning(int Code, const char* Message)
 {
   if (state.pass != 2) {
     return;
@@ -690,10 +690,10 @@ gpmsg_warning(int Code, const char *Message)
 /*------------------------------------------------------------------------------------------------*/
 
 void
-gpmsg_vwarning(int Code, const char *Message, ...)
+gpmsg_vwarning(int Code, const char* Message, ...)
 {
   va_list     ap;
-  const char *msg;
+  const char* msg;
   char        buf[BUFSIZ];
 
   if (state.pass != 2) {
@@ -727,7 +727,7 @@ gpmsg_vwarning(int Code, const char *Message, ...)
 /*------------------------------------------------------------------------------------------------*/
 
 void
-gpmsg_message(int Code, const char *Message)
+gpmsg_message(int Code, const char* Message)
 {
   if (state.pass != 2) {
     return;
@@ -754,10 +754,10 @@ gpmsg_message(int Code, const char *Message)
 /*------------------------------------------------------------------------------------------------*/
 
 void
-gpmsg_vmessage(int Code, const char *Message, ...)
+gpmsg_vmessage(int Code, const char* Message, ...)
 {
   va_list     ap;
-  const char *msg;
+  const char* msg;
   char        buf[BUFSIZ];
 
   if (state.pass != 2) {

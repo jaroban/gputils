@@ -33,9 +33,9 @@ enum mode_flags_e {
 };
 
 static int         checksum;
-static const char *newline;
-static FILE       *hex;
-static MemBlock_t *memory;
+static const char* newline;
+static FILE*       hex;
+static MemBlock_t* memory;
 
 /*------------------------------------------------------------------------------------------------*/
 
@@ -174,11 +174,11 @@ _last_line(void)
 static void
 _write_i_mem(enum formats Hex_format, enum mode_flags_e Mode, unsigned int Core_mask)
 {
-  MemBlock_t   *m;
-  int           i;
-  int           j;
-  int           maximum;
-  uint8_t       byte;
+  MemBlock_t* m;
+  int         i;
+  int         j;
+  int         maximum;
+  uint8_t     byte;
 
   m = memory;
   while (m != NULL) {
@@ -237,7 +237,7 @@ _write_i_mem(enum formats Hex_format, enum mode_flags_e Mode, unsigned int Core_
 /*------------------------------------------------------------------------------------------------*/
 
 gp_boolean
-gp_writehex(const char *Base_filename, MemBlock_t *M, enum formats Hex_format, int Num_errors,
+gp_writehex(const char* Base_filename, MemBlock_t* M, enum formats Hex_format, int Num_errors,
             gp_boolean Dos_newlines, unsigned int Core_mask)
 {
   char hex_filename[BUFSIZ];
@@ -316,7 +316,7 @@ gp_writehex(const char *Base_filename, MemBlock_t *M, enum formats Hex_format, i
 /* Scan the memory to see if it exceeds 32kB limit on INHX8M limit. */
 
 gp_boolean
-gp_writehex_check(MemBlock_t *M, enum formats Hex_format)
+gp_writehex_check(MemBlock_t* M, enum formats Hex_format)
 {
   gp_boolean ok = true;
 

@@ -1,3 +1,21 @@
+2017-01-01  Molnar Karoly  <molnarkaroly@users.sourceforge.net>
+  * configure, configure.ac:
+    More compiler warning options.
+
+  * gpasm/directive.c, gpasm/gpmsg.c, gpasm/special.c:
+    More and talkative warning and error messages.
+    Fixed this bug: "#301 GPASM warning message badly formatted"
+    Thanks to Philippe Paternotte for the report.
+
+  * libgputils/gpdis.c, libgputils/gplist.c, libgputils/gpsystem.c:
+    More debug info.
+
+  * gpasm/gpmsg.c, gpasm/gpmsg.h, libgputils/gpmessage.c,
+    libgputils/gpmessage.h, libgputils/gpsystem.c,
+    libgputils/gpsystem.h, libgputils/gpwritehex.c,
+    libgputils/gpwritehex.h:
+    Code formatting.
+
 2016-12-29  Molnar Karoly  <molnarkaroly@users.sourceforge.net>
   * configure, configure.ac:
     More clang warning options.

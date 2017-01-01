@@ -41,7 +41,7 @@ static int _real_num_messages = 0;
 /*------------------------------------------------------------------------------------------------*/
 
 void
-gp_error(const char *Format, ...)
+gp_error(const char* Format, ...)
 {
   va_list args;
   char    buffer[BUFSIZ];
@@ -68,7 +68,7 @@ gp_error(const char *Format, ...)
 /*------------------------------------------------------------------------------------------------*/
 
 void
-gp_warning(const char *Format, ...)
+gp_warning(const char* Format, ...)
 {
   va_list args;
   char    buffer[BUFSIZ];
@@ -95,7 +95,7 @@ gp_warning(const char *Format, ...)
 /*------------------------------------------------------------------------------------------------*/
 
 void
-gp_message(const char *Format, ...)
+gp_message(const char* Format, ...)
 {
   va_list args;
   char    buffer[BUFSIZ];
@@ -122,7 +122,7 @@ gp_message(const char *Format, ...)
 /*------------------------------------------------------------------------------------------------*/
 
 void
-gp_debug(const char *Format, ...)
+gp_debug(const char* Format, ...)
 {
   va_list args;
   char    buffer[BUFSIZ];
