@@ -2,6 +2,10 @@
   * configure, configure.ac:
     More compiler warning options.
 
+2017-01-01  Molnar Karoly  <molnarkaroly@users.sourceforge.net>
+  * configure, configure.ac:
+    More compiler warning options.
+
   * gpasm/directive.c, gpasm/gpmsg.c, gpasm/special.c:
     More and talkative warning and error messages.
     Fixed this bug: "#301 GPASM warning message badly formatted"

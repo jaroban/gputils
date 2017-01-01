@@ -19,8 +19,41 @@ GPUTILS_LIB_PATH="\$(datadir)/gputils/lib"
 GPUTILS_HTMLDOC_PATH=${GPUTILS_HTMLDOC_PATH:-"\$(datadir)/doc/gputils-\$(PACKAGE_VERSION)/html"}
 LIBGPUTILS=libgputils/libgputils.a
 LIBIBERTY=libiberty/libiberty.a
-MPLABX_PATH_DEFAULT="/opt/microchip/mplabx/v3.35"
+MPLABX_PATH_DEFAULT="/opt/microchip/mplabx/v3.45"
 MAKE_SUBDIRS="libgputils libiberty gpasm gplink gputils header lkr doc man"
+
+# Redefine the faulty macro.
+AC_DEFUN([AX_CHECK_COMPILE_FLAG],
+[AC_PREREQ(2.60)dnl for _AC_LANG_PREFIX
+AS_VAR_PUSHDEF([CACHEVAR],[ax_cv_check_[]_AC_LANG_ABBREV[]flags_$4_$1])dnl
+AC_CACHE_CHECK([whether _AC_LANG compiler accepts $1], CACHEVAR, [
+  ax_check_save_flags=$[]_AC_LANG_PREFIX[]FLAGS
+  _AC_LANG_PREFIX[]FLAGS="$[]_AC_LANG_PREFIX[]FLAGS $4 $1"
+  AC_COMPILE_IFELSE([AC_LANG_PROGRAM()],
+    [AS_VAR_SET(CACHEVAR,[yes])],
+    [AS_VAR_SET(CACHEVAR,[no])])
+  _AC_LANG_PREFIX[]FLAGS=$ax_check_save_flags])
+AS_IF([test x"AS_VAR_GET(CACHEVAR)" = xyes],
+  [m4_default([$2], :)],
+  [m4_default([$3], :)])
+AS_VAR_POPDEF([CACHEVAR])dnl
+])dnl AX_CHECK_COMPILE_FLAGS
+
+# Redefine the faulty macro.
+AC_DEFUN([AX_CHECK_LINK_FLAG],
+[AS_VAR_PUSHDEF([CACHEVAR],[ax_cv_check_ldflags_$4_$1])dnl
+AC_CACHE_CHECK([whether the linker accepts $1], CACHEVAR, [
+  ax_check_save_flags=$LDFLAGS
+  LDFLAGS="$LDFLAGS $4 $1"
+  AC_LINK_IFELSE([m4_default([$5],[AC_LANG_PROGRAM()])],
+    [AS_VAR_SET(CACHEVAR,[yes])],
+    [AS_VAR_SET(CACHEVAR,[no])])
+    LDFLAGS=$ax_check_save_flags])
+AS_IF([test x"AS_VAR_GET(CACHEVAR)" = xyes],
+  [m4_default([$2], :)],
+  [m4_default([$3], :)])
+AS_VAR_POPDEF([CACHEVAR])dnl
+])dnl AX_CHECK_LINK_FLAGS
 
 # Check for additional parameters.
 AC_ARG_ENABLE(debug,
@@ -175,40 +208,40 @@ AM_PACKAGE_SVN_VERSION=`./get_cl_revision.sh ChangeLog`
 AM_CFLAGS="-DGPUTILS_SVN_VERSION=\$(AM_GPUTILS_SVN_VERSION)"
 AM_LDFLAGS=
 
+AX_CHECK_COMPILE_FLAG([-pedantic], [AM_CFLAGS="$AM_CFLAGS -pedantic"])
+AX_CHECK_COMPILE_FLAG([-Wall], [AM_CFLAGS="$AM_CFLAGS -Wall"])
+AX_CHECK_COMPILE_FLAG([-Warray-bounds], [AM_CFLAGS="$AM_CFLAGS -Warray-bounds"])
+AX_CHECK_COMPILE_FLAG([-Warray-bounds-pointer-arithmetic], [AM_CFLAGS="$AM_CFLAGS -Warray-bounds-pointer-arithmetic"])
+AX_CHECK_COMPILE_FLAG([-Wbitwise-op-parentheses], [AM_CFLAGS="$AM_CFLAGS -Wbitwise-op-parentheses"])
+AX_CHECK_COMPILE_FLAG([-Wimplicit-function-declaration], [AM_CFLAGS="$AM_CFLAGS -Wimplicit-function-declaration"])
+AX_CHECK_COMPILE_FLAG([-Wformat], [AM_CFLAGS="$AM_CFLAGS -Wformat"])
+AX_CHECK_COMPILE_FLAG([-Wformat-security], [AM_CFLAGS="$AM_CFLAGS -Wformat-security"])
+AX_CHECK_COMPILE_FLAG([-Wlogical-op-parentheses], [AM_CFLAGS="$AM_CFLAGS -Wlogical-op-parentheses"])
+AX_CHECK_COMPILE_FLAG([-Wparentheses], [AM_CFLAGS="$AM_CFLAGS -Wparentheses"])
+AX_CHECK_COMPILE_FLAG([-Wpointer-arith], [AM_CFLAGS="$AM_CFLAGS -Wpointer-arith"])
+
+if test "x$CC" != "xclang"; then
+  AX_CHECK_COMPILE_FLAG([-Wreturn-local-addr], [AM_CFLAGS="$AM_CFLAGS -Wreturn-local-addr"])
+fi
+
+AX_CHECK_COMPILE_FLAG([-Wreturn-stack-address], [AM_CFLAGS="$AM_CFLAGS -Wreturn-stack-address"])
+AX_CHECK_COMPILE_FLAG([-Wshadow], [AM_CFLAGS="$AM_CFLAGS -Wshadow"])
+AX_CHECK_COMPILE_FLAG([-Wshift-op-parentheses], [AM_CFLAGS="$AM_CFLAGS -Wshift-op-parentheses"])
+AX_CHECK_COMPILE_FLAG([-Wshift-overflow], [AM_CFLAGS="$AM_CFLAGS -Wshift-overflow"])
+AX_CHECK_COMPILE_FLAG([-Wtautological-compare], [AM_CFLAGS="$AM_CFLAGS -Wtautological-compare"])
+
+AX_CHECK_LINK_FLAG([-Wl,-warn-common], [AM_LDFLAGS="$AM_LDFLAGS -Wl,-warn-common"])
+AX_CHECK_LINK_FLAG([-Wl,-warn-once], [AM_LDFLAGS="$AM_LDFLAGS -Wl,-warn-once"])
+
 # Options for the system on which the package will run.
 case "${host}" in
-  *cygwin* )
-    if test "x$GCC" = "xyes"; then
-      AM_CFLAGS="$AM_CFLAGS -Wall -pedantic -Wimplicit-function-declaration -Wformat-security -Wlogical-op"
-      AM_LDFLAGS="-Wl,-warn-common -Wl,-warn-once"
-    fi
-    ;;
-  *darwin* )
-    if test "x$CC" = "xclang"; then
-      AM_CFLAGS="$AM_CFLAGS -Wall -pedantic -Wformat -Wtautological-compare -Wimplicit-function-declaration -Wformat-security"
-    fi
-    ;;
-  *linux* )
-    if test "x$CC" = "xclang"; then
-      AM_CFLAGS="$AM_CFLAGS -Wall -pedantic -Wformat -Wtautological-compare -Wimplicit-function-declaration \
--Wformat-security -Wlogical-op-parentheses -Wbitwise-op-parentheses -Wshift-op-parentheses -Wshift-overflow -Warray-bounds \
--Warray-bounds-pointer-arithmetic -Wreturn-stack-address -Wshadow"
-      AM_LDFLAGS="-Wl,-warn-common -Wl,-warn-once"
-    else
-      if test "x$GCC" = "xyes"; then
-        AM_CFLAGS="$AM_CFLAGS -Wall -pedantic -Wformat -Wimplicit-function-declaration -Wformat-security -Wlogical-op"
-        AM_LDFLAGS="-Wl,-warn-common -Wl,-warn-once"
-      fi
-    fi
-    ;;
-  *mingw* )
-    ;;
   *-pc-os2_emx | *-pc-os2-emx )
     EXEEXT=".exe"
     if test "x$GCC" = "xyes"; then
       AM_CFLAGS="$AM_CFLAGS -Zcrtdll"
     fi
     ;;
+
   *sun* )
     # sunos cc needs the -xCC flag for // comments
     if test "x$GCC" != "xyes"; then
@@ -220,15 +253,13 @@ esac
 # Host filesystem options.
 case "${host}" in
   *mingw* | *-pc-os2_emx | *-pc-os2-emx | *djgpp* )
-    AC_DEFINE(HAVE_DOS_BASED_FILE_SYSTEM, 1, 
-      [Define if your host uses a DOS based file system.])
+    AC_DEFINE(HAVE_DOS_BASED_FILE_SYSTEM, 1, [Define if your host uses a DOS based file system.])
     ;;
 esac
 
 # Process the options.
 if test x$enable_gputils_debug = xyes; then
-  AC_DEFINE(GPUTILS_DEBUG, 1,
-    [Define if you want to enable GPUTILS debug features.])
+  AC_DEFINE(GPUTILS_DEBUG, 1, [Define if you want to enable GPUTILS debug features.])
 fi
 
 if test x$enable_gdb_debuginfo = xyes; then
@@ -236,8 +267,7 @@ if test x$enable_gdb_debuginfo = xyes; then
 fi
 
 if test x$enable_gputils_path = xyes; then
-  AC_DEFINE(USE_DEFAULT_PATHS, 1,
-    [Define if you want to add default search paths.])
+  AC_DEFINE(USE_DEFAULT_PATHS, 1, [Define if you want to add default search paths.])
 fi
 
 # Substitute configuration variables.
