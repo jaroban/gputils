@@ -199,8 +199,8 @@
 	movlw	file
 
 	movpf	0,0
-	movpf	0x34, file2
-	movpf	file, 0x34
+	movpf	0x1f, file2
+	movpf	file, 0x1f
 	movpf	file, file2
 
 	movwf	0
