@@ -1,3 +1,12 @@
+2017-01-21  Molnar Karoly  <molnarkaroly@users.sourceforge.net>
+  * gpasm/directive.c:
+    Applied tis patch: "#69 Fix quoting in .assert directive"
+    Thanks to Martin Habets.
+
+  * gpasm/testsuite/gpasm.project/objasm/op16.asm,
+    gpasm/testsuite/gpasm.project/objfiles/op16.o:
+    Fixed the parameters of movfp and movpf instructions.
+
 2017-01-01  Molnar Karoly  <molnarkaroly@users.sourceforge.net>
   * configure, configure.ac:
     More compiler warning options.

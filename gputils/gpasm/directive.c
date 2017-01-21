@@ -151,16 +151,16 @@ _resolve_meta_chars(char *Dst, int Max_size, const char *Src, int Size)
 
 /*------------------------------------------------------------------------------------------------*/
 
-static const char *
-_hv_macro_resolver(const char *String)
+static const char*
+_hv_macro_resolver(const char* String)
 {
   static char out[BUFSIZ];
 
   char        buf[BUFSIZ];
-  const char *st_start;
-  const char *st_end;
-  const char *hv_start;
-  const char *hv_end;
+  const char* st_start;
+  const char* st_end;
+  const char* hv_start;
+  const char* hv_end;
   int         out_idx;
   int         raw_size;
   int         mt_size;
@@ -250,11 +250,21 @@ _hv_macro_resolver(const char *String)
         return NULL;
       }
 
-      /* It adds to existing text. */
-      memcpy(&out[out_idx], st_start, raw_size);
-      out_idx += raw_size;
-      out[out_idx] = '\0';
+      /* Decodes the protected characters. */
+      mt_size = _resolve_meta_chars(buf, sizeof(buf), st_start, raw_size);
       st_start += raw_size;
+
+      if (mt_size > 0) {
+        if (mt_size > (int)(sizeof(out) - out_idx - 1)) {
+          gpmsg_verror(GPE_TOO_LONG, NULL, buf, (size_t)mt_size, sizeof(out) - out_idx - 1);
+          return NULL;
+        }
+
+        /* It adds to existing text. */
+        memcpy(&out[out_idx], buf, mt_size);
+        out_idx += mt_size;
+        out[out_idx] = '\0';
+      }
     }
   }
 
