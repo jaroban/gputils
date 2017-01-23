@@ -1581,6 +1581,7 @@ _patch_addr(gp_object_t *Object, gp_section_t *Section, const gp_reloc_t *Reloca
   int                bank;
   int                page;
   gp_boolean         write_data;
+  const insn_t      *instruction;
 
   class     = Object->class;
   num_pages = gp_processor_num_pages(Object->processor);
@@ -1613,9 +1614,23 @@ _patch_addr(gp_object_t *Object, gp_section_t *Section, const gp_reloc_t *Reloca
       data = class->reloc_goto(value);
       break;
 
-    case RELOC_LOW:
-      data = value & 0xff;
+    case RELOC_LOW: {
+      instruction = class->find_insn(class, current_value);
+
+      if (instruction == NULL)  {
+        gp_error("No instruction for %#x at %#x(%s/%s)", current_value,
+                 byte_addr, Section->name, symbol->name);
+        return;
+      }
+
+      if (instruction->class == INSN_CLASS_LIT8) {
+        data = value & 0xff;
+      }
+      else {
+        data = class->reloc_f(value);
+      }
       break;
+    }
 
     case RELOC_HIGH:
       data = class->reloc_high(FlagIsSet(symbol->section->flags, STYP_ROM_AREA), value);

@@ -38,6 +38,7 @@ opwf7	macro i
 	i	d1+1
 	i	d2-1
 	i	d3+2
+	i	low(d1+1),W
 	endm
 
 b7	macro i

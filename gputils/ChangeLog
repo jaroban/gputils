@@ -1,6 +1,14 @@
+2017-01-23  Molnar Karoly  <molnarkaroly@users.sourceforge.net>
+  * libgputils/gpcofflink.c,
+    gplink/testsuite/gplink.project/hexfiles/reloc12.hex,
+    gplink/testsuite/gplink.project/asmfiles/reloc14_1.asm,
+    gplink/testsuite/gplink.project/hexfiles/reloc14.hex:
+    Applied this patch: "#70 gplink: preserve destination for low relocations"
+    Thanks to Martin Habets.
+
 2017-01-21  Molnar Karoly  <molnarkaroly@users.sourceforge.net>
   * gpasm/directive.c:
-    Applied tis patch: "#69 Fix quoting in .assert directive"
+    Applied this patch: "#69 Fix quoting in .assert directive"
     Thanks to Martin Habets.
 
   * gpasm/testsuite/gpasm.project/objasm/op16.asm,
