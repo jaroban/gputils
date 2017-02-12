@@ -95,10 +95,10 @@ _select_mode(enum lib_modes Mode)
 
 /* return the object name without the path */
 
-static char *
-_object_name(char *File_name)
+static const char*
+_object_name(const char* File_name)
 {
-  char *name;
+  const char* name;
 
 #ifdef HAVE_DOS_BASED_FILE_SYSTEM
   for (name = File_name + strlen(File_name) - 1; name >= File_name; --name) {
@@ -122,9 +122,9 @@ _object_name(char *File_name)
 /*------------------------------------------------------------------------------------------------*/
 
 static gp_boolean
-_has_path(const char *File_name)
+_has_path(const char* File_name)
 {
-  char *name;
+  const char* name;
 
   name = strrchr(File_name, PATH_SEPARATOR_CHAR);
 #ifdef HAVE_DOS_BASED_FILE_SYSTEM
@@ -138,15 +138,16 @@ _has_path(const char *File_name)
 
 /*------------------------------------------------------------------------------------------------*/
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
   int           c;
   int           i;
   gp_boolean    usage          = false;
   gp_boolean    update_archive = false;
   gp_boolean    no_index       = false;
-  gp_archive_t *object         = NULL;
+  gp_archive_t* object         = NULL;
   gp_coff_t     type;
+  const char*   obj_name;
 
   gp_init();
 
@@ -205,9 +206,9 @@ int main(int argc, char *argv[])
   }
 
   if (optind < argc) {
-    /* fetch the library name */
+    /* Fetch the library name. */
     state.filename = argv[optind++];
-    /* some operations require object filenames or membernames */
+    /* Some operations require object filenames or membernames. */
     for ( ; optind < argc; optind++) {
       state.objectname[state.numobjects] = argv[optind];
       if (state.numobjects >= MAX_OBJ_NAMES) {
@@ -241,9 +242,8 @@ int main(int argc, char *argv[])
       gp_error("\"%s\" is not a valid archive file.", state.filename);
       exit(1);
     }
-    else {
-      state.archive = gp_archive_read(state.filename);
-    }
+
+    state.archive = gp_archive_read(state.filename);
   }
 
   /* process the option */
@@ -252,16 +252,15 @@ int main(int argc, char *argv[])
     case AR_CREATE:
     case AR_REPLACE: {
       while (i < state.numobjects) {
-        type = gp_identify_coff_file(state.objectname[i]);
+        obj_name = state.objectname[i];
+        type     = gp_identify_coff_file(obj_name);
 
         if ((type != GP_COFF_OBJECT_V2) && (type != GP_COFF_OBJECT)) {
-          gp_error("\"%s\" is not a valid object file.", state.objectname[i]);
+          gp_error("\"%s\" is not a valid object file.", obj_name);
           break;
         }
-        else {
-          state.archive = gp_archive_add_member(state.archive, state.objectname[i],
-                                                _object_name(state.objectname[i]));
-        }
+
+        state.archive = gp_archive_add_member(state.archive, obj_name, _object_name(obj_name));
         i++;
       }
       update_archive = true;
@@ -270,19 +269,20 @@ int main(int argc, char *argv[])
 
     case AR_DELETE: {
       while (i < state.numobjects) {
-        if (_has_path(state.objectname[i])) {
-          gp_error("Invalid object name: \"%s\"", state.objectname[i]);
+        obj_name = state.objectname[i];
+
+        if (_has_path(obj_name)) {
+          gp_error("Invalid object name: \"%s\"", obj_name);
           break;
         }
 
-        object = gp_archive_find_member(state.archive, state.objectname[i]);
+        object = gp_archive_find_member(state.archive, obj_name);
         if (object == NULL) {
-          gp_error("Object \"%s\" not found.", state.objectname[i]);
+          gp_error("Object \"%s\" not found.", obj_name);
           break;
         }
-        else {
-          state.archive = gp_archive_delete_member(state.archive, state.objectname[i]);
-        }
+
+        state.archive = gp_archive_delete_member(state.archive, obj_name);
         i++;
       }
       update_archive = true;
@@ -291,23 +291,24 @@ int main(int argc, char *argv[])
 
     case AR_EXTRACT: {
       while (i < state.numobjects) {
-        if (_has_path(state.objectname[i])) {
-          gp_error("Invalid object name: \"%s\"", state.objectname[i]);
+        obj_name = state.objectname[i];
+
+        if (_has_path(obj_name)) {
+          gp_error("Invalid object name: \"%s\"", obj_name);
           break;
         }
 
-        object = gp_archive_find_member(state.archive, state.objectname[i]);
+        object = gp_archive_find_member(state.archive, obj_name);
         if (object == NULL) {
-          gp_error("Object \"%s\" not found.", state.objectname[i]);
+          gp_error("Object \"%s\" not found.", obj_name);
           break;
         }
-        else {
-          if (!gp_archive_extract_member(state.archive, state.objectname[i])) {
-            gp_error("Can't write this file: \"%s\"", state.objectname[i]);
-            exit(1);
-            break;
-          }
+
+        if (!gp_archive_extract_member(state.archive, obj_name)) {
+          gp_error("Can't write this file: \"%s\"", obj_name);
+          exit(1);
         }
+
         i++;
       }
       break;
