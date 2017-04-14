@@ -1,3 +1,7 @@
+2017-04-14  Molnar Karoly  <molnarkaroly@users.sourceforge.net>
+  * libgputils/gpwriteobj.c:
+    An string table optimisation on proposal of Pete Restall.
+
 2017-02-12  Molnar Karoly  <molnarkaroly@users.sourceforge.net>
   * libgputils/gparchive.c:
     Bugfix: Archive extract member.

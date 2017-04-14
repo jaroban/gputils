@@ -2,6 +2,8 @@
    Copyright (C) 2003, 2004, 2005
    Craig Franklin
 
+    Copyright (C) 2017 Molnar Karoly
+
 This file is part of gputils.
 
 gputils is free software; you can redistribute it and/or modify
@@ -22,37 +24,96 @@ Boston, MA 02111-1307, USA.  */
 #include "stdhdr.h"
 #include "libgputils.h"
 
-/* String table offsets are 16 bits so this coff has a limit on the
-   maximum string table size. */
+/* String table offsets are 16 bits so this coff has a limit on the maximum string table size. */
 #define MAX_STRING_TABLE      0xffff
+
+static uint8_t      string_table[MAX_STRING_TABLE];
+
+static uint32_t     string_offsets[MAX_STRING_TABLE + 1];
+static unsigned int string_offs_num;
+static uint32_t     last_string_size;
 
 /*------------------------------------------------------------------------------------------------*/
 
-/* write the symbol or section name into the string table */
+static uint32_t
+_search_string(const uint8_t* Table, const uint8_t* String, uint32_t String_size)
+{
+  uint32_t     offs;
+  uint32_t     size;
+  unsigned int i;
+  unsigned int e;
+
+  if (string_offs_num == 0) {
+    return UINT32_MAX;
+  }
+
+  if (string_offs_num == 1) {
+    if (last_string_size != String_size) {
+      return UINT32_MAX;
+    }
+
+    offs = string_offsets[0];
+    return (memcmp(&Table[offs], String, String_size) == 0) ? offs : UINT32_MAX;
+  }
+
+  e = string_offs_num - 1;
+
+  for (i = 0; i < e; ++i) {
+    offs = string_offsets[i];
+    size = string_offsets[i + 1] - offs;
+    if ((size == String_size) && (memcmp(&Table[offs], String, String_size) == 0)) {
+      return offs;
+    }
+  }
+
+  if (last_string_size != String_size) {
+    return UINT32_MAX;
+  }
+
+  offs = string_offsets[i];
+  return (memcmp(&Table[offs], String, String_size) == 0) ? offs : UINT32_MAX;
+}
+
+/*------------------------------------------------------------------------------------------------*/
+
+static void
+_store_string(uint8_t* Table, uint32_t Offset, const uint8_t* String, uint32_t String_size)
+{
+  memcpy(&Table[Offset], String, String_size);
+  string_offsets[string_offs_num] = Offset;
+  ++string_offs_num;
+  last_string_size = String_size;
+}
+
+/*------------------------------------------------------------------------------------------------*/
+
+/* Write the symbol or section name into the string table. */
 
 static unsigned int
-_add_string(const char *Name, uint8_t *Table)
+_add_string(const char* String, uint8_t* Table)
 {
   uint32_t nbytes;
   uint32_t offset;
-  uint32_t sizeof_name;
+  uint32_t string_size;
 
-  assert(Name != NULL);
+  assert(!(String == NULL));
 
-  sizeof_name = strlen(Name) + 1;
+  string_size = (uint32_t)(strlen(String) + 1);
+  offset      = _search_string(Table, (const uint8_t*)String, string_size);
+  if (offset == UINT32_MAX) {
+    /* Read the number of bytes in the string table. */
+    offset = nbytes = gp_getu32(Table);
 
-  /* read the number of bytes in the string table */
-  offset = nbytes = gp_getl32(&Table[0]);
+    /* Check the length against the max string table size. */
+    nbytes += string_size;
+    assert(!(nbytes > MAX_STRING_TABLE));
 
-  /* check the length against the max string table size */
-  nbytes += sizeof_name;
-  assert(nbytes <= MAX_STRING_TABLE);
+    /* Copy the string to the table. */
+    _store_string(Table, offset, (const uint8_t*)String, string_size);
 
-  /* copy the string to the table */
-  memcpy(&Table[offset], Name, sizeof_name);
-
-  /* write the new byte count */
-  gp_putl32(&Table[0], nbytes);
+    /* Write the new byte count. */
+    gp_putl32(Table, nbytes);
+  }
 
   return offset;
 }
@@ -69,7 +130,7 @@ _add_name(const char *Name, uint8_t *Table, FILE *Fp)
     return;
   }
 
-  length = strlen(Name);
+  length = (uint32_t)strlen(Name);
 
   if (length <= COFF_SSYMBOL_NAME_MAX) {
     /* The string will fit in the structure. */
@@ -103,7 +164,7 @@ _write_file_header(const gp_object_t *Object, FILE *Fp)
   /* 'f_magic'  -- magic number */
   gp_fputl16((Object->isnew ? MICROCHIP_MAGIC_v2 : MICROCHIP_MAGIC_v1), Fp);
   /* 'f_nscns'  -- number of sections */
-  gp_fputl16(Object->section_list.num_nodes, Fp);
+  gp_fputl16((uint16_t)Object->section_list.num_nodes, Fp);
   /* 'f_timdat' -- time and date stamp */
   gp_fputl32(Object->time, Fp);
   /* 'f_symptr' -- file ptr to symtab */
@@ -162,7 +223,7 @@ _write_section_header(const gp_section_t *Section, unsigned int Org_to_byte_shif
     Org_to_byte_shift = 0;
   }
 
-  section_address = gp_insn_from_byte(Org_to_byte_shift, Section->address);
+  section_address = (uint32_t)gp_insn_from_byte(Org_to_byte_shift, (int)Section->address);
   _add_name(Section->name, Table, Fp);
   /* 's_paddr'   -- physical address */
   gp_fputl32(section_address, Fp);
@@ -177,11 +238,11 @@ _write_section_header(const gp_section_t *Section, unsigned int Org_to_byte_shif
   /* 's_lnnoptr' -- file ptr to line numbers */
   gp_fputl32(Section->lineno_ptr, Fp);
   /* 's_nreloc'  -- # reloc entries */
-  gp_fputl16(Section->relocation_list.num_nodes, Fp);
+  gp_fputl16((uint16_t)Section->relocation_list.num_nodes, Fp);
   /* 's_nlnno'   -- # line number entries */
-  gp_fputl16(Section->line_number_list.num_nodes, Fp);
+  gp_fputl16((uint16_t)Section->line_number_list.num_nodes, Fp);
   /* 's_flags'   -- Don't write internal section flags. */
-  gp_fputl32(Section->flags & ~(STYP_RELOC | STYP_BPACK), Fp);
+  gp_fputl32(Section->flags & (unsigned int)(~(STYP_RELOC | STYP_BPACK)), Fp);
 }
 
 /*------------------------------------------------------------------------------------------------*/
@@ -201,6 +262,8 @@ _write_section_data(pic_processor_t Processor, const gp_section_t *Section, FILE
 #ifdef GPUTILS_DEBUG
   printf("section \"%s\"\nsize= %li\ndata:\n", Section->name, Section->size);
   gp_mem_i_print(Section->data, Processor);
+#else
+  (void)Processor;
 #endif
 
   for ( ; org < end; org++) {
@@ -253,7 +316,7 @@ _write_linenumbers(const gp_section_t *Section, unsigned int Org_to_byte_shift, 
     /* 'l_lnno'   -- line number */
     gp_fputl16(current->line_number, Fp);
     /* 'l_paddr'  -- address of code for this lineno */
-    gp_fputl32(gp_insn_from_byte(Org_to_byte_shift, current->address), Fp);
+    gp_fputl32(gp_insn_from_byte(Org_to_byte_shift, (int)current->address), Fp);
     /* 'l_flags'  -- bit flags for the line number */
     gp_fputl16(0, Fp);
     /* 'l_fcnndx' -- symbol table index of associated function, if there is one */
@@ -367,14 +430,14 @@ _write_symbols(const gp_object_t *Object, uint8_t *Table, FILE *Fp)
   while (symbol != NULL) {
     _add_name(symbol->name, Table, Fp);
     /* 'value' */
-    gp_fputl32(symbol->value, Fp);
+    gp_fputl32((int32_t)symbol->value, Fp);
 
     /* 'sec_num' */
     if (symbol->section_number < N_SCNUM) {
       gp_fputl16(symbol->section_number, Fp);
     }
     else {
-      gp_fputl16(symbol->section->number, Fp);
+      gp_fputl16((uint16_t)symbol->section->number, Fp);
     }
 
     /* 'type' */
@@ -388,7 +451,7 @@ _write_symbols(const gp_object_t *Object, uint8_t *Table, FILE *Fp)
     /* 'st_class' */
     fputc(symbol->class, Fp);
     /* 'num_auxsym' */
-    fputc(symbol->aux_list.num_nodes, Fp);
+    fputc((int)symbol->aux_list.num_nodes, Fp);
 
     if (symbol->aux_list.num_nodes > 0) {
       _write_aux_symbols(symbol->aux_list.first, Table, isnew, Fp);
@@ -411,7 +474,7 @@ _update_pointers(gp_object_t *Object)
   unsigned int  section_number;
   unsigned int  symbol_number;
 
-  section_number = Object->section_list.num_nodes;
+  section_number = (unsigned int)Object->section_list.num_nodes;
   data_idx = (Object->isnew) ? (FILE_HDR_SIZ_v2 + OPT_HDR_SIZ_v2 + (SEC_HDR_SIZ_v2 * section_number)) :
                                (FILE_HDR_SIZ_v1 + OPT_HDR_SIZ_v1 + (SEC_HDR_SIZ_v1 * section_number));
 
@@ -478,7 +541,6 @@ gp_writeobj_write_coff(gp_object_t *Object, int Num_errors)
   FILE         *coff;
   unsigned int  org_to_byte_shift;
   gp_section_t *section;
-  uint8_t       table[MAX_STRING_TABLE]; /* string table */
 
   if (Num_errors > 0) {
     unlink(Object->filename);
@@ -491,11 +553,14 @@ gp_writeobj_write_coff(gp_object_t *Object, int Num_errors)
     return false;
   }
 
+  string_offs_num  = 0;
+  last_string_size = 0;
+
   /* update file pointers in the coff */
   _update_pointers(Object);
 
   /* initialize the string table byte count */
-  gp_putl32(&table[0], 4);
+  gp_putl32(string_table, (uint32_t)sizeof(uint32_t));
 
   /* write the data to the file */
   _write_file_header(Object, coff);
@@ -505,7 +570,7 @@ gp_writeobj_write_coff(gp_object_t *Object, int Num_errors)
   org_to_byte_shift = Object->class->org_to_byte_shift;
   section           = Object->section_list.first;
   while (section != NULL) {
-    _write_section_header(section, org_to_byte_shift, &table[0], coff);
+    _write_section_header(section, org_to_byte_shift, string_table, coff);
     section = section->next;
   }
 
@@ -538,11 +603,11 @@ gp_writeobj_write_coff(gp_object_t *Object, int Num_errors)
 
   /* write symbols */
   if (Object->num_symbols != 0) {
-    _write_symbols(Object, &table[0], coff);
+    _write_symbols(Object, string_table, coff);
   }
 
   /* write string table */
-  fwrite(&table[0], 1, gp_getl32(&table[0]), coff);
+  fwrite(string_table, 1, gp_getl32(string_table), coff);
 
   fclose(coff);
   return true;
