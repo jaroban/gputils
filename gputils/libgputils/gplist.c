@@ -347,13 +347,13 @@ gp_list_move(void *Dst, void *Src)
   if (s->first != NULL) {
     /* Append the nodes from the "Src" list to the "Dst". */
     if (s->num_nodes == 0) {
-      fprintf(stderr, "%s.%s() -- Src->num_nodes: %zu", __FILE__, __func__, s->num_nodes);
+      fprintf(stderr, "%s.%s() -- Src->num_nodes: %"SIZE_FMTu, __FILE__, __func__, s->num_nodes);
       assert(0);
     }
 
     if (d->first == NULL) {
       if (d->num_nodes > 0) {
-        fprintf(stderr, "%s.%s() -- Dst->num_nodes: %zu", __FILE__, __func__, d->num_nodes);
+        fprintf(stderr, "%s.%s() -- Dst->num_nodes: %"SIZE_FMTu, __FILE__, __func__, d->num_nodes);
         assert(0);
       }
 
@@ -363,7 +363,7 @@ gp_list_move(void *Dst, void *Src)
     }
     else {
       if (d->num_nodes == 0) {
-        fprintf(stderr, "%s.%s() -- Dst->num_nodes: %zu", __FILE__, __func__, d->num_nodes);
+        fprintf(stderr, "%s.%s() -- Dst->num_nodes: %"SIZE_FMTu, __FILE__, __func__, d->num_nodes);
         assert(0);
       }
 

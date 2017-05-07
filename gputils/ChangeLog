@@ -1,4 +1,21 @@
 2017-05-07  Molnar Karoly  <molnarkaroly@users.sourceforge.net>
+  * libgputils/gplist.c:
+    Changed the print format: "%zu" --> "%"SIZE_FMTu
+
+  * libgputils/gpcod.c:
+    Eliminating the problem of older glibc: The strftime function not
+    know the "%g" format.
+
+  * gpasm/evaluate.c,
+    gputils/block.c,
+    gputils/block.h,
+    gputils/dump.c,
+    libgputils/gpcoffopt.c,
+    libgputils/gpreadhex.c,
+    libgputils/gpsystem.c:
+    Eliminated some compiler warning.
+
+2017-05-07  Molnar Karoly  <molnarkaroly@users.sourceforge.net>
   * gpasm/gpmsg.c,
     gputils/gpvo.c:
     Changed the print format: "%zu" --> "%"SIZE_FMTu

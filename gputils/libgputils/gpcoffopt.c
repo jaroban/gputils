@@ -390,6 +390,7 @@ _sections_decrease_start_address(proc_class_t Class, const gp_section_t *Section
     return;
   }
 
+  value_prev = 0;
   for (i = 0; i < num_sections; ++i) {
     section = section_array[i];
     /* Prevents the modification of sections on other pages. */

@@ -359,7 +359,9 @@ gp_date_string(char *Buffer, size_t Sizeof_buffer)
 {
   time_t           now;
   const struct tm *now_tm;
+#if defined(HAVE_LOCALE_H) && defined(HAVE_LANGINFO_H)
   char             format[60];
+#endif
 
   time(&now);
   now_tm = localtime(&now);
@@ -494,7 +496,7 @@ gp_strdup_lower_case(const char *Name)
   ptr = new = GP_Strdup(Name);
 
   while ((ch = *ptr) != '\0') {
-    *ptr = tolower(ch);
+    *ptr = (tolower)(ch);
     ptr++;
   }
 
@@ -515,7 +517,7 @@ gp_strdup_upper_case(const char *Name)
   ptr = new = GP_Strdup(Name);
 
   while ((ch = *ptr) != '\0') {
-    *ptr = toupper(ch);
+    *ptr = (toupper)(ch);
     ptr++;
   }
 
@@ -602,7 +604,7 @@ gp_stptoupper(char *Dest, const char *Src, size_t Maxlen)
     }
 
     ch = *Src++;
-    *Dest++ = toupper(ch);
+    *Dest++ = (toupper)(ch);
   } while (ch != '\0');
 
   return Dest;

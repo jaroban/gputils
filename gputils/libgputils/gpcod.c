@@ -41,19 +41,26 @@ _cod_time(uint8_t *Buffer, size_t Sizeof_buffer)
 
 /*------------------------------------------------------------------------------------------------*/
 
+static const char* m_day_names[] = {
+  "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+};
+
 static void
-_cod_Pdate(uint8_t *Pascal_str, size_t Pascal_max_size)
+_cod_Pdate(uint8_t* Pascal_str, size_t Pascal_max_size)
 {
-  time_t now;
-  char   temp[16];
-  size_t length;
+  time_t     now;
+  struct tm* t;
+  char       temp[16];
+  int        length;
 
   time(&now);
 #ifdef HAVE_LOCALE_H
   setlocale(LC_ALL, "C");
 #endif
-  length = strftime(temp, sizeof(temp), "%d%b%g", localtime(&now));
-  assert(length < Pascal_max_size);
+  t = localtime(&now);
+  length = snprintf(temp, sizeof(temp),
+                    "%02d%s%02d\n", t->tm_mday, m_day_names[t->tm_mon], (t->tm_year + 1900) % 100);
+  assert(length < (int)Pascal_max_size);
 
   *Pascal_str = (uint8_t)length;
   ++Pascal_str;

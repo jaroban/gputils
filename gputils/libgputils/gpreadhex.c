@@ -24,10 +24,10 @@ Boston, MA 02111-1307, USA.  */
 
 #define LINESIZ         520
 
-static char     linebuf[LINESIZ];
-static char    *linept;
-static uint8_t  checksum;
-static FILE    *infile;
+static char    linebuf[LINESIZ];
+static char*   linept;
+static uint8_t checksum;
+static FILE*   infile;
 
 /*------------------------------------------------------------------------------------------------*/
 
@@ -57,9 +57,9 @@ _readbyte(void)
   uint8_t number;
 
   linept++;
-  number  = _a2n(*linept) << 4;
+  number  = (uint8_t)(_a2n((uint8_t)(*linept)) << 4);
   linept++;
-  number |= _a2n(*linept);
+  number |= _a2n((uint8_t)(*linept));
 
   checksum += number;
   return number;
@@ -84,22 +84,22 @@ _swapword(uint16_t Input)
 {
   uint16_t number;
 
-  number = ((Input & 0xFF) << 8) | ((Input & 0xFF00) >> 8);
+  number = (uint16_t)((Input & 0xFF) << 8) | (uint16_t)((Input & 0xFF00) >> 8);
   return number;
 }
 
 /*------------------------------------------------------------------------------------------------*/
 
-hex_data_t *
-gp_readhex(const char *File_name, MemBlock_t *M)
+hex_data_t*
+gp_readhex(const char* File_name, MemBlock_t* M)
 {
-  hex_data_t   *info;
-  unsigned int  length;
-  unsigned int  address;
-  unsigned int  type;
-  uint8_t       byte;
-  unsigned int  i;
-  unsigned int  page;
+  hex_data_t*  info;
+  unsigned int length;
+  unsigned int address;
+  unsigned int type;
+  uint8_t      byte;
+  unsigned int i;
+  unsigned int page;
 
   info = GP_Malloc(sizeof(*info));
   info->hex_format = INHX8M;
@@ -117,6 +117,7 @@ gp_readhex(const char *File_name, MemBlock_t *M)
 
   /* Set the line pointer to the beginning of the line buffer. */
   linept = linebuf;
+  page   = 0;
 
   /* Read a line of data from the file, if NULL stop. */
   while (fgets(linept, LINESIZ, infile) != NULL)
@@ -153,7 +154,7 @@ gp_readhex(const char *File_name, MemBlock_t *M)
       }
 
       /* INHX32 segment line. */
-      page = ((_readbyte() << 8) + _readbyte()) << 16;
+      page = (unsigned int)((_readbyte() << 8) + _readbyte()) << 16;
       info->hex_format = INHX32;
     }
     else {
