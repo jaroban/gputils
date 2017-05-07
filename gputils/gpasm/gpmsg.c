@@ -226,7 +226,7 @@ _get_error(int Code)
     case GPE_NO_ACC:
       return "The access of RAM is not selected, use A or B:";
     case GPE_TOO_LONG:
-      return "The string (\"%s\") too long (%zu bytes). It cannot be more than %zu bytes.";
+      return "The string (\"%s\") too long (%"SIZE_FMTu" bytes). It cannot be more than %"SIZE_FMTu" bytes.";
     case GPE_IN_OF_ACCRAM:
       return "This register is located on the Access RAM:";
     case GPE_OUT_OF_ACCRAM:
@@ -654,7 +654,7 @@ gpmsg_verror(int Code, const char* Message, ...)
 
   /* list file output */
   va_start(ap, Message);
-  lst_err_line("Error", Code, msg, ap);
+  lst_err_line("Error", (unsigned int)Code, msg, ap);
   va_end(ap);
 
   state.num.errors++;
@@ -714,7 +714,7 @@ gpmsg_vwarning(int Code, const char* Message, ...)
     va_end(ap);
 
     va_start(ap, Message);
-    lst_err_line("Warning", Code, msg, ap);
+    lst_err_line("Warning", (unsigned int)Code, msg, ap);
     va_end(ap);
 
     state.num.warnings++;
@@ -779,7 +779,7 @@ gpmsg_vmessage(int Code, const char* Message, ...)
 
     /* list file output */
     va_start(ap, Message);
-    lst_err_line("Message", Code, msg, ap);
+    lst_err_line("Message", (unsigned int)Code, msg, ap);
     va_end(ap);
 
     state.num.messages++;

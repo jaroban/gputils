@@ -53,6 +53,7 @@ static struct option longopts[] =
 
 /*------------------------------------------------------------------------------------------------*/
 
+__attribute__((noreturn))
 static void
 _show_usage(void)
 {
@@ -113,17 +114,17 @@ _print_header(const gp_object_t *Object)
 
   printf("COFF File and Optional Headers\n");
 
-  for (i = 0; i < ARRAY_SIZE(magic); ++i) {
+  for (i = 0; i < (int)ARRAY_SIZE(magic); ++i) {
     if (magic[i].magic_num == Object->version) {
       break;
     }
   }
 
   printf("COFF version         %#x: %s\n", Object->version,
-         (i < ARRAY_SIZE(magic)) ? magic[i].magic_name : "unknown");
+         (i < (int)ARRAY_SIZE(magic)) ? magic[i].magic_name : "unknown");
   printf("Processor Type       %s\n",  processor_name);
   printf("Time Stamp           %s\n",  time_str);
-  printf("Number of Sections   %zu\n", Object->section_list.num_nodes);
+  printf("Number of Sections   %"SIZE_FMTu"\n", Object->section_list.num_nodes);
   printf("Number of Symbols    %u\n",  Object->num_symbols);
   printf("Characteristics      %#x\n", Object->flags);
 
@@ -183,7 +184,7 @@ _print_relocation_list(proc_class_t Class, const gp_reloc_t *Relocation, const c
 
   while (Relocation != NULL) {
     printf("0x%0*x%s    0x%08x  %11d  %-25s %-s\n",
-           addr_digits, gp_processor_insn_from_byte_c(Class, Relocation->address), Column_gap,
+           addr_digits, gp_processor_insn_from_byte_c(Class, (int)Relocation->address), Column_gap,
            Relocation->offset, Relocation->offset,
            _format_reloc_type(Relocation->type, buffer, sizeof(buffer)),
            Relocation->symbol->name);
@@ -217,7 +218,7 @@ _print_linenum_list(proc_class_t Class, const gp_linenum_t *Linenumber, const ch
 
     printf("%-8i  0x%0*x%s    %s\n",
            Linenumber->line_number,
-           addr_digits, gp_processor_insn_from_byte_c(Class, Linenumber->address), Column_gap,
+           addr_digits, gp_processor_insn_from_byte_c(Class, (int)Linenumber->address), Column_gap,
            filename);
 
     Linenumber = Linenumber->next;
@@ -254,10 +255,10 @@ _print_data(pic_processor_t Processor, const gp_section_t *Section)
         break;
       }
 
-      num_words = gp_disassemble(Section->data, address, class, bsr_boundary, 0,
-                                 GPDIS_SHOW_ALL_BRANCH, buffer, sizeof(buffer), 0);
+      num_words = (int)gp_disassemble(Section->data, address, class, bsr_boundary, 0,
+                                      GPDIS_SHOW_ALL_BRANCH, buffer, sizeof(buffer), 0);
       printf("%0*x:  %04x  %s\n",
-             addr_digits, gp_processor_insn_from_byte_c(class, address), word, buffer);
+             addr_digits, gp_processor_insn_from_byte_c(class, (int)address), word, buffer);
 
       if (num_words != 1) {
         if (class->i_memory_get(Section->data, address + WORD_SIZE, &word, NULL, NULL) != W_USED_ALL) {
@@ -265,19 +266,19 @@ _print_data(pic_processor_t Processor, const gp_section_t *Section)
         }
 
         printf("%0*x:  %04x\n",
-               addr_digits, gp_processor_insn_from_byte_c(class, address + WORD_SIZE), word);
+               addr_digits, gp_processor_insn_from_byte_c(class, (int)(address + WORD_SIZE)), word);
       }
 
-      address += num_words * WORD_SIZE;
+      address += (size_t)num_words * WORD_SIZE;
     }
     else if ((Section->flags & STYP_DATA_ROM) || (class == PROC_CLASS_EEPROM16)) {
       if (class->i_memory_get(Section->data, address, &word, NULL, NULL) != 0) {
-        printf("%0*x:  %04x\n", addr_digits, gp_processor_insn_from_byte_c(class, address), word);
+        printf("%0*x:  %04x\n", addr_digits, gp_processor_insn_from_byte_c(class, (int)address), word);
         address += WORD_SIZE;
       }
       else {
         if (gp_mem_b_get(Section->data, address, &byte, NULL, NULL)) {
-          printf("%0*x:  %02x\n", addr_digits, gp_processor_insn_from_byte_c(class, address), byte);
+          printf("%0*x:  %02x\n", addr_digits, gp_processor_insn_from_byte_c(class, (int)address), byte);
         }
 
         break;
@@ -308,11 +309,11 @@ _print_section_header(proc_class_t Class, const gp_section_t *Section)
 
   printf("Section Header\n");
   printf("Name                    %s\n",  Section->name);
-  printf("Physical address        %#x\n", gp_insn_from_byte(org_to_byte_shift, Section->address));
-  printf("Virtual address         %#x\n", gp_insn_from_byte(org_to_byte_shift, Section->virtual_address));
+  printf("Physical address        %#x\n", gp_insn_from_byte(org_to_byte_shift, (int)Section->address));
+  printf("Virtual address         %#x\n", gp_insn_from_byte(org_to_byte_shift, (int)Section->virtual_address));
   printf("Size of Section         %u\n",  Section->size);
-  printf("Number of Relocations   %zu\n", Section->relocation_list.num_nodes);
-  printf("Number of Line Numbers  %zu\n", Section->line_number_list.num_nodes);
+  printf("Number of Relocations   %"SIZE_FMTu"\n", Section->relocation_list.num_nodes);
+  printf("Number of Line Numbers  %"SIZE_FMTu"\n", Section->line_number_list.num_nodes);
   printf("Flags                   %#x\n", Section->flags);
 
   if (Section->flags & STYP_TEXT) {
@@ -365,7 +366,7 @@ _print_section_list(const gp_object_t *Object)
   unsigned int        i;
 
   class = Object->class;
-  i     = class->addr_digits;
+  i     = (unsigned int)class->addr_digits;
 
   if (i > 6) {
     i = 6;
@@ -448,7 +449,7 @@ _format_sym_type(unsigned int Type, char *Buffer, size_t Sizeof_buffer)
 {
   const char *str;
 
-  str = gp_coffgen_symbol_type_to_str(Type);
+  str = gp_coffgen_symbol_type_to_str((uint8_t)Type);
   if (str != NULL) {
     return str;
   }
@@ -480,7 +481,7 @@ _format_sym_class(unsigned int Class, char *Buffer, size_t Sizeof_buffer)
 {
   const char *str;
 
-  str = gp_coffgen_symbol_class_to_str(Class);
+  str = gp_coffgen_symbol_class_to_str((uint8_t)Class);
   if (str != NULL) {
     return str;
   }
@@ -534,7 +535,7 @@ _print_symbol_table(const gp_object_t *Object)
       }
     }
 
-    printf("%04u %-24s %-16s 0x%08lx %-8s %-12s %-9s %zu\n",
+    printf("%04u %-24s %-16s 0x%08lx %-8s %-12s %-9s %"SIZE_FMTu"\n",
            idx,
            symbol->name,
            section,
