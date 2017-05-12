@@ -101,12 +101,16 @@ use constant {
   PROC_CLASS_PIC14EX => 5,
   PROC_CLASS_PIC16   => 6,
   PROC_CLASS_PIC16E  => 7,
+  PROC_CLASS_PIC16EV => 8,
 
   PIC12_BANK_SHIFT  => 5,
-  PIC12_BANK_SIZE   => 2 ** PIC12_BANK_SHIFT,
   PIC14_BANK_SHIFT  => 7,
+  PIC16_BANK_SHIFT  => 8
+};
+
+use constant {
+  PIC12_BANK_SIZE   => 2 ** PIC12_BANK_SHIFT,
   PIC14_BANK_SIZE   => 2 ** PIC14_BANK_SHIFT,
-  PIC16_BANK_SHIFT  => 8,
   PIC16_BANK_SIZE   => 2 ** PIC16_BANK_SHIFT
 };
 
@@ -285,6 +289,25 @@ my %class_features_p16e = (
   CORE_SFRS     => undef
 );
 
+my %class_features_p16ev = (
+  CLASS         => PROC_CLASS_PIC16EV,
+  NAME          => '16 bit extended V MCU',
+  CSS_CLASS     => 'mcuAttrP16E',
+  CSS_BGRND     => '#EBEB81',
+  ENHANCED      => TRUE,
+  PAGE_SIZE     => 0,
+  WORD_SIZE     => 16,
+  CONF_SIZE     => 8,
+  EE_START      => 0xF00000,
+  BANK_MAX      => 64,
+  BANK_SIZE     => PIC16_BANK_SIZE,
+  BANK_MASK     => ~(PIC16_BANK_SIZE - 1),
+  BANK_SHIFT    => PIC16_BANK_SHIFT,
+  ACC_SPLIT_MIN => 0x5F,
+  ACC_SPLIT_MAX => 0x7F,
+  CORE_SFRS     => undef
+);
+
 my @class_features_list = (
   \%class_features_p12,         # PROC_CLASS_PIC12
   \%class_features_p12e,        # PROC_CLASS_PIC12E
@@ -293,7 +316,8 @@ my @class_features_list = (
   \%class_features_p14e,        # PROC_CLASS_PIC14E
   \%class_features_p14ex,       # PROC_CLASS_PIC14EX
   \%class_features_p16,         # PROC_CLASS_PIC16
-  \%class_features_p16e         # PROC_CLASS_PIC16E
+  \%class_features_p16e,        # PROC_CLASS_PIC16E
+  \%class_features_p16ev        # PROC_CLASS_PIC16EV
 );
 
 my %class_features_by_mpasmx = (
@@ -304,7 +328,8 @@ my %class_features_by_mpasmx = (
   '16Exxx' => \%class_features_p14e,
   '16EXxx' => \%class_features_p14ex,
   '17xxxx' => \%class_features_p16,
-  '18xxxx' => \%class_features_p16e
+  '18xxxx' => \%class_features_p16e,
+  '18XVxx' => \%class_features_p16ev
 );
 
 my @mcu_feat_names = sort {
@@ -648,7 +673,8 @@ use constant {
   COMMON_SFR_MENU_P14E  => 4,
   COMMON_SFR_MENU_P14EX => 5,
   COMMON_SFR_MENU_P16   => 6,
-  COMMON_SFR_MENU_P16E  => 7
+  COMMON_SFR_MENU_P16E  => 7,
+  COMMON_SFR_MENU_P16EV => 8
 };
 =cut
 
