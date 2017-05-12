@@ -1,10 +1,10 @@
         LIST
 
 ;==========================================================================
-; Build date : Oct 21 2015
+; Build date : Mar 21 2017
 ;  MPASM PIC16F18345 processor include
 ; 
-;  (c) Copyright 1999-2015 Microchip Technology, All rights reserved
+;  (c) Copyright 1999-2017 Microchip Technology, All rights reserved
 ;==========================================================================
 
         NOLIST
@@ -70,7 +70,9 @@ PIR1             EQU  H'0011'
 PIR2             EQU  H'0012'
 PIR3             EQU  H'0013'
 PIR4             EQU  H'0014'
+TMR0             EQU  H'0015'
 TMR0L            EQU  H'0015'
+PR0              EQU  H'0016'
 TMR0H            EQU  H'0016'
 T0CON0           EQU  H'0017'
 T0CON1           EQU  H'0018'
@@ -225,9 +227,6 @@ MDCARH           EQU  H'039E'
 MDCARL           EQU  H'039F'
 
 ;-----Bank8------------------
-CCDNA            EQU  H'040C'
-CCDNB            EQU  H'040D'
-CCDNC            EQU  H'040E'
 TMR3             EQU  H'0411'
 TMR3L            EQU  H'0411'
 TMR3H            EQU  H'0412'
@@ -247,9 +246,6 @@ T6CON            EQU  H'041E'
 CCDCON           EQU  H'041F'
 
 ;-----Bank9------------------
-CCDPA            EQU  H'048C'
-CCDPB            EQU  H'048D'
-CCDPC            EQU  H'048E'
 NCO1ACC          EQU  H'0498'
 NCO1ACCL         EQU  H'0498'
 NCO1ACCH         EQU  H'0499'
@@ -295,14 +291,30 @@ CWG2AS1          EQU  H'0718'
 CWG2STR          EQU  H'0719'
 
 ;-----Bank17------------------
+EEADR            EQU  H'0891'
+EEADRL           EQU  H'0891'
 NVMADR           EQU  H'0891'
 NVMADRL          EQU  H'0891'
+PMADR            EQU  H'0891'
+PMADRL           EQU  H'0891'
+EEADRH           EQU  H'0892'
 NVMADRH          EQU  H'0892'
+PMADRH           EQU  H'0892'
+EEDAT            EQU  H'0893'
+EEDATL           EQU  H'0893'
 NVMDAT           EQU  H'0893'
 NVMDATL          EQU  H'0893'
+PMDAT            EQU  H'0893'
+PMDATL           EQU  H'0893'
+EEDATH           EQU  H'0894'
 NVMDATH          EQU  H'0894'
+PMDATH           EQU  H'0894'
+EECON1           EQU  H'0895'
 NVMCON1          EQU  H'0895'
+PMCON1           EQU  H'0895'
+EECON2           EQU  H'0896'
 NVMCON2          EQU  H'0896'
+PMCON2           EQU  H'0896'
 PCON0            EQU  H'089B'
 
 ;-----Bank18------------------
@@ -527,6 +539,17 @@ CWG1IF           EQU  H'0006'
 CWG2IF           EQU  H'0007'
 
 
+;----- TMR0 Bits -----------------------------------------------------
+TMR00            EQU  H'0000'
+TMR01            EQU  H'0001'
+TMR02            EQU  H'0002'
+TMR03            EQU  H'0003'
+TMR04            EQU  H'0004'
+TMR05            EQU  H'0005'
+TMR06            EQU  H'0006'
+TMR07            EQU  H'0007'
+
+
 ;----- TMR0L Bits -----------------------------------------------------
 TMR00            EQU  H'0000'
 TMR01            EQU  H'0001'
@@ -538,6 +561,18 @@ TMR06            EQU  H'0006'
 TMR07            EQU  H'0007'
 
 
+;----- PR0 Bits -----------------------------------------------------
+TMR08            EQU  H'0000'
+TMR09            EQU  H'0001'
+TMR010           EQU  H'0002'
+TMR011           EQU  H'0003'
+TMR012           EQU  H'0004'
+TMR013           EQU  H'0005'
+TMR014           EQU  H'0006'
+TMR015           EQU  H'0007'
+
+
+
 ;----- TMR0H Bits -----------------------------------------------------
 TMR08            EQU  H'0000'
 TMR09            EQU  H'0001'
@@ -547,6 +582,7 @@ TMR012           EQU  H'0004'
 TMR013           EQU  H'0005'
 TMR014           EQU  H'0006'
 TMR015           EQU  H'0007'
+
 
 
 ;----- T0CON0 Bits -----------------------------------------------------
@@ -1657,32 +1693,6 @@ MDCL2            EQU  H'0002'
 MDCL3            EQU  H'0003'
 
 
-;----- CCDNA Bits -----------------------------------------------------
-CCDNA0           EQU  H'0000'
-CCDNA1           EQU  H'0001'
-CCDNA2           EQU  H'0002'
-CCDNA4           EQU  H'0004'
-CCDNA5           EQU  H'0005'
-
-
-;----- CCDNB Bits -----------------------------------------------------
-CCDNB4           EQU  H'0004'
-CCDNB5           EQU  H'0005'
-CCDNB6           EQU  H'0006'
-CCDNB7           EQU  H'0007'
-
-
-;----- CCDNC Bits -----------------------------------------------------
-CCDNC0           EQU  H'0000'
-CCDNC1           EQU  H'0001'
-CCDNC2           EQU  H'0002'
-CCDNC3           EQU  H'0003'
-CCDNC4           EQU  H'0004'
-CCDNC5           EQU  H'0005'
-CCDNC6           EQU  H'0006'
-CCDNC7           EQU  H'0007'
-
-
 ;----- T3CON Bits -----------------------------------------------------
 TMR3ON           EQU  H'0000'
 T3SYNC           EQU  H'0002'
@@ -1756,32 +1766,6 @@ CCDEN            EQU  H'0007'
 
 CCDS0            EQU  H'0000'
 CCDS1            EQU  H'0001'
-
-
-;----- CCDPA Bits -----------------------------------------------------
-CCDPA0           EQU  H'0000'
-CCDPA1           EQU  H'0001'
-CCDPA2           EQU  H'0002'
-CCDPA4           EQU  H'0004'
-CCDPA5           EQU  H'0005'
-
-
-;----- CCDPB Bits -----------------------------------------------------
-CCDPB4           EQU  H'0004'
-CCDPB5           EQU  H'0005'
-CCDPB6           EQU  H'0006'
-CCDPB7           EQU  H'0007'
-
-
-;----- CCDPC Bits -----------------------------------------------------
-CCDPC0           EQU  H'0000'
-CCDPC1           EQU  H'0001'
-CCDPC2           EQU  H'0002'
-CCDPC3           EQU  H'0003'
-CCDPC4           EQU  H'0004'
-CCDPC5           EQU  H'0005'
-CCDPC6           EQU  H'0006'
-CCDPC7           EQU  H'0007'
 
 
 ;----- NCO1CON Bits -----------------------------------------------------
@@ -2102,6 +2086,19 @@ CWG2OVRC         EQU  H'0006'
 CWG2OVRD         EQU  H'0007'
 
 
+;----- EEADRL Bits -----------------------------------------------------
+NVMADR0          EQU  H'0000'
+NVMADR1          EQU  H'0001'
+NVMADR2          EQU  H'0002'
+NVMADR3          EQU  H'0003'
+NVMADR4          EQU  H'0004'
+NVMADR5          EQU  H'0005'
+NVMADR6          EQU  H'0006'
+NVMADR7          EQU  H'0007'
+
+
+
+
 ;----- NVMADRL Bits -----------------------------------------------------
 NVMADR0          EQU  H'0000'
 NVMADR1          EQU  H'0001'
@@ -2113,6 +2110,33 @@ NVMADR6          EQU  H'0006'
 NVMADR7          EQU  H'0007'
 
 
+
+
+;----- PMADRL Bits -----------------------------------------------------
+NVMADR0          EQU  H'0000'
+NVMADR1          EQU  H'0001'
+NVMADR2          EQU  H'0002'
+NVMADR3          EQU  H'0003'
+NVMADR4          EQU  H'0004'
+NVMADR5          EQU  H'0005'
+NVMADR6          EQU  H'0006'
+NVMADR7          EQU  H'0007'
+
+
+
+
+;----- EEADRH Bits -----------------------------------------------------
+NVMADR8          EQU  H'0000'
+NVMADR9          EQU  H'0001'
+NVMADR10         EQU  H'0002'
+NVMADR11         EQU  H'0003'
+NVMADR12         EQU  H'0004'
+NVMADR13         EQU  H'0005'
+NVMADR14         EQU  H'0006'
+
+
+
+
 ;----- NVMADRH Bits -----------------------------------------------------
 NVMADR8          EQU  H'0000'
 NVMADR9          EQU  H'0001'
@@ -2121,6 +2145,33 @@ NVMADR11         EQU  H'0003'
 NVMADR12         EQU  H'0004'
 NVMADR13         EQU  H'0005'
 NVMADR14         EQU  H'0006'
+
+
+
+
+;----- PMADRH Bits -----------------------------------------------------
+NVMADR8          EQU  H'0000'
+NVMADR9          EQU  H'0001'
+NVMADR10         EQU  H'0002'
+NVMADR11         EQU  H'0003'
+NVMADR12         EQU  H'0004'
+NVMADR13         EQU  H'0005'
+NVMADR14         EQU  H'0006'
+
+
+
+
+;----- EEDATL Bits -----------------------------------------------------
+NVMDAT0          EQU  H'0000'
+NVMDAT1          EQU  H'0001'
+NVMDAT2          EQU  H'0002'
+NVMDAT3          EQU  H'0003'
+NVMDAT4          EQU  H'0004'
+NVMDAT5          EQU  H'0005'
+NVMDAT6          EQU  H'0006'
+NVMDAT7          EQU  H'0007'
+
+
 
 
 ;----- NVMDATL Bits -----------------------------------------------------
@@ -2134,6 +2185,32 @@ NVMDAT6          EQU  H'0006'
 NVMDAT7          EQU  H'0007'
 
 
+
+
+;----- PMDATL Bits -----------------------------------------------------
+NVMDAT0          EQU  H'0000'
+NVMDAT1          EQU  H'0001'
+NVMDAT2          EQU  H'0002'
+NVMDAT3          EQU  H'0003'
+NVMDAT4          EQU  H'0004'
+NVMDAT5          EQU  H'0005'
+NVMDAT6          EQU  H'0006'
+NVMDAT7          EQU  H'0007'
+
+
+
+
+;----- EEDATH Bits -----------------------------------------------------
+NVMDAT8          EQU  H'0000'
+NVMDAT9          EQU  H'0001'
+NVMDAT10         EQU  H'0002'
+NVMDAT11         EQU  H'0003'
+NVMDAT12         EQU  H'0004'
+NVMDAT13         EQU  H'0005'
+
+
+
+
 ;----- NVMDATH Bits -----------------------------------------------------
 NVMDAT8          EQU  H'0000'
 NVMDAT9          EQU  H'0001'
@@ -2141,6 +2218,31 @@ NVMDAT10         EQU  H'0002'
 NVMDAT11         EQU  H'0003'
 NVMDAT12         EQU  H'0004'
 NVMDAT13         EQU  H'0005'
+
+
+
+
+;----- PMDATH Bits -----------------------------------------------------
+NVMDAT8          EQU  H'0000'
+NVMDAT9          EQU  H'0001'
+NVMDAT10         EQU  H'0002'
+NVMDAT11         EQU  H'0003'
+NVMDAT12         EQU  H'0004'
+NVMDAT13         EQU  H'0005'
+
+
+
+
+;----- EECON1 Bits -----------------------------------------------------
+RD               EQU  H'0000'
+WR               EQU  H'0001'
+WREN             EQU  H'0002'
+WRERR            EQU  H'0003'
+FREE             EQU  H'0004'
+LWLO             EQU  H'0005'
+NVMREGS          EQU  H'0006'
+
+CFGS             EQU  H'0006'
 
 
 ;----- NVMCON1 Bits -----------------------------------------------------
@@ -2151,6 +2253,20 @@ WRERR            EQU  H'0003'
 FREE             EQU  H'0004'
 LWLO             EQU  H'0005'
 NVMREGS          EQU  H'0006'
+
+CFGS             EQU  H'0006'
+
+
+;----- PMCON1 Bits -----------------------------------------------------
+RD               EQU  H'0000'
+WR               EQU  H'0001'
+WREN             EQU  H'0002'
+WRERR            EQU  H'0003'
+FREE             EQU  H'0004'
+LWLO             EQU  H'0005'
+NVMREGS          EQU  H'0006'
+
+CFGS             EQU  H'0006'
 
 
 ;----- PCON0 Bits -----------------------------------------------------
@@ -3409,8 +3525,8 @@ Z_SHAD           EQU  H'0002'
        __BADRAM  H'0319'-H'031F'
        __BADRAM  H'038F'-H'0390'
        __BADRAM  H'039B'
-       __BADRAM  H'040F'-H'0410'
-       __BADRAM  H'048F'-H'0497'
+       __BADRAM  H'040C'-H'0410'
+       __BADRAM  H'048C'-H'0497'
        __BADRAM  H'050C'-H'051F'
        __BADRAM  H'058C'-H'059F'
        __BADRAM  H'060C'-H'0616'
@@ -3543,7 +3659,7 @@ _DEBUG_OFF           EQU  H'3FFF'; Background debugger disabled
 
 ;----- CONFIG3 Options --------------------------------------------------
 _WRT_ALL             EQU  H'3FFC'; 0000h to 1FFFh write protected, no addresses may be modified
-_WRT_HALF            EQU  H'3FFD'; 0000h to 03FFh write-protected, 0400h to 1FFFh may be modified
+_WRT_HALF            EQU  H'3FFD'; 0000h to 0FFFh write-protected, 1000h to 1FFFh may be modified
 _WRT_BOOT            EQU  H'3FFE'; 0000h to 01FFh write-protected, 0200h to 1FFFh may be modified
 _WRT_OFF             EQU  H'3FFF'; Write protection off
 

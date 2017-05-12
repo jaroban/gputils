@@ -1,10 +1,10 @@
         LIST
 
 ;==========================================================================
-; Build date : Oct 21 2015
+; Build date : Mar 21 2017
 ;  MPASM PIC16LF1778 processor include
 ; 
-;  (c) Copyright 1999-2015 Microchip Technology, All rights reserved
+;  (c) Copyright 1999-2017 Microchip Technology, All rights reserved
 ;==========================================================================
 
         NOLIST
@@ -537,9 +537,17 @@ T3GPPS           EQU  H'0E12'
 T5CKIPPS         EQU  H'0E13'
 T5GPPS           EQU  H'0E14'
 T2CKIPPS         EQU  H'0E15'
+T2INPPS          EQU  H'0E15'
+T2PPS            EQU  H'0E15'
 T4CKIPPS         EQU  H'0E16'
+T4INPPS          EQU  H'0E16'
+T4PPS            EQU  H'0E16'
 T6CKIPPS         EQU  H'0E17'
+T6INPPS          EQU  H'0E17'
+T6PPS            EQU  H'0E17'
 T8CKIPPS         EQU  H'0E18'
+T8INPPS          EQU  H'0E18'
+T8PPS            EQU  H'0E18'
 CCP1PPS          EQU  H'0E19'
 CCP2PPS          EQU  H'0E1A'
 CCP7PPS          EQU  H'0E1B'
@@ -1716,6 +1724,7 @@ MD3CL0           EQU  H'0000'
 MD3CL1           EQU  H'0001'
 MD3CL2           EQU  H'0002'
 MD3CL3           EQU  H'0003'
+MD3CL4           EQU  H'0004'
 
 
 ;----- MD3CARH Bits -----------------------------------------------------
@@ -1730,6 +1739,7 @@ MD3CH0           EQU  H'0000'
 MD3CH1           EQU  H'0001'
 MD3CH2           EQU  H'0002'
 MD3CH3           EQU  H'0003'
+MD3CH4           EQU  H'0004'
 
 
 ;----- ODCONA Bits -----------------------------------------------------
@@ -1744,10 +1754,10 @@ ODA7             EQU  H'0007'
 
 
 ;----- ODCONB Bits -----------------------------------------------------
-ODA0             EQU  H'0000'
-ODA1             EQU  H'0001'
-ODA2             EQU  H'0002'
-ODA3             EQU  H'0003'
+ODB0             EQU  H'0000'
+ODB1             EQU  H'0001'
+ODB2             EQU  H'0002'
+ODB3             EQU  H'0003'
 ODB4             EQU  H'0004'
 ODB5             EQU  H'0005'
 ODB6             EQU  H'0006'
@@ -1966,6 +1976,7 @@ MD1CL0           EQU  H'0000'
 MD1CL1           EQU  H'0001'
 MD1CL2           EQU  H'0002'
 MD1CL3           EQU  H'0003'
+MD1CL4           EQU  H'0004'
 
 
 ;----- MD1CARH Bits -----------------------------------------------------
@@ -1980,6 +1991,7 @@ MD1CH0           EQU  H'0000'
 MD1CH1           EQU  H'0001'
 MD1CH2           EQU  H'0002'
 MD1CH3           EQU  H'0003'
+MD1CH4           EQU  H'0004'
 
 
 ;----- MD2CON0 Bits -----------------------------------------------------
@@ -2033,6 +2045,7 @@ MD2CL0           EQU  H'0000'
 MD2CL1           EQU  H'0001'
 MD2CL2           EQU  H'0002'
 MD2CL3           EQU  H'0003'
+MD2CL4           EQU  H'0004'
 
 
 ;----- MD2CARH Bits -----------------------------------------------------
@@ -2047,6 +2060,7 @@ MD2CH0           EQU  H'0000'
 MD2CH1           EQU  H'0001'
 MD2CH2           EQU  H'0002'
 MD2CH3           EQU  H'0003'
+MD2CH4           EQU  H'0004'
 
 
 ;----- INLVLA Bits -----------------------------------------------------

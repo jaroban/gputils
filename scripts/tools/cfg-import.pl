@@ -2,7 +2,7 @@
 
 =back
 
-    Copyright (C) 2014-2016 Molnar Karoly <molnarkaroly@users.sf.net>
+    Copyright (C) 2014-2017 Molnar Karoly <molnarkaroly@users.sf.net>
 
     This file is part of gputils.
 
@@ -38,14 +38,16 @@ no if $] >= 5.018, warnings => "experimental::smartmatch";        # perl 5.16
 use feature 'switch';
 use POSIX 'strftime';
 
-use constant FALSE => 0;
-use constant TRUE  => 1;
+use constant {
+  FALSE         => 0,
+  TRUE          => 1,
 
-use constant ST_WAIT   => 0;
-use constant ST_LISTEN => 1;
+  ST_WAIT       => 0,
+  ST_LISTEN     => 1,
 
-use constant FNV1A32_INIT  => 0x811C9DC5;
-use constant FNV1A32_PRIME => 0x01000193;
+  FNV1A32_INIT  => 0x811C9DC5,
+  FNV1A32_PRIME => 0x01000193
+};
 
 my $PROGRAM = 'cfg-import.pl';
 my $limit_defaults = FALSE;
@@ -60,81 +62,82 @@ my $pic_name_mask = qr/PIC1(2(C[ER]?|HV)\d+\w+|6(C[ER]?|HV)\d+\w+|7C[R]?\d+\w+|[
 
 my $time_str;
 
-use constant PROC_CLASS_PIC12   => 0;
-use constant PROC_CLASS_PIC12E  => 1;
-use constant PROC_CLASS_PIC12I  => 2;
-use constant PROC_CLASS_PIC14   => 3;
-use constant PROC_CLASS_PIC14E  => 4;
-use constant PROC_CLASS_PIC14EX => 5;
-use constant PROC_CLASS_PIC16   => 6;
-use constant PROC_CLASS_PIC16E  => 7;
+use constant {
+  PROC_CLASS_PIC12   => 0,
+  PROC_CLASS_PIC12E  => 1,
+  PROC_CLASS_PIC12I  => 2,
+  PROC_CLASS_PIC14   => 3,
+  PROC_CLASS_PIC14E  => 4,
+  PROC_CLASS_PIC14EX => 5,
+  PROC_CLASS_PIC16   => 6,
+  PROC_CLASS_PIC16E  => 7,
+  PROC_CLASS_PIC16EV => 8
+};
 
-my %class_features_p12 =
-  (
+my %class_features_p12 = (
   CLASS      => PROC_CLASS_PIC12,
   NAME       => '12 bit MCU',
   DIR_DIGITS => 3,
   ENHANCED   => FALSE
-  );
+);
 
-my %class_features_p12e =
-  (
+my %class_features_p12e = (
   CLASS      => PROC_CLASS_PIC12E,
   NAME       => '12 bit enhanced MCU',
   DIR_DIGITS => 3,
   ENHANCED   => TRUE
-  );
+);
 
-my %class_features_p12i =
-  (
+my %class_features_p12i = (
   CLASS      => PROC_CLASS_PIC12I,
   NAME       => '12 bit enhanced MCU',
   DIR_DIGITS => 3,
   ENHANCED   => TRUE
-  );
+);
 
-my %class_features_p14 =
-  (
+my %class_features_p14 = (
   CLASS      => PROC_CLASS_PIC14,
   NAME       => '14 bit MCU',
   DIR_DIGITS => 4,
   ENHANCED   => FALSE
-  );
+);
 
-my %class_features_p14e =
-  (
+my %class_features_p14e = (
   CLASS      => PROC_CLASS_PIC14E,
   NAME       => '14 bit enhanced MCU',
   DIR_DIGITS => 4,
   ENHANCED   => TRUE
-  );
+);
 
-my %class_features_p14ex =
-  (
+my %class_features_p14ex = (
   CLASS      => PROC_CLASS_PIC14EX,
   NAME       => '14 bit enhanced MCU',
   DIR_DIGITS => 4,
   ENHANCED   => TRUE
-  );
+);
 
-my %class_features_p16 =
-  (
+my %class_features_p16 = (
   CLASS      => PROC_CLASS_PIC16,
   NAME       => '16 bit MCU',
   DIR_DIGITS => 2,
   ENHANCED   => FALSE
-  );
+);
 
-my %class_features_p16e =
-  (
+my %class_features_p16e = (
   CLASS      => PROC_CLASS_PIC16E,
   NAME       => '16 bit extended MCU',
   DIR_DIGITS => 2,
   ENHANCED   => TRUE
-  );
+);
 
-my %class_features_by_mpasmx =
-  (
+my %class_features_p16ev = (
+  CLASS      => PROC_CLASS_PIC16EV,
+  NAME       => '16 bit extended V MCU',
+  DIR_DIGITS => 2,
+  ENHANCED   => TRUE
+);
+
+my %class_features_by_mpasmx = (
   '16c5x'  => \%class_features_p12,
   '16c5xe' => \%class_features_p12e,
   '16c5ie' => \%class_features_p12i,
@@ -142,11 +145,11 @@ my %class_features_by_mpasmx =
   '16Exxx' => \%class_features_p14e,
   '16EXxx' => \%class_features_p14ex,
   '17xxxx' => \%class_features_p16,
-  '18xxxx' => \%class_features_p16e
-  );
+  '18xxxx' => \%class_features_p16e,
+  '18XVxx' => \%class_features_p16ev
+);
 
-my @mcu_classes =
-  (
+my @mcu_classes = (
   \%class_features_p12,
   \%class_features_p12e,
   \%class_features_p12i,
@@ -154,8 +157,9 @@ my @mcu_classes =
   \%class_features_p14e,
   \%class_features_p14ex,
   \%class_features_p16,
-  \%class_features_p16e
-  );
+  \%class_features_p16e,
+  \%class_features_p16ev
+);
 
 my @mcu_feat_names = sort {
                           $class_features_by_mpasmx{$a}->{ENHANCED} <=> $class_features_by_mpasmx{$b}->{ENHANCED} ||
@@ -311,8 +315,7 @@ my $cfg_addr_pack_t     = "${name_head}addr_pack_t";
 
 my $out_handler;
 
-my @mcu_missed_debug_0x8008_0x1000 =
-  (
+my @mcu_missed_debug_0x8008_0x1000 = (
   'PIC12F1571', 'PIC12F1572', 'PIC12F1612', 'PIC12F1822',
   'PIC12F1840', 'PIC12LF1571', 'PIC12LF1572', 'PIC12LF1612',
   'PIC12LF1822', 'PIC12LF1840', 'PIC12LF1840T39A', 'PIC12LF1840T48A',
@@ -352,54 +355,50 @@ my @mcu_missed_debug_0x8008_0x1000 =
   'PIC16LF1903', 'PIC16LF1904', 'PIC16LF1906', 'PIC16LF1907',
   'PIC16LF1933', 'PIC16LF1934', 'PIC16LF1936', 'PIC16LF1937',
   'PIC16LF1938', 'PIC16LF1939', 'PIC16LF1946', 'PIC16LF1947'
-  );
+);
 
-my @mcu_missed_debug_0x8008_0x2000 =
-  (
-  'PIC16F18854', 'PIC16F18855', 'PIC16F18856', 'PIC16F18857',
-  'PIC16F18875', 'PIC16F18876', 'PIC16F18877',
-  'PIC16LF18854', 'PIC16LF18855', 'PIC16LF18856', 'PIC16LF18857',
-  'PIC16LF18875', 'PIC16LF18876', 'PIC16LF18877'
-  );
+my @mcu_missed_debug_0x8008_0x2000 = (
+  'PIC16F15354', 'PIC16F15355', 'PIC16F19197',
+  'PIC16LF15354', 'PIC16LF15355'
+);
 
 # The Microchip created faulty database: 8bit_device.info
 # Some parts of it are missing.
 
-my %missed_directive_substitutions =
-  (
+my %missed_directive_substitutions = (
   'PIC16LF707'  => {
-                   DIR_ADDR  => 0x2008,
-                   SUBST_MCU => 'PIC16F707'
+                     DIR_ADDR  => 0x2008,
+                     SUBST_MCU => 'PIC16F707'
                    },
   'PIC16LF722'  => {
-                   DIR_ADDR  => 0x2008,
-                   SUBST_MCU => 'PIC16F722'
+                     DIR_ADDR  => 0x2008,
+                     SUBST_MCU => 'PIC16F722'
                    },
   'PIC16LF722A' => {
-                   DIR_ADDR  => 0x2008,
-                   SUBST_MCU => 'PIC16F722A'
+                     DIR_ADDR  => 0x2008,
+                     SUBST_MCU => 'PIC16F722A'
                    },
   'PIC16LF723'  => {
-                   DIR_ADDR  => 0x2008,
-                   SUBST_MCU => 'PIC16F723'
+                     DIR_ADDR  => 0x2008,
+                     SUBST_MCU => 'PIC16F723'
                    },
   'PIC16LF723A' => {
-                   DIR_ADDR  => 0x2008,
-                   SUBST_MCU => 'PIC16F723A'
+                     DIR_ADDR  => 0x2008,
+                     SUBST_MCU => 'PIC16F723A'
                    },
   'PIC16LF724'  => {
-                   DIR_ADDR  => 0x2008,
-                   SUBST_MCU => 'PIC16F724'
+                     DIR_ADDR  => 0x2008,
+                     SUBST_MCU => 'PIC16F724'
                    },
   'PIC16LF726'  => {
-                   DIR_ADDR  => 0x2008,
-                   SUBST_MCU => 'PIC16F726'
+                     DIR_ADDR  => 0x2008,
+                     SUBST_MCU => 'PIC16F726'
                    },
   'PIC16LF727'  => {
-                   DIR_ADDR  => 0x2008,
-                   SUBST_MCU => 'PIC16F727'
+                     DIR_ADDR  => 0x2008,
+                     SUBST_MCU => 'PIC16F727'
                    }
-  );
+);
 
 my @insufficient_mcus = ();
 
@@ -1218,7 +1217,7 @@ sub print_device_table()
 sub print_license()
   {
   print $out_handler <<EOT
-/*  Copyright (C) 2014-2016 Molnar Karoly <molnarkaroly\@users.sf.net>
+/*  Copyright (C) 2014-2017 Molnar Karoly
 
 This file is part of gputils.
 

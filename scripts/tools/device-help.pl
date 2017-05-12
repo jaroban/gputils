@@ -2,7 +2,7 @@
 
 =back
 
-    Copyright (C) 2012-2016 Molnar Karoly <molnarkaroly@users.sf.net>
+    Copyright (C) 2012-2017 Molnar Karoly <molnarkaroly@users.sf.net>
 
     This file is part of gputils.
 
@@ -44,11 +44,13 @@ use 5.12.0;                             # when (regex)
 use feature 'switch';
 use POSIX 'strftime', 'ULONG_MAX';
 
-use constant FALSE => 0;
-use constant TRUE  => 1;
+use constant {
+  FALSE     => 0,
+  TRUE      => 1,
 
-use constant ST_WAIT   => 0;
-use constant ST_LISTEN => 1;
+  ST_WAIT   => 0,
+  ST_LISTEN => 1
+};
 
 my $PROGRAM = 'device-help.pl';
 
@@ -90,24 +92,25 @@ my $config_mask;
 my $addr;
 my $mask;
 
-use constant PROC_CLASS_PIC12   => 0;
-use constant PROC_CLASS_PIC12E  => 1;
-use constant PROC_CLASS_PIC12I  => 2;
-use constant PROC_CLASS_PIC14   => 3;
-use constant PROC_CLASS_PIC14E  => 4;
-use constant PROC_CLASS_PIC14EX => 5;
-use constant PROC_CLASS_PIC16   => 6;
-use constant PROC_CLASS_PIC16E  => 7;
+use constant {
+  PROC_CLASS_PIC12   => 0,
+  PROC_CLASS_PIC12E  => 1,
+  PROC_CLASS_PIC12I  => 2,
+  PROC_CLASS_PIC14   => 3,
+  PROC_CLASS_PIC14E  => 4,
+  PROC_CLASS_PIC14EX => 5,
+  PROC_CLASS_PIC16   => 6,
+  PROC_CLASS_PIC16E  => 7,
 
-use constant PIC12_BANK_SHIFT  => 5;
-use constant PIC12_BANK_SIZE   => 2 ** PIC12_BANK_SHIFT;
-use constant PIC14_BANK_SHIFT  => 7;
-use constant PIC14_BANK_SIZE   => 2 ** PIC14_BANK_SHIFT;
-use constant PIC16_BANK_SHIFT  => 8;
-use constant PIC16_BANK_SIZE   => 2 ** PIC16_BANK_SHIFT;
+  PIC12_BANK_SHIFT  => 5,
+  PIC12_BANK_SIZE   => 2 ** PIC12_BANK_SHIFT,
+  PIC14_BANK_SHIFT  => 7,
+  PIC14_BANK_SIZE   => 2 ** PIC14_BANK_SHIFT,
+  PIC16_BANK_SHIFT  => 8,
+  PIC16_BANK_SIZE   => 2 ** PIC16_BANK_SHIFT
+};
 
-my %class_features_p12 =
-  (
+my %class_features_p12 = (
   CLASS         => PROC_CLASS_PIC12,
   NAME          => '12 bit MCU',
   CSS_CLASS     => 'mcuAttrP12',
@@ -124,12 +127,11 @@ my %class_features_p12 =
   ACC_SPLIT_MIN => -1,
   ACC_SPLIT_MAX => -1,
   CORE_SFRS     => [
-                   0x00, 0x02, 0x03, 0x04
+                     0x00, 0x02, 0x03, 0x04
                    ]
-  );
+);
 
-my %class_features_p12e =
-  (
+my %class_features_p12e = (
   CLASS         => PROC_CLASS_PIC12E,
   NAME          => '12 bit enhanced MCU',
   CSS_CLASS     => 'mcuAttrP12E',
@@ -146,12 +148,11 @@ my %class_features_p12e =
   ACC_SPLIT_MIN => -1,
   ACC_SPLIT_MAX => -1,
   CORE_SFRS     => [
-                   0x00, 0x02, 0x03, 0x04
+                     0x00, 0x02, 0x03, 0x04
                    ]
-  );
+);
 
-my %class_features_p12i =
-  (
+my %class_features_p12i = (
   CLASS         => PROC_CLASS_PIC12I,
   NAME          => '12 bit enhanced MCU',
   CSS_CLASS     => 'mcuAttrP12E',
@@ -168,12 +169,11 @@ my %class_features_p12i =
   ACC_SPLIT_MIN => -1,
   ACC_SPLIT_MAX => -1,
   CORE_SFRS     => [
-                   0x00, 0x02, 0x03, 0x04
+                     0x00, 0x02, 0x03, 0x04
                    ]
-  );
+);
 
-my %class_features_p14 =
-  (
+my %class_features_p14 = (
   CLASS         => PROC_CLASS_PIC14,
   NAME          => '14 bit MCU',
   CSS_CLASS     => 'mcuAttrP14',
@@ -190,13 +190,12 @@ my %class_features_p14 =
   ACC_SPLIT_MIN => -1,
   ACC_SPLIT_MAX => -1,
   CORE_SFRS     => [
-                   0x00, 0x02, 0x03, 0x04,
-                   0x0A, 0x0B
+                     0x00, 0x02, 0x03, 0x04,
+                     0x0A, 0x0B
                    ]
-  );
+);
 
-my %class_features_p14e =
-  (
+my %class_features_p14e = (
   CLASS         => PROC_CLASS_PIC14E,
   NAME          => '14 bit enhanced MCU',
   CSS_CLASS     => 'mcuAttrP14E',
@@ -213,14 +212,13 @@ my %class_features_p14e =
   ACC_SPLIT_MIN => -1,
   ACC_SPLIT_MAX => -1,
   CORE_SFRS     => [
-                   0x00, 0x01, 0x02, 0x03,
-                   0x04, 0x05, 0x06, 0x07,
-                   0x08, 0x09, 0x0A, 0x0B
+                     0x00, 0x01, 0x02, 0x03,
+                     0x04, 0x05, 0x06, 0x07,
+                     0x08, 0x09, 0x0A, 0x0B
                    ]
-  );
+);
 
-my %class_features_p14ex =
-  (
+my %class_features_p14ex = (
   CLASS         => PROC_CLASS_PIC14EX,
   NAME          => '14 bit enhanced MCU',
   CSS_CLASS     => 'mcuAttrP14E',
@@ -237,14 +235,13 @@ my %class_features_p14ex =
   ACC_SPLIT_MIN => -1,
   ACC_SPLIT_MAX => -1,
   CORE_SFRS     => [
-                   0x00, 0x01, 0x02, 0x03,
-                   0x04, 0x05, 0x06, 0x07,
-                   0x08, 0x09, 0x0A, 0x0B
+                     0x00, 0x01, 0x02, 0x03,
+                     0x04, 0x05, 0x06, 0x07,
+                     0x08, 0x09, 0x0A, 0x0B
                    ]
-  );
+);
 
-my %class_features_p16 =
-  (
+my %class_features_p16 = (
   CLASS         => PROC_CLASS_PIC16,
   NAME          => '16 bit MCU',
   CSS_CLASS     => 'mcuAttrP16',
@@ -261,16 +258,15 @@ my %class_features_p16 =
   ACC_SPLIT_MIN => -1,
   ACC_SPLIT_MAX => -1,
   CORE_SFRS     => [
-                   0x00, 0x01, 0x02, 0x03,
-                   0x04, 0x05, 0x06, 0x07,
-                   0x08, 0x09, 0x0A, 0x0B,
-                   0x0C, 0x0D, 0x0E, 0x0F,
-                   0x18, 0x19
+                     0x00, 0x01, 0x02, 0x03,
+                     0x04, 0x05, 0x06, 0x07,
+                     0x08, 0x09, 0x0A, 0x0B,
+                     0x0C, 0x0D, 0x0E, 0x0F,
+                     0x18, 0x19
                    ]
-  );
+);
 
-my %class_features_p16e =
-  (
+my %class_features_p16e = (
   CLASS         => PROC_CLASS_PIC16E,
   NAME          => '16 bit extended MCU',
   CSS_CLASS     => 'mcuAttrP16E',
@@ -287,10 +283,9 @@ my %class_features_p16e =
   ACC_SPLIT_MIN => 0x5F,
   ACC_SPLIT_MAX => 0x7F,
   CORE_SFRS     => undef
-  );
+);
 
-my @class_features_list =
-  (
+my @class_features_list = (
   \%class_features_p12,         # PROC_CLASS_PIC12
   \%class_features_p12e,        # PROC_CLASS_PIC12E
   \%class_features_p12i,        # PROC_CLASS_PIC12I
@@ -299,10 +294,9 @@ my @class_features_list =
   \%class_features_p14ex,       # PROC_CLASS_PIC14EX
   \%class_features_p16,         # PROC_CLASS_PIC16
   \%class_features_p16e         # PROC_CLASS_PIC16E
-  );
+);
 
-my %class_features_by_mpasmx =
-  (
+my %class_features_by_mpasmx = (
   '16c5x'  => \%class_features_p12,
   '16c5xe' => \%class_features_p12e,
   '16c5ie' => \%class_features_p12i,
@@ -311,7 +305,7 @@ my %class_features_by_mpasmx =
   '16EXxx' => \%class_features_p14ex,
   '17xxxx' => \%class_features_p16,
   '18xxxx' => \%class_features_p16e
-  );
+);
 
 my @mcu_feat_names = sort {
                           $class_features_by_mpasmx{$a}->{ENHANCED} <=> $class_features_by_mpasmx{$b}->{ENHANCED} ||
@@ -552,110 +546,114 @@ my $only_css = FALSE;
 
 #---------------------------------------------------------------------------------------------------
 
-use constant PRI_MENU_ALL         => 0;
-use constant PRI_MENU_ENH         => 1;
-use constant PRI_MENU_EXT         => 2;
-use constant PRI_MENU_REG         => 3;
-use constant PRI_MENU_12_BIT      => 4;
-use constant PRI_MENU_14_BIT      => 5;
-use constant PRI_MENU_16_BIT      => 6;
-use constant PRI_MENU_RAM         => 7;
-use constant PRI_MENU_ROM         => 8;
-use constant PRI_MENU_EEPROM      => 9;
-use constant PRI_COMMON_SFR       => 10;
+use constant {
+  PRI_MENU_ALL         => 0,
+  PRI_MENU_ENH         => 1,
+  PRI_MENU_EXT         => 2,
+  PRI_MENU_REG         => 3,
+  PRI_MENU_12_BIT      => 4,
+  PRI_MENU_14_BIT      => 5,
+  PRI_MENU_16_BIT      => 6,
+  PRI_MENU_RAM         => 7,
+  PRI_MENU_ROM         => 8,
+  PRI_MENU_EEPROM      => 9,
+  PRI_COMMON_SFR       => 10
+};
 
-my @primary_menu =
-  (
-    {                                   # PRI_MENU_ALL
+my @primary_menu = (
+  {                                   # PRI_MENU_ALL
     HREF  => 'index.html',
     NAME  => 'All',
     PFUNC => \&print_mcu_list,
     CLASS => PRI_MENU_ALL
-    },
+  },
 
-    {                                   # PRI_MENU_ENH  (12 and 14 bit)
+  {                                   # PRI_MENU_ENH  (12 and 14 bit)
     HREF  => 'enhanced-mcus.html',
     NAME  => 'Enhanced',
     PFUNC => \&print_mcu_list,
     CLASS => PRI_MENU_ENH
-    },
+  },
 
-    {                                   # PRI_MENU_EXT  (16 bit)
+  {                                   # PRI_MENU_EXT  (16 bit)
     HREF  => 'extended-mcus.html',
     NAME  => 'Extended',
     PFUNC => \&print_mcu_list,
     CLASS => PRI_MENU_EXT
-    },
+  },
 
-    {                                   # PRI_MENU_REG
+  {                                   # PRI_MENU_REG
     HREF  => 'regular-mcus.html',
     NAME  => 'Regular',
     PFUNC => \&print_mcu_list,
     CLASS => PRI_MENU_REG
-    },
+  },
 
-    {                                   # PRI_MENU_12_BIT
+  {                                   # PRI_MENU_12_BIT
     HREF  => '12-bits-mcus.html',
     NAME  => '12 bits',
     PFUNC => \&print_mcu_list,
     CLASS => PRI_MENU_12_BIT
-    },
+  },
 
-    {                                   # PRI_MENU_14_BIT
+  {                                   # PRI_MENU_14_BIT
     HREF  => '14-bits-mcus.html',
     NAME  => '14 bits',
     PFUNC => \&print_mcu_list,
     CLASS => PRI_MENU_14_BIT
-    },
+  },
 
-    {                                   # PRI_MENU_16_BIT
+  {                                   # PRI_MENU_16_BIT
     HREF  => '16-bits-mcus.html',
     NAME  => '16 bits',
     PFUNC => \&print_mcu_list,
     CLASS => PRI_MENU_16_BIT
-    },
+  },
 
-    {                                   # PRI_MENU_RAM
+  {                                   # PRI_MENU_RAM
     HREF  => 'mcus-by-ram-size.html',
     NAME  => 'RAM<br>size',
     PFUNC => \&print_mcu_list,
     CLASS => PRI_MENU_RAM
-    },
+  },
 
-    {                                   # PRI_MENU_ROM
+  {                                   # PRI_MENU_ROM
     HREF  => 'mcus-by-rom-size.html',
     NAME  => 'ROM<br>size',
     PFUNC => \&print_mcu_list,
     CLASS => PRI_MENU_ROM
-    },
+  },
 
-    {                                   # PRI_MENU_EEPROM
+  {                                   # PRI_MENU_EEPROM
     HREF  => 'mcus-by-eeprom-size.html',
     NAME  => 'EEPROM<br>size',
     PFUNC => \&print_mcu_list,
     CLASS => PRI_MENU_EEPROM
-    },
+  },
 
-    {                                   # PRI_COMMON_SFR
+  {                                   # PRI_COMMON_SFR
     HREF  => "pic12_$common_tag.html",
     NAME  => 'Common<br>SFRs',
     PFUNC => undef,
     CLASS => PRI_COMMON_SFR
-    }
-  );
+  }
+);
 
-#use constant COMMON_SFR_MENU_P12   => 0;
-#use constant COMMON_SFR_MENU_P12E  => 1;
-#use constant COMMON_SFR_MENU_P12I  => 2;
-#use constant COMMON_SFR_MENU_P14   => 3;
-#use constant COMMON_SFR_MENU_P14E  => 4;
-#use constant COMMON_SFR_MENU_P14EX => 5;
-#use constant COMMON_SFR_MENU_P16   => 6;
-#use constant COMMON_SFR_MENU_P16E  => 7;
+=back
+use constant {
+  COMMON_SFR_MENU_P12   => 0,
+  COMMON_SFR_MENU_P12E  => 1,
+  COMMON_SFR_MENU_P12I  => 2,
+  COMMON_SFR_MENU_P14   => 3,
+  COMMON_SFR_MENU_P14E  => 4,
+  COMMON_SFR_MENU_P14EX => 5,
+  COMMON_SFR_MENU_P16   => 6,
+  COMMON_SFR_MENU_P16E  => 7
+};
+=cut
 
-my @common_sfr_menu =
-  (
-    {                                   # PROC_CLASS_PIC12
+my @common_sfr_menu = (
+  {                                   # PROC_CLASS_PIC12
     HREF   => "pic12_$common_tag.html",
     NAME   => 'PIC12',
     HEAD   => 'PIC12 Common SFRs',
@@ -663,9 +661,9 @@ my @common_sfr_menu =
     PARAM0 => \%pic12_common_SFRs,
     PARAM1 => \$pic12_mcu_number,
     CLASS  => PROC_CLASS_PIC12
-    },
+  },
 
-    {                                   # PROC_CLASS_P12E
+  {                                   # PROC_CLASS_P12E
     HREF   => "pic12e_$common_tag.html",
     NAME   => 'PIC12E',
     HEAD   => 'PIC12E Common SFRs',
@@ -673,9 +671,9 @@ my @common_sfr_menu =
     PARAM0 => \%pic12e_common_SFRs,
     PARAM1 => \$pic12e_mcu_number,
     CLASS  => PROC_CLASS_PIC12E
-    },
+  },
 
-    {                                   # PROC_CLASS_P12I
+  {                                   # PROC_CLASS_P12I
     HREF   => "pic12i_$common_tag.html",
     NAME   => 'PIC12I',
     HEAD   => 'PIC12I Common SFRs',
@@ -683,9 +681,9 @@ my @common_sfr_menu =
     PARAM0 => \%pic12i_common_SFRs,
     PARAM1 => \$pic12i_mcu_number,
     CLASS  => PROC_CLASS_PIC12I
-    },
+  },
 
-    {                                   # PROC_CLASS_P14
+  {                                   # PROC_CLASS_P14
     HREF   => "pic14_$common_tag.html",
     NAME   => 'PIC14',
     HEAD   => 'PIC14 Common SFRs',
@@ -693,9 +691,9 @@ my @common_sfr_menu =
     PARAM0 => \%pic14_common_SFRs,
     PARAM1 => \$pic14_mcu_number,
     CLASS  => PROC_CLASS_PIC14
-    },
+  },
 
-    {                                   # PROC_CLASS_P14E
+  {                                   # PROC_CLASS_P14E
     HREF   => "pic14e_$common_tag.html",
     NAME   => 'PIC14E',
     HEAD   => 'PIC14E Common SFRs',
@@ -703,9 +701,9 @@ my @common_sfr_menu =
     PARAM0 => \%pic14e_common_SFRs,
     PARAM1 => \$pic14e_mcu_number,
     CLASS  => PROC_CLASS_PIC14E
-    },
+  },
 
-    {                                   # PROC_CLASS_P14EX
+  {                                   # PROC_CLASS_P14EX
     HREF   => "pic14ex_$common_tag.html",
     NAME   => 'PIC14EX',
     HEAD   => 'PIC14EX Common SFRs',
@@ -713,9 +711,9 @@ my @common_sfr_menu =
     PARAM0 => \%pic14ex_common_SFRs,
     PARAM1 => \$pic14ex_mcu_number,
     CLASS  => PROC_CLASS_PIC14EX
-    },
+  },
 
-    {                                   # COMMON_SFR_P16
+  {                                   # COMMON_SFR_P16
     HREF   => "pic16_$common_tag.html",
     NAME   => 'PIC16',
     HEAD   => 'PIC16 Common SFRs',
@@ -723,9 +721,9 @@ my @common_sfr_menu =
     PARAM0 => \%pic16_common_SFRs,
     PARAM1 => \$pic16_mcu_number,
     CLASS  => PROC_CLASS_PIC16
-    },
+  },
 
-    {                                   # PROC_CLASS_P16E
+  {                                   # PROC_CLASS_P16E
     HREF   => "pic16e_$common_tag.html",
     NAME   => 'PIC16E',
     HEAD   => 'PIC16E Common SFRs',
@@ -733,49 +731,51 @@ my @common_sfr_menu =
     PARAM0 => \%pic16e_common_SFRs,
     PARAM1 => \$pic16e_mcu_number,
     CLASS  => PROC_CLASS_PIC16E
-    }
-  );
+  }
+);
 
-use constant MCU_MENU_FEAT => 0;
-use constant MCU_MENU_CONF => 1;
-use constant MCU_MENU_RAM  => 2;
-use constant MCU_MENU_SFR  => 3;
+use constant {
+  MCU_MENU_FEAT => 0,
+  MCU_MENU_CONF => 1,
+  MCU_MENU_RAM  => 2,
+  MCU_MENU_SFR  => 3
+};
 
-my @mcu_menu_elems =
-  (
-    {
+my @mcu_menu_elems = (
+  {
     HREF  => "-$feat_tag.html",
     NAME  => 'Features',
     CLASS => MCU_MENU_FEAT
-    },
+  },
 
-    {
+  {
     HREF  => "-$conf_tag.html",
     NAME  => 'Configuration Bits',
     CLASS => MCU_MENU_CONF
-    },
+  },
 
-    {
+  {
     HREF  => "-$ram_tag.html",
     NAME  => 'RAM map',
     CLASS => MCU_MENU_RAM
-    },
+  },
 
-    {
+  {
     HREF  => "-$sfr_tag.html",
     NAME  => 'SFR map',
     CLASS => MCU_MENU_SFR
-    }
-  );
+  }
+);
 
-use constant RAM_BAD    => 0;
-use constant RAM_GPR    => 1;
-use constant RAM_SFR    => 2;
-use constant RAM_COMMON => 3;
-use constant RAM_MIRROR => 4;
+use constant {
+  RAM_BAD    => 0,
+  RAM_GPR    => 1,
+  RAM_SFR    => 2,
+  RAM_COMMON => 3,
+  RAM_MIRROR => 4
+};
 
-my @mcu_missed_debug_0x8008_0x1000 =
-  (
+my @mcu_missed_debug_0x8008_0x1000 = (
   'PIC12F1571', 'PIC12F1572', 'PIC12F1612', 'PIC12F1822',
   'PIC12F1840', 'PIC12LF1571', 'PIC12LF1572', 'PIC12LF1612',
   'PIC12LF1822', 'PIC12LF1840', 'PIC12LF1840T39A', 'PIC12LF1840T48A',
@@ -815,59 +815,54 @@ my @mcu_missed_debug_0x8008_0x1000 =
   'PIC16LF1903', 'PIC16LF1904', 'PIC16LF1906', 'PIC16LF1907',
   'PIC16LF1933', 'PIC16LF1934', 'PIC16LF1936', 'PIC16LF1937',
   'PIC16LF1938', 'PIC16LF1939', 'PIC16LF1946', 'PIC16LF1947'
-  );
+);
 
-my @mcu_missed_debug_0x8008_0x2000 =
-  (
-  'PIC16F18854', 'PIC16F18855', 'PIC16F18856', 'PIC16F18857',
-  'PIC16F18875', 'PIC16F18876', 'PIC16F18877',
-  'PIC16LF18854', 'PIC16LF18855', 'PIC16LF18856', 'PIC16LF18857',
-  'PIC16LF18875', 'PIC16LF18876', 'PIC16LF18877'
-  );
+my @mcu_missed_debug_0x8008_0x2000 = (
+  'PIC16F15354', 'PIC16F15355', 'PIC16F19197',
+  'PIC16LF15354', 'PIC16LF15355'
+);
 
 # The Microchip created faulty database: 8bit_device.info
 # Some parts of it are missing.
 
-my %missed_directive_substitutions =
-  (
+my %missed_directive_substitutions = (
   'PIC16LF707'  => {
-                   DIR_ADDR  => 0x2008,
-                   SUBST_MCU => 'PIC16F707'
+                     DIR_ADDR  => 0x2008,
+                     SUBST_MCU => 'PIC16F707'
                    },
   'PIC16LF722'  => {
-                   DIR_ADDR  => 0x2008,
-                   SUBST_MCU => 'PIC16F722'
+                     DIR_ADDR  => 0x2008,
+                     SUBST_MCU => 'PIC16F722'
                    },
   'PIC16LF722A' => {
-                   DIR_ADDR  => 0x2008,
-                   SUBST_MCU => 'PIC16F722A'
+                     DIR_ADDR  => 0x2008,
+                     SUBST_MCU => 'PIC16F722A'
                    },
   'PIC16LF723'  => {
-                   DIR_ADDR  => 0x2008,
-                   SUBST_MCU => 'PIC16F723'
+                     DIR_ADDR  => 0x2008,
+                     SUBST_MCU => 'PIC16F723'
                    },
   'PIC16LF723A' => {
-                   DIR_ADDR  => 0x2008,
-                   SUBST_MCU => 'PIC16F723A'
+                     DIR_ADDR  => 0x2008,
+                     SUBST_MCU => 'PIC16F723A'
                    },
   'PIC16LF724'  => {
-                   DIR_ADDR  => 0x2008,
-                   SUBST_MCU => 'PIC16F724'
+                     DIR_ADDR  => 0x2008,
+                     SUBST_MCU => 'PIC16F724'
                    },
   'PIC16LF726'  => {
-                   DIR_ADDR  => 0x2008,
-                   SUBST_MCU => 'PIC16F726'
+                     DIR_ADDR  => 0x2008,
+                     SUBST_MCU => 'PIC16F726'
                    },
   'PIC16LF727'  => {
-                   DIR_ADDR  => 0x2008,
-                   SUBST_MCU => 'PIC16F727'
+                     DIR_ADDR  => 0x2008,
+                     SUBST_MCU => 'PIC16F727'
                    }
-  );
+);
 
 my @insufficient_mcus = ();
 
-my @data_sheet_name_exception_list =
-  (
+my @data_sheet_name_exception_list = (
   'PIC12LF1552',
   'PIC12LF1840T39A',
   'PIC12LF1840T48A',
@@ -880,7 +875,7 @@ my @data_sheet_name_exception_list =
   'PIC16LF1904',
   'PIC16LF1906',
   'PIC16LF1907'
-  );
+);
 
 ####################################################################################################
 ####################################################################################################

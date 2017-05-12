@@ -1,3 +1,8 @@
+2017-05-12  Molnar Karoly  <molnarkaroly@users.sourceforge.net>
+  * configure, configure.ac, libgputils/gpcfg-table.c,
+    header/*.inc, lkr/*.lkr:
+    Updated based on the mplabx-3.61.
+
 2017-05-10  Molnar Karoly  <molnarkaroly@users.sourceforge.net>
   * libgputils/gpcod.c:
     Bugfix: Removed the unnecessary "\n" character.

@@ -1,10 +1,10 @@
         LIST
 
 ;==========================================================================
-; Build date : Feb 01 2016
+; Build date : Mar 21 2017
 ;  MPASM PIC16LF1567 processor include
 ; 
-;  (c) Copyright 1999-2016 Microchip Technology, All rights reserved
+;  (c) Copyright 1999-2017 Microchip Technology, All rights reserved
 ;==========================================================================
 
         NOLIST
@@ -1697,6 +1697,8 @@ CH15             EQU  H'0005'
 CH16             EQU  H'0006'
 CHS17            EQU  H'0007'
 
+CH17             EQU  H'0007'
+
 
 ;----- AD1CH0 Bits -----------------------------------------------------
 CH10             EQU  H'0000'
@@ -1707,6 +1709,8 @@ CH14             EQU  H'0004'
 CH15             EQU  H'0005'
 CH16             EQU  H'0006'
 CHS17            EQU  H'0007'
+
+CH17             EQU  H'0007'
 
 
 ;----- AAD1CH1 Bits -----------------------------------------------------

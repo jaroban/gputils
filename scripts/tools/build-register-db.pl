@@ -2,7 +2,7 @@
 
 =back
 
-    Copyright (C) 2014-2016 Molnar Karoly <molnarkaroly@users.sf.net>
+    Copyright (C) 2014-2017 Molnar Karoly <molnarkaroly@users.sf.net>
 
     This file is part of gputils.
 
@@ -38,19 +38,21 @@ use 5.12.0;                     # when (regex)
 use feature 'switch';           # Starting from 5.10.1.
 use POSIX 'strftime', 'UINT_MAX';
 
-use constant FALSE => 0;
-use constant TRUE  => 1;
+use constant {
+  FALSE => 0,
+  TRUE  => 1,
 
-use constant ST_NONE     => 0;
-use constant ST_REG_ADDR => 1;
-use constant ST_REG1_DEF => 2;
-use constant ST_REG2_DEF => 3;
-use constant ST_RAM_DEF  => 4;
+  ST_NONE     => 0,
+  ST_REG_ADDR => 1,
+  ST_REG1_DEF => 2,
+  ST_REG2_DEF => 3,
+  ST_RAM_DEF  => 4,
 
-use constant REG_LINE_LENGTH => 26;
+  REG_LINE_LENGTH => 26,
 
-use constant FNV1A32_INIT  => 0x811C9DC5;
-use constant FNV1A32_PRIME => 0x01000193;
+  FNV1A32_INIT  => 0x811C9DC5,
+  FNV1A32_PRIME => 0x01000193
+};
 
 my $PROGRAM  = 'build-register-db.pl';
 my $time_str = '';
@@ -92,10 +94,9 @@ my @mcu_name_array;
         #  BAD  => 'GOOD'  or
         # 'BAD' => 'GOOD'
 
-my %correction_of_names =
-  (
+my %correction_of_names = (
   OPTION => 'OPTION_REG'
-  );
+);
 
 #-----------------------------------------------
 
@@ -927,31 +928,31 @@ sub print_header()
   {
   print $out_handler <<EOT
 
-\#ifndef __GPREGISTER_H__
-\#define __GPREGISTER_H__
+\#ifndef g__GPREGISTER_H__
+\#define g__GPREGISTER_H__
 
 /* This file is generated automatically by the $PROGRAM${time_str}. */
 
 typedef struct {
-  const char *name;
-  unsigned int address;
+  const char   *name;
+  unsigned int  address;
 } $bit_line_t;
 
 typedef struct {
-  const char *name;
-  unsigned int address;
-  unsigned int bit_number;
+  const char     *name;
+  unsigned int    address;
+  unsigned int    bit_number;
   const $bit_line_t *bits;
 } $reg_line_t;
 
 typedef struct {
-  const char *name;
-  unsigned int register_number;
+  const char           *name;
+  unsigned int          register_number;
   const $reg_line_t **registers;
 } $reg_table_t;
 
 extern const $reg_table_t $reg_table\[\];
-extern const int ${reg_table}_size;
+extern const int                 ${reg_table}_size;
 
 extern const $reg_table_t *gp_register_find_mcu(const $reg_table_t *Table, int Table_size, const char *McuName);
 
@@ -961,7 +962,7 @@ extern const char *gp_register_find_reg_name(const $reg_table_t *Mcu, unsigned i
 extern const $bit_line_t *gp_register_find_bit(const $reg_line_t *Reg, unsigned int Address);
 extern const char *gp_register_find_bit_name(const $reg_line_t *Reg, unsigned int Address);
 
-\#endif /* __GPREGISTER_H__ */
+\#endif /* g__GPREGISTER_H__ */
 EOT
 ;
   }

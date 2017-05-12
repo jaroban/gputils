@@ -1,10 +1,10 @@
         LIST
 
 ;==========================================================================
-; Build date : May 15 2016
+; Build date : Mar 21 2017
 ;  MPASM PIC18F26K40 processor include
 ; 
-;  (c) Copyright 1999-2016 Microchip Technology, All rights reserved
+;  (c) Copyright 1999-2017 Microchip Technology, All rights reserved
 ;==========================================================================
 
         NOLIST
@@ -66,6 +66,7 @@ BANKED           EQU  1
 
 ;----- Register Files -----------------------------------------------------
 RX2PPS           EQU  H'0E8D'
+CX2PPS           EQU  H'0E8E'
 TX2PPS           EQU  H'0E8E'
 SSP2CLKPPS       EQU  H'0E8F'
 SSP2DATPPS       EQU  H'0E90'
@@ -116,7 +117,11 @@ MDCARLPPS        EQU  H'0EB2'
 MDCARHPPS        EQU  H'0EB3'
 MDSRCPPS         EQU  H'0EB4'
 RX1PPS           EQU  H'0EB5'
+RXPPS            EQU  H'0EB5'
+CK1PPS           EQU  H'0EB6'
+CKPPS            EQU  H'0EB6'
 TX1PPS           EQU  H'0EB6'
+TXPPS            EQU  H'0EB6'
 SSP1CLKPPS       EQU  H'0EB7'
 SSP1DATPPS       EQU  H'0EB8'
 SSP1SSPPS        EQU  H'0EB9'
@@ -399,6 +404,7 @@ T2HLT            EQU  H'0FBE'
 T2CLK            EQU  H'0FBF'
 T2CLKCON         EQU  H'0FBF'
 T2RST            EQU  H'0FC0'
+TMR5             EQU  H'0FC1'
 TMR5L            EQU  H'0FC1'
 TMR5H            EQU  H'0FC2'
 T5CON            EQU  H'0FC3'
@@ -408,6 +414,7 @@ T5GATE           EQU  H'0FC5'
 TMR5GATE         EQU  H'0FC5'
 T5CLK            EQU  H'0FC6'
 TMR5CLK          EQU  H'0FC6'
+TMR3             EQU  H'0FC7'
 TMR3L            EQU  H'0FC7'
 TMR3H            EQU  H'0FC8'
 T3CON            EQU  H'0FC9'
@@ -417,6 +424,7 @@ T3GATE           EQU  H'0FCB'
 TMR3GATE         EQU  H'0FCB'
 T3CLK            EQU  H'0FCC'
 TMR3CLK          EQU  H'0FCC'
+TMR1             EQU  H'0FCD'
 TMR1L            EQU  H'0FCD'
 TMR1H            EQU  H'0FCE'
 T1CON            EQU  H'0FCF'
@@ -3464,6 +3472,15 @@ TMR5L6           EQU  H'0006'
 TMR5L7           EQU  H'0007'
 
 
+TMR50            EQU  H'0000'
+TMR51            EQU  H'0001'
+TMR52            EQU  H'0002'
+TMR53            EQU  H'0003'
+TMR54            EQU  H'0004'
+TMR55            EQU  H'0005'
+TMR56            EQU  H'0006'
+TMR57            EQU  H'0007'
+
 
 ;----- TMR5H Bits -----------------------------------------------------
 TMR5H0           EQU  H'0000'
@@ -3475,6 +3492,15 @@ TMR5H5           EQU  H'0005'
 TMR5H6           EQU  H'0006'
 TMR5H7           EQU  H'0007'
 
+
+TMR58            EQU  H'0000'
+TMR59            EQU  H'0001'
+TMR510           EQU  H'0002'
+TMR511           EQU  H'0003'
+TMR512           EQU  H'0004'
+TMR513           EQU  H'0005'
+TMR514           EQU  H'0006'
+TMR515           EQU  H'0007'
 
 
 ;----- T5CON Bits -----------------------------------------------------
@@ -3587,6 +3613,15 @@ TMR3L6           EQU  H'0006'
 TMR3L7           EQU  H'0007'
 
 
+TMR30            EQU  H'0000'
+TMR31            EQU  H'0001'
+TMR32            EQU  H'0002'
+TMR33            EQU  H'0003'
+TMR34            EQU  H'0004'
+TMR35            EQU  H'0005'
+TMR36            EQU  H'0006'
+TMR37            EQU  H'0007'
+
 
 ;----- TMR3H Bits -----------------------------------------------------
 TMR3H0           EQU  H'0000'
@@ -3598,6 +3633,15 @@ TMR3H5           EQU  H'0005'
 TMR3H6           EQU  H'0006'
 TMR3H7           EQU  H'0007'
 
+
+TMR38            EQU  H'0000'
+TMR39            EQU  H'0001'
+TMR310           EQU  H'0002'
+TMR311           EQU  H'0003'
+TMR312           EQU  H'0004'
+TMR313           EQU  H'0005'
+TMR314           EQU  H'0006'
+TMR315           EQU  H'0007'
 
 
 ;----- T3CON Bits -----------------------------------------------------
@@ -3710,6 +3754,15 @@ TMR1L6           EQU  H'0006'
 TMR1L7           EQU  H'0007'
 
 
+TMR10            EQU  H'0000'
+TMR11            EQU  H'0001'
+TMR12            EQU  H'0002'
+TMR13            EQU  H'0003'
+TMR14            EQU  H'0004'
+TMR15            EQU  H'0005'
+TMR16            EQU  H'0006'
+TMR17            EQU  H'0007'
+
 
 ;----- TMR1H Bits -----------------------------------------------------
 TMR1H0           EQU  H'0000'
@@ -3721,6 +3774,15 @@ TMR1H5           EQU  H'0005'
 TMR1H6           EQU  H'0006'
 TMR1H7           EQU  H'0007'
 
+
+TMR18            EQU  H'0000'
+TMR19            EQU  H'0001'
+TMR110           EQU  H'0002'
+TMR111           EQU  H'0003'
+TMR112           EQU  H'0004'
+TMR113           EQU  H'0005'
+TMR114           EQU  H'0006'
+TMR115           EQU  H'0007'
 
 
 ;----- T1CON Bits -----------------------------------------------------
@@ -3998,7 +4060,7 @@ SP5              EQU  H'0005'
 ;              superseded by the CONFIG directive.  The following settings
 ;              are available for this device.
 ;
-;   :
+;   External Oscillator mode Selection bits:
 ;     FEXTOSC = LP         LP (crystal oscillator) optimized for 32.768 kHz; PFM set to low power
 ;     FEXTOSC = XT         XT (crystal oscillator) above 100 kHz, below 8 MHz; PFM set to medium power
 ;     FEXTOSC = HS         HS (crystal oscillator) above 8 MHz; PFM set to high power
@@ -4008,7 +4070,7 @@ SP5              EQU  H'0005'
 ;     FEXTOSC = ECM        EC (external clock) for 500 kHz to 8 MHz; PFM set to medium power
 ;     FEXTOSC = ECH        EC (external clock) above 8 MHz; PFM set to high power
 ;
-;   :
+;   Power-up default value for COSC bits:
 ;     RSTOSC = HFINTOSC_64MHZHFINTOSC with HFFRQ = 64 MHz and CDIV = 1:1
 ;     RSTOSC = RESERVED_1  Reserved
 ;     RSTOSC = EXTOSC_4PLL EXTOSC with 4x PLL, with EXTOSC operating per FEXTOSC bits
@@ -4018,11 +4080,11 @@ SP5              EQU  H'0005'
 ;     RSTOSC = HFINTOSC_1MHZHFINTOSC with HFFRQ = 4 MHz and CDIV = 4:1
 ;     RSTOSC = EXTOSC      EXTOSC operating per FEXTOSC bits (device manufacturing default)
 ;
-;   :
+;   Clock Out Enable bit:
 ;     CLKOUTEN = ON        CLKOUT function is enabled
 ;     CLKOUTEN = OFF       CLKOUT function is disabled
 ;
-;   :
+;   Clock Switch Enable bit:
 ;     CSWEN = OFF          The NOSC and NDIV bits cannot be changed by user software
 ;     CSWEN = ON           Writing to NOSC and NDIV is allowed
 ;
@@ -4030,7 +4092,7 @@ SP5              EQU  H'0005'
 ;     FCMEN = OFF          Fail-Safe Clock Monitor disabled
 ;     FCMEN = ON           Fail-Safe Clock Monitor enabled
 ;
-;   :
+;   Master Clear Enable bit:
 ;     MCLRE = INTMCLR      If LVP = 0, MCLR pin function is port defined function; If LVP =1, RE3 pin fuction is MCLR
 ;     MCLRE = EXTMCLR      If LVP = 0, MCLR pin is MCLR; If LVP = 1, RE3 pin function is MCLR 
 ;
@@ -4038,7 +4100,7 @@ SP5              EQU  H'0005'
 ;     PWRTE = ON           Power up timer enabled
 ;     PWRTE = OFF          Power up timer disabled
 ;
-;   :
+;   Low-power BOR enable bit:
 ;     LPBOREN = ON         ULPBOR enabled
 ;     LPBOREN = OFF        ULPBOR disabled
 ;
@@ -4074,7 +4136,7 @@ SP5              EQU  H'0005'
 ;     XINST = ON           Extended Instruction Set and Indexed Addressing Mode enabled
 ;     XINST = OFF          Extended Instruction Set and Indexed Addressing Mode disabled
 ;
-;   :
+;   WDT Period Select bits:
 ;     WDTCPS = WDTCPS_0    Divider ratio 1:32
 ;     WDTCPS = WDTCPS_1    Divider ratio 1:64
 ;     WDTCPS = WDTCPS_2    Divider ratio 1:128
@@ -4157,7 +4219,7 @@ SP5              EQU  H'0005'
 ;     WRTD = ON            Data EEPROM write-protected
 ;     WRTD = OFF           Data EEPROM not write-protected
 ;
-;   :
+;   Scanner Enable bit:
 ;     SCANE = OFF          Scanner module is NOT available for use, SCANMD bit is ignored
 ;     SCANE = ON           Scanner module is available for use, SCANMD bit can control the module
 ;

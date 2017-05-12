@@ -2,7 +2,7 @@
 
 =back
 
-   Copyright (C) 2012-2016 Molnar Karoly <molnarkaroly@users.sf.net>
+   Copyright (C) 2012-2017 Molnar Karoly <molnarkaroly@users.sf.net>
 
     This file is part of gputils.
 
@@ -64,42 +64,44 @@ use 5.10.1;                     # Because of her need: ${^POSTMATCH}
 use feature 'switch';           # Starting from 5.10.1.
 use POSIX qw(strftime);
 
-use constant FALSE => 0;
-use constant TRUE  => 1;
+use constant {
+  FALSE => 0,
+  TRUE  => 1,
 
-use constant ST_WAIT   => 0;
-use constant ST_LISTEN => 1;
+  ST_WAIT   => 0,
+  ST_LISTEN => 1,
 
-use constant AL_NAME => 17;
-use constant AL_ADDR => 22;
+  AL_NAME => 17,
+  AL_ADDR => 22,
 
-use constant OP_NULL         => 0;
-use constant OP_ADD          => 1;
-use constant OP_REMOVE       => 2;
-use constant OP_REGENERATE   => 3;
-use constant OP_FABR_INC     => 4;
-use constant OP_FABR_LKR     => 5;
-use constant OP_LIST_GP      => 6;
-use constant OP_LIST_MP      => 7;
-use constant OP_SURVEY       => 8;
-use constant OP_SHOWS_SPDIFF => 9;
-use constant OP_SHOWS_CDIFF  => 10;
-use constant OP_SHOWS_PXDIFF => 11;
+  OP_NULL         => 0,
+  OP_ADD          => 1,
+  OP_REMOVE       => 2,
+  OP_REGENERATE   => 3,
+  OP_FABR_INC     => 4,
+  OP_FABR_LKR     => 5,
+  OP_LIST_GP      => 6,
+  OP_LIST_MP      => 7,
+  OP_SURVEY       => 8,
+  OP_SHOWS_SPDIFF => 9,
+  OP_SHOWS_CDIFF  => 10,
+  OP_SHOWS_PXDIFF => 11,
 
-use constant SORT_DEFINED_AS => 0;
-use constant SORT_NAME0      => 1;
-use constant SORT_NAME1      => 2;
-use constant SORT_NAME2      => 3;
+  SORT_DEFINED_AS => 0,
+  SORT_NAME0      => 1,
+  SORT_NAME1      => 2,
+  SORT_NAME2      => 3,
 
-use constant RP_ADD   => 0;
-use constant RP_PRINT => 1;
+  RP_ADD   => 0,
+  RP_PRINT => 1,
 
-use constant E_COFF_COLL => 0;
-use constant E_COFF_DIFF => 1;
-use constant E_ROM_DIFF  => 2;
-use constant E_NAME_COLL => 3;
-use constant E_INC_NAME  => 4;
-use constant E_LKR_NAME  => 5;
+  E_COFF_COLL => 0,
+  E_COFF_DIFF => 1,
+  E_ROM_DIFF  => 2,
+  E_NAME_COLL => 3,
+  E_INC_NAME  => 4,
+  E_LKR_NAME  => 5
+};
 
 my $PROGRAM = 'device-manager.pl';
 
@@ -108,31 +110,36 @@ my $verbose = 0;
 my $border0 = ('-' x 70);
 my $border1 = ('=' x 60);
 
-use constant PIC_BANK_NUMBER_MAX   => 32;
-use constant PICEX_BANK_NUMBER_MAX => 64;
+use constant {
+  PIC_BANK_NUMBER_MAX   => 32,
+  PICEX_BANK_NUMBER_MAX => 64,
 
-use constant PROC_CLASS_EEPROM8  =>  0;
-use constant PROC_CLASS_EEPROM16 =>  1;
-use constant PROC_CLASS_GENERIC  =>  2;
-use constant PROC_CLASS_PIC12    =>  3;
-use constant PROC_CLASS_PIC12E   =>  4;
-use constant PROC_CLASS_PIC12I   =>  5;
-use constant PROC_CLASS_PIC14    =>  6;
-use constant PROC_CLASS_PIC14E   =>  7;
-use constant PROC_CLASS_PIC14EX  =>  8;
-use constant PROC_CLASS_PIC16    =>  9;
-use constant PROC_CLASS_PIC16E   => 10;
-use constant PROC_CLASS_SX       => 11;
+  PROC_CLASS_EEPROM8  =>  0,
+  PROC_CLASS_EEPROM16 =>  1,
+  PROC_CLASS_GENERIC  =>  2,
+  PROC_CLASS_PIC12    =>  3,
+  PROC_CLASS_PIC12E   =>  4,
+  PROC_CLASS_PIC12I   =>  5,
+  PROC_CLASS_PIC14    =>  6,
+  PROC_CLASS_PIC14E   =>  7,
+  PROC_CLASS_PIC14EX  =>  8,
+  PROC_CLASS_PIC16    =>  9,
+  PROC_CLASS_PIC16E   => 10,
+  PROC_CLASS_PIC16EV  => 11,
+  PROC_CLASS_SX       => 12,
 
-use constant PIC12_BANK_SHIFT => 5;
-use constant PIC12_BANK_SIZE  => 2 ** PIC12_BANK_SHIFT;
-use constant PIC14_BANK_SHIFT => 7;
-use constant PIC14_BANK_SIZE  => 2 ** PIC14_BANK_SHIFT;
-use constant PIC16_BANK_SHIFT => 8;
-use constant PIC16_BANK_SIZE  => 2 ** PIC16_BANK_SHIFT;
+  PIC12_BANK_SHIFT => 5,
+  PIC14_BANK_SHIFT => 7,
+  PIC16_BANK_SHIFT => 8
+};
 
-my %class_features_eeprom8 =
-  (
+use constant {
+  PIC12_BANK_SIZE  => 2 ** PIC12_BANK_SHIFT,
+  PIC14_BANK_SIZE  => 2 ** PIC14_BANK_SHIFT,
+  PIC16_BANK_SIZE  => 2 ** PIC16_BANK_SHIFT
+};
+
+my %class_features_eeprom8 = (
   CLASS         => PROC_CLASS_EEPROM8,
   ENHANCED      => FALSE,
   PAGE_SIZE     => -1,
@@ -147,10 +154,9 @@ my %class_features_eeprom8 =
   IDLOCS_MASK   => 0,
   ACC_SPLIT_MIN => -1,
   ACC_SPLIT_MAX => -1
-  );
+);
 
-my %class_features_eeprom16 =
-  (
+my %class_features_eeprom16 = (
   CLASS         => PROC_CLASS_EEPROM16,
   ENHANCED      => FALSE,
   PAGE_SIZE     => -1,
@@ -165,10 +171,9 @@ my %class_features_eeprom16 =
   IDLOCS_MASK   => 0,
   ACC_SPLIT_MIN => -1,
   ACC_SPLIT_MAX => -1
-  );
+);
 
-my %class_features_generic =
-  (
+my %class_features_generic = (
   CLASS         => PROC_CLASS_GENERIC,
   ENHANCED      => FALSE,
   PAGE_SIZE     => 512,
@@ -183,10 +188,9 @@ my %class_features_generic =
   IDLOCS_MASK   => 0x0FF0,
   ACC_SPLIT_MIN => -1,
   ACC_SPLIT_MAX => -1
-  );
+);
 
-my %class_features_p12 =
-  (
+my %class_features_p12 = (
   CLASS         => PROC_CLASS_PIC12,
   ENHANCED      => FALSE,
   PAGE_SIZE     => 512,
@@ -201,10 +205,9 @@ my %class_features_p12 =
   IDLOCS_MASK   => 0x0FF0,
   ACC_SPLIT_MIN => -1,
   ACC_SPLIT_MAX => -1
-  );
+);
 
-my %class_features_p12e =
-  (
+my %class_features_p12e = (
   CLASS         => PROC_CLASS_PIC12E,
   ENHANCED      => TRUE,
   PAGE_SIZE     => 512,
@@ -219,10 +222,9 @@ my %class_features_p12e =
   IDLOCS_MASK   => 0x0FF0,
   ACC_SPLIT_MIN => -1,
   ACC_SPLIT_MAX => -1
-  );
+);
 
-my %class_features_p12i =
-  (
+my %class_features_p12i = (
   CLASS         => PROC_CLASS_PIC12I,
   ENHANCED      => TRUE,
   PAGE_SIZE     => 512,
@@ -237,10 +239,9 @@ my %class_features_p12i =
   IDLOCS_MASK   => 0x0FF0,
   ACC_SPLIT_MIN => -1,
   ACC_SPLIT_MAX => -1
-  );
+);
 
-my %class_features_p14 =
-  (
+my %class_features_p14 = (
   CLASS         => PROC_CLASS_PIC14,
   ENHANCED      => FALSE,
   PAGE_SIZE     => 2048,
@@ -255,10 +256,9 @@ my %class_features_p14 =
   IDLOCS_MASK   => 0x3F80,
   ACC_SPLIT_MIN => -1,
   ACC_SPLIT_MAX => -1
-  );
+);
 
-my %class_features_p14e =
-  (
+my %class_features_p14e = (
   CLASS         => PROC_CLASS_PIC14E,
   ENHANCED      => TRUE,
   PAGE_SIZE     => 2048,
@@ -273,10 +273,9 @@ my %class_features_p14e =
   IDLOCS_MASK   => 0x3F80,
   ACC_SPLIT_MIN => -1,
   ACC_SPLIT_MAX => -1
-  );
+);
 
-my %class_features_p14ex =
-  (
+my %class_features_p14ex = (
   CLASS         => PROC_CLASS_PIC14EX,
   ENHANCED      => TRUE,
   PAGE_SIZE     => 2048,
@@ -291,10 +290,9 @@ my %class_features_p14ex =
   IDLOCS_MASK   => 0x3F80,
   ACC_SPLIT_MIN => -1,
   ACC_SPLIT_MAX => -1
-  );
+);
 
-my %class_features_p16 =
-  (
+my %class_features_p16 = (
   CLASS         => PROC_CLASS_PIC16,
   ENHANCED      => FALSE,
   PAGE_SIZE     => -1,
@@ -309,10 +307,9 @@ my %class_features_p16 =
   IDLOCS_MASK   => 0x00,
   ACC_SPLIT_MIN => -1,
   ACC_SPLIT_MAX => -1
-  );
+);
 
-my %class_features_p16e =
-  (
+my %class_features_p16e = (
   CLASS         => PROC_CLASS_PIC16E,
   ENHANCED      => TRUE,
   PAGE_SIZE     => -1,
@@ -327,10 +324,26 @@ my %class_features_p16e =
   IDLOCS_MASK   => 0x00,
   ACC_SPLIT_MIN => 0x5F,
   ACC_SPLIT_MAX => 0x7F
-  );
+);
 
-my %class_features_sx =
-  (
+my %class_features_p16ev = (
+  CLASS         => PROC_CLASS_PIC16EV,
+  ENHANCED      => TRUE,
+  PAGE_SIZE     => -1,
+  WORD_SIZE     => 16,
+  CONF_SIZE     => 8,
+  CONF_MASK     => 0x00FF,
+  EE_START      => 0xF00000,
+  BANK_MAX      => 64,
+  BANK_SIZE     => PIC16_BANK_SIZE,
+  BANK_MASK     => ~(PIC16_BANK_SIZE - 1),
+  BANK_SHIFT    => PIC16_BANK_SHIFT,
+  IDLOCS_MASK   => 0x00,
+  ACC_SPLIT_MIN => 0x5F,
+  ACC_SPLIT_MAX => 0x7F
+);
+
+my %class_features_sx = (
   CLASS         => PROC_CLASS_SX,
   ENHANCED      => FALSE,
   PAGE_SIZE     => 512,
@@ -345,10 +358,9 @@ my %class_features_sx =
   IDLOCS_MASK   => 0x3F80,
   ACC_SPLIT_MIN => -1,
   ACC_SPLIT_MAX => -1
-  );
+);
 
-my @classnames =
-  (
+my @classnames = (
   'PROC_CLASS_EEPROM8',
   'PROC_CLASS_EEPROM16',
   'PROC_CLASS_GENERIC',
@@ -360,11 +372,11 @@ my @classnames =
   'PROC_CLASS_PIC14EX',
   'PROC_CLASS_PIC16',
   'PROC_CLASS_PIC16E',
+  'PROC_CLASS_PIC16EV',
   'PROC_CLASS_SX'
-  );
+);
 
-my @class_features_list =
-  (
+my @class_features_list = (
   \%class_features_eeprom8,     # PROC_CLASS_EEPROM8
   \%class_features_eeprom16,    # PROC_CLASS_EEPROM16
   \%class_features_generic,     # PROC_CLASS_GENERIC
@@ -376,11 +388,11 @@ my @class_features_list =
   \%class_features_p14ex,       # PROC_CLASS_PIC14EX
   \%class_features_p16,         # PROC_CLASS_PIC16
   \%class_features_p16e,        # PROC_CLASS_PIC16E
+  \%class_features_p16ev,       # PROC_CLASS_PIC16EV
   \%class_features_sx           # PROC_CLASS_SX
-  );
+);
 
-my %class_features_by_gputils =
-  (
+my %class_features_by_gputils = (
   'PROC_CLASS_EEPROM8'  => \%class_features_eeprom8,
   'PROC_CLASS_EEPROM16' => \%class_features_eeprom16,
   'PROC_CLASS_GENERIC'  => \%class_features_generic,
@@ -392,11 +404,11 @@ my %class_features_by_gputils =
   'PROC_CLASS_PIC14EX'  => \%class_features_p14ex,
   'PROC_CLASS_PIC16'    => \%class_features_p16,
   'PROC_CLASS_PIC16E'   => \%class_features_p16e,
+  'PROC_CLASS_PIC16EV'  => \%class_features_p16ev,
   'PROC_CLASS_SX'       => \%class_features_sx
-  );
+);
 
-my %class_features_by_mpasmx =
-  (
+my %class_features_by_mpasmx = (
   'EEPROM8'  => \%class_features_eeprom8,
   'EEPROM16' => \%class_features_eeprom16,
   'generic'  => \%class_features_generic,
@@ -408,11 +420,11 @@ my %class_features_by_mpasmx =
   '16EXxx'   => \%class_features_p14ex,
   '17xxxx'   => \%class_features_p16,
   '18xxxx'   => \%class_features_p16e,
+  '18XVxx'   => \%class_features_p16ev,
   'sx'       => \%class_features_sx
-  );
+);
 
-my %lost_devices =
-  (
+my %lost_devices = (
   '16c52'    => \%class_features_p12,
   '16c54b'   => \%class_features_p12,
   '16c61'    => \%class_features_p14,
@@ -428,7 +440,7 @@ my %lost_devices =
   '17cr43'   => \%class_features_p16,
   'hcs1365'  => \%class_features_p12,
   'hcs1370'  => \%class_features_p12
-  );
+);
 
 # From the gputils/libgputils/gpprocessor.h header.
 use constant PIC16E_FLAG_HAVE_EXTINST => (1 << 0);

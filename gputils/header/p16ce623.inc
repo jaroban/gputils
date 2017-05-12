@@ -1,10 +1,10 @@
         LIST
 
 ;==========================================================================
-; Build date : Oct 21 2015
+; Build date : Mar 21 2017
 ;  MPASM PIC16CE623 processor include
 ; 
-;  (c) Copyright 1999-2015 Microchip Technology, All rights reserved
+;  (c) Copyright 1999-2017 Microchip Technology, All rights reserved
 ;==========================================================================
 
         NOLIST
@@ -79,6 +79,9 @@ IRP              EQU  H'0007'
 
 RP0              EQU  H'0005'
 RP1              EQU  H'0006'
+
+CARRY            EQU  H'0000'
+ZERO             EQU  H'0002'
 
 
 ;----- PORTA Bits -----------------------------------------------------
@@ -214,33 +217,33 @@ VR3              EQU  H'0003'
 
 ; The following is an assignment of address values for all of the
 ; configuration registers for the purpose of table reads
-_CONFIG1         EQU  H'2007'
+_CONFIG1        EQU  H'2007'
 
 ;----- CONFIG1 Options --------------------------------------------------
-_FOSC_LP             EQU  H'3FFC'    ; LP oscillator
-_LP_OSC              EQU  H'3FFC'    ; LP oscillator
-_FOSC_XT             EQU  H'3FFD'    ; XT oscillator
-_XT_OSC              EQU  H'3FFD'    ; XT oscillator
-_FOSC_HS             EQU  H'3FFE'    ; HS oscillator
-_HS_OSC              EQU  H'3FFE'    ; HS oscillator
-_FOSC_RC             EQU  H'3FFF'    ; RC oscillator
-_RC_OSC              EQU  H'3FFF'    ; RC oscillator
+_FOSC_LP             EQU  H'3FFC'; LP oscillator
+_LP_OSC              EQU  H'3FFC'; LP oscillator
+_FOSC_XT             EQU  H'3FFD'; XT oscillator
+_XT_OSC              EQU  H'3FFD'; XT oscillator
+_FOSC_HS             EQU  H'3FFE'; HS oscillator
+_HS_OSC              EQU  H'3FFE'; HS oscillator
+_FOSC_RC             EQU  H'3FFF'; RC oscillator
+_RC_OSC              EQU  H'3FFF'; RC oscillator
 
-_WDTE_OFF            EQU  H'3FFB'    ; WDT disabled
-_WDT_OFF             EQU  H'3FFB'    ; WDT disabled
-_WDTE_ON             EQU  H'3FFF'    ; WDT enabled
-_WDT_ON              EQU  H'3FFF'    ; WDT enabled
+_WDTE_OFF            EQU  H'3FFB'; WDT disabled
+_WDT_OFF             EQU  H'3FFB'; WDT disabled
+_WDTE_ON             EQU  H'3FFF'; WDT enabled
+_WDT_ON              EQU  H'3FFF'; WDT enabled
 
-_PWRTE_ON            EQU  H'3FF7'    ; PWRT enabled
-_PWRTE_OFF           EQU  H'3FFF'    ; PWRT disabled
+_PWRTE_ON            EQU  H'3FF7'; PWRT enabled
+_PWRTE_OFF           EQU  H'3FFF'; PWRT disabled
 
-_CP_ON               EQU  H'00CF'    ; Code protection on
-_CP_OFF              EQU  H'3FFF'    ; Code protection off
+_CP_ON               EQU  H'00CF'; Code protection on
+_CP_OFF              EQU  H'3FFF'; Code protection off
 
-_BOREN_OFF           EQU  H'3FBF'    ; BOR disabled
-_BODEN_OFF           EQU  H'3FBF'    ; BOR disabled
-_BOREN_ON            EQU  H'3FFF'    ; BOR enabled
-_BODEN_ON            EQU  H'3FFF'    ; BOR enabled
+_BOREN_OFF           EQU  H'3FBF'; BOR disabled
+_BODEN_OFF           EQU  H'3FBF'; BOR disabled
+_BOREN_ON            EQU  H'3FFF'; BOR enabled
+_BODEN_ON            EQU  H'3FFF'; BOR enabled
 
 
 ;----- IDLOC Equates --------------------------------------------------
