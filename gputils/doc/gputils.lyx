@@ -74,7 +74,7 @@
 \begin_body
 
 \begin_layout Title
-gputils 1.5.1
+gputils 1.5.2
 \end_layout
 
 \begin_layout Author
@@ -82,7 +82,7 @@ James Bowman, Craig Franklin, David Barnett, Borut Ražem and Molnár Károly
 \end_layout
 
 \begin_layout Date
-2016 Oct 15
+2017 May 13
 \end_layout
 
 \begin_layout Standard
@@ -261,7 +261,7 @@ name "sec:Supported-processors"
 \end_layout
 
 \begin_layout Standard
-The gputils currently supports most processors supported by MPLABX v3.35.
+The gputils currently supports most processors supported by MPLABX v3.61.
  This includes the following processors:
 \begin_inset Newline newline
 \end_inset
@@ -520,18 +520,28 @@ p16f1936       p16f1937       p16f1938       p16f1939       p16f1946
 \begin_inset Newline newline
 \end_inset
 
-p16f15354      p16f15355      p16f18313      p16f18323      p16f18324  
-    p16f18325      
+p16f15324      p16f15325      p16f15344      p16f15345      p16f15354  
+    p16f15355      
 \begin_inset Newline newline
 \end_inset
 
-p16f18326      p16f18344      p16f18345      p16f18346      p16f18854  
-    p16f18855      
+p16f15356      p16f15375      p16f15376      p16f15385      p16f15386  
+    p16f18313      
 \begin_inset Newline newline
 \end_inset
 
-p16f18856      p16f18857      p16f18875      p16f18876      p16f18877  
-    p16f19197      
+p16f18323      p16f18324      p16f18325      p16f18326      p16f18344  
+    p16f18345      
+\begin_inset Newline newline
+\end_inset
+
+p16f18346      p16f18854      p16f18855      p16f18856      p16f18857  
+    p16f18875      
+\begin_inset Newline newline
+\end_inset
+
+p16f18876      p16f18877      p16f19195      p16f19196      p16f19197  
+                   
 \begin_inset Newline newline
 \end_inset
 
@@ -635,18 +645,28 @@ p16lf1934      p16lf1936      p16lf1937      p16lf1938      p16lf1939
 \begin_inset Newline newline
 \end_inset
 
-p16lf1947      p16lf15354     p16lf15355     p16lf18313     p16lf18323 
-    p16lf18324     
+p16lf1947      p16lf15324     p16lf15325     p16lf15344     p16lf15345 
+    p16lf15354     
 \begin_inset Newline newline
 \end_inset
 
-p16lf18325     p16lf18326     p16lf18344     p16lf18345     p16lf18346 
-    p16lf18854     
+p16lf15355     p16lf15356     p16lf15375     p16lf15376     p16lf15385 
+    p16lf15386     
 \begin_inset Newline newline
 \end_inset
 
-p16lf18855     p16lf18856     p16lf18857     p16lf18875     p16lf18876 
-    p16lf18877     
+p16lf18313     p16lf18323     p16lf18324     p16lf18325     p16lf18326 
+    p16lf18344     
+\begin_inset Newline newline
+\end_inset
+
+p16lf18345     p16lf18346     p16lf18854     p16lf18855     p16lf18856 
+    p16lf18857     
+\begin_inset Newline newline
+\end_inset
+
+p16lf18875     p16lf18876     p16lf18877     p16lf19195     p16lf19196 
+    p16lf19197     
 \begin_inset Newline newline
 \end_inset
 

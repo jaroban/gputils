@@ -274,11 +274,38 @@ endif
 ifdef __16F1947
   include <p16f1947.inc>
 endif
+ifdef __16F15324
+  include <p16f15324.inc>
+endif
+ifdef __16F15325
+  include <p16f15325.inc>
+endif
+ifdef __16F15344
+  include <p16f15344.inc>
+endif
+ifdef __16F15345
+  include <p16f15345.inc>
+endif
 ifdef __16F15354
   include <p16f15354.inc>
 endif
 ifdef __16F15355
   include <p16f15355.inc>
+endif
+ifdef __16F15356
+  include <p16f15356.inc>
+endif
+ifdef __16F15375
+  include <p16f15375.inc>
+endif
+ifdef __16F15376
+  include <p16f15376.inc>
+endif
+ifdef __16F15385
+  include <p16f15385.inc>
+endif
+ifdef __16F15386
+  include <p16f15386.inc>
 endif
 ifdef __16F18313
   include <p16f18313.inc>
@@ -324,6 +351,12 @@ ifdef __16F18876
 endif
 ifdef __16F18877
   include <p16f18877.inc>
+endif
+ifdef __16F19195
+  include <p16f19195.inc>
+endif
+ifdef __16F19196
+  include <p16f19196.inc>
 endif
 ifdef __16F19197
   include <p16f19197.inc>
@@ -562,11 +595,38 @@ endif
 ifdef __16LF1947
   include <p16lf1947.inc>
 endif
+ifdef __16LF15324
+  include <p16lf15324.inc>
+endif
+ifdef __16LF15325
+  include <p16lf15325.inc>
+endif
+ifdef __16LF15344
+  include <p16lf15344.inc>
+endif
+ifdef __16LF15345
+  include <p16lf15345.inc>
+endif
 ifdef __16LF15354
   include <p16lf15354.inc>
 endif
 ifdef __16LF15355
   include <p16lf15355.inc>
+endif
+ifdef __16LF15356
+  include <p16lf15356.inc>
+endif
+ifdef __16LF15375
+  include <p16lf15375.inc>
+endif
+ifdef __16LF15376
+  include <p16lf15376.inc>
+endif
+ifdef __16LF15385
+  include <p16lf15385.inc>
+endif
+ifdef __16LF15386
+  include <p16lf15386.inc>
 endif
 ifdef __16LF18313
   include <p16lf18313.inc>
@@ -612,4 +672,13 @@ ifdef __16LF18876
 endif
 ifdef __16LF18877
   include <p16lf18877.inc>
+endif
+ifdef __16LF19195
+  include <p16lf19195.inc>
+endif
+ifdef __16LF19196
+  include <p16lf19196.inc>
+endif
+ifdef __16LF19197
+  include <p16lf19197.inc>
 endif
