@@ -4,7 +4,7 @@
     libgputils/gpprocessor.c, libgputils/gpreg-table.c,
     header/*.inc, lkr/*.lkr:
     Updated with new devices based on the mplabx-3.61.
-    Changed version from 1.5.1 to 1.5.2 .
+    Changed version from 1.5.1 to 1.5.2.
 
 2017-05-12  Molnar Karoly  <molnarkaroly@users.sourceforge.net>
   * configure, configure.ac, libgputils/gpcfg-table.c,

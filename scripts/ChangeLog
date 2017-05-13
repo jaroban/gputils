@@ -1,5 +1,10 @@
 2017-05-13  Molnar Karoly  <molnarkaroly@users.sourceforge.net>
 	* tools/cfg-import.pl,
+	  tools/device-help.pl:
+	  bugfix
+
+2017-05-13  Molnar Karoly  <molnarkaroly@users.sourceforge.net>
+	* tools/cfg-import.pl,
 	  tools/cfg-import.py,
 	  tools/device-help.pl:
 	  Updated based on the mplabx-3.61.

@@ -2216,8 +2216,10 @@ sub read_device_informations()
 
           if ($switch_count == 0)
             {
-            if (($mcu_features->{MCU_CLASS} == PROC_CLASS_PIC14E) && ($directive_addr == 0x8008) &&
-                ! $debug_present)
+            my $mcu_class = $mcu_features->{MCU_CLASS};
+
+            if ((($mcu_class == PROC_CLASS_PIC14E) || ($mcu_class == PROC_CLASS_PIC14EX)) &&
+                ($directive_addr == 0x8008) && ! $debug_present)
               {
               if ($mcu_name ~~ @mcu_missed_debug_0x8008_0x1000)
                 {
