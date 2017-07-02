@@ -321,8 +321,9 @@ extern const struct proc_class proc_class_pic16e;    /* enhanced 16 bit devices 
 #define MAX_NAMES                   3          /* Maximum number of names a processor can have. */
 #define MAX_BADROM                  (1 * 2)    /* Maximum number of BADROM ranges a processor can be initialized with. */
 
-#define PIC16E_FLAG_HAVE_EXTINST    (1 << 0)   /* The device supports the 16 bit extended instruction set. */
-#define PIC16E_FLAG_J_SUBFAMILY     (1 << 1)   /* The device member of the "J" series. (18f..J..) */
+#define CPU_HAVE_EXTINST            (1 << 0)   /* The device supports the 16 bit extended instruction set. */
+#define CPU_18FJ_FAMILY             (1 << 1)   /* The device member of the "J" series. (18f..J..) */
+#define CPU_NO_OPTION_INSN          (1 << 2)   /* This - 14 bits - MCU not have the "option" instruction. */
 
 struct px {
   proc_class_t  class;
@@ -351,8 +352,7 @@ struct px {
   /* Use the gpdasm. */
   const char   *header;
   const char   *script;
-  /* Used ony for the PROC_CLASS_PIC16E class. (PIC16E_FLAG_yyyyy) */
-  unsigned int  pic16e_flags;
+  unsigned int  cpu_flags;
 };
 
 typedef const struct px *pic_processor_t;

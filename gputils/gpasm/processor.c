@@ -138,7 +138,7 @@ select_processor(const char *Name)
     if (found != NULL) {
       if (state.processor == NULL) {
         /* If in extended mode: Check if processor supports extended instruction set. */
-        if (state.extended_pic16e && !(found->pic16e_flags & PIC16E_FLAG_HAVE_EXTINST)) {
+        if (state.extended_pic16e && !(found->cpu_flags & CPU_HAVE_EXTINST)) {
           gpmsg_verror(GPE_NO_EXTENDED_MODE, NULL);
         }
 

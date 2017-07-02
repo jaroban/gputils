@@ -443,8 +443,10 @@ my %lost_devices = (
 );
 
 # From the gputils/libgputils/gpprocessor.h header.
-use constant PIC16E_FLAG_HAVE_EXTINST => (1 << 0);
-use constant PIC16E_FLAG_J_SUBFAMILY  => (1 << 1);
+use constant {
+  CPU_HAVE_EXTINST   => (1 << 0),
+  CPU_18FJ_SUBFAMILY => (1 << 1)
+};
 
 my $name_filter = qr/10l?f\d+[a-z]*|1[26]((c(e|r)?)|hv)\d+[a-z]*|17c\d+[a-z]*|1[268]l?f\d+([a-z]*|[a-z]+\d+[a-z]*)/i;
 
@@ -537,7 +539,7 @@ my $px_struct_end;              # The end of the px structure in the gpprocessor
         IDLOCS_MASK  => 0,
         HEADER       => '',
         SCRIPT       => '',
-        P16E_FLAGS   => 0,
+        CPU_FLAGS    => '',
         COMMENT      => ''              Comment on the end of line.
         }
 =cut
@@ -580,17 +582,17 @@ my $lkr_eeprom_end;
 =back
         The structure of one element of the @mp_mcus arrays:
         {
-        NAME       => '',
-        CLASS      => 0,
-        COFF       => 0,
-        PAGES      => 0,
-        ROM        => 0,
-        FLASHDATA  => 0,
-        EEPROM     => 0,
-        CONFIGS    => 0,
-        BANKS      => 0,
-        ACCESS     => 0,
-        P16E_FLAGS => 0
+        NAME      => '',
+        CLASS     => 0,
+        COFF      => 0,
+        PAGES     => 0,
+        ROM       => 0,
+        FLASHDATA => 0,
+        EEPROM    => 0,
+        CONFIGS   => 0,
+        BANKS     => 0,
+        ACCESS    => 0,
+        CPU_FLAGS => ''
         }
 =cut
 
@@ -1935,25 +1937,25 @@ sub read_all_mcu_info_from_mplabx()
         }
 
       $info = {
-              NAME       => $name,
-              CLASS      => $class,
-              COFF       => $coff,            # Coff ID of device. (16 bit wide)
-              PAGES      => $pages,           # Number of ROM/FLASH pages.
+              NAME      => $name,
+              CLASS     => $class,
+              COFF      => $coff,            # Coff ID of device. (16 bit wide)
+              PAGES     => $pages,           # Number of ROM/FLASH pages.
 
                 # These addresses relative, compared to the beginning of the blocks.
-              ROM        => $rom,             # Last address of ROM/FLASH.
-              FLASHDATA  => $fdata,           # Last address of FLASH Data.
-              EEPROM     => $eeprom,          # Last address of EEPROM.
+              ROM       => $rom,             # Last address of ROM/FLASH.
+              FLASHDATA => $fdata,           # Last address of FLASH Data.
+              EEPROM    => $eeprom,          # Last address of EEPROM.
 
-              CONFIGS    => $configs,         # Number of Configuration bytes/words.
-              BANKS      => $banks,           # Number of RAM Banks.
-              ACCESS     => $split,           # Last address of lower Access RAM of pic18f series.
-              P16E_FLAGS => (($name =~ /^18l?f\d+j\d+/o) ? PIC16E_FLAG_J_SUBFAMILY : 0)
+              CONFIGS   => $configs,         # Number of Configuration bytes/words.
+              BANKS     => $banks,           # Number of RAM Banks.
+              ACCESS    => $split,           # Last address of lower Access RAM of pic18f series.
+              CPU_FLAGS => (($name =~ /^18l?f\d+j\d+/o) ? 'CPU_18FJ_FAMILY' : '0')
               };
       }
     elsif (/^<SWITCH_INFO_TYPE><n?XINST>/io)
       {
-      $info->{P16E_FLAGS} |= PIC16E_FLAG_HAVE_EXTINST if (defined($info));
+      $info->{CPU_FLAGS} = "CPU_HAVE_EXTINST | $info->{CPU_FLAGS}" if (defined($info));
       }
     }
 
@@ -2041,7 +2043,7 @@ sub new_px_row($$$$)
            IDLOCS_MASK  => $class_features_list[$class]->{IDLOCS_MASK},
            HEADER       => $Header,
            SCRIPT       => $Script,
-    	   P16E_FLAGS   => $Info->{P16E_FLAGS},
+    	   CPU_FLAGS    => $Info->{CPU_FLAGS},
            COMMENT      => ''
            };
 
@@ -2198,8 +2200,8 @@ sub extract_px_struct()
         $px_struct_begin = $n;
         }
       }
-        #               $1                $2                 $3            $4            $5                 $6             $7             $8             $9                $10         $11              $12              $13         $14              $15         $16         $17              $18         $19                  $20         $21                  $22         $23                  $24         $25              $26              $27                   $28              $29
-    elsif (/\{\s*(PROC_CLASS_\w+)\s*,\s*"(\w+)"\s*,\s*\{\s*"(\w+)"\s*,\s*"(\w+)"\s*,\s*"(\w+)"\s*}\s*,\s*([\w-]+)\s*,\s*([\w-]+)\s*,\s*([\w-]+)\s*,\s*([\w-]+)\s*,\s*\{\s*(\S+)\s*,\s*(\S+)\s*\}\s*,\s*(\S+)\s*,\s*\{\s*(\S+)\s*,\s*(\S+)\s*\}\s*,\s*(\S+)\s*,\s*(\S+)\s*,\s*(\S+)\s*,\s*\{\s*(\S+)\s*,\s*(\S+)\s*\}\s*,\s*{\s*(\S+)\s*,\s*(\S+)\s*\}\s*,\s*{\s*(\S+)\s*,\s*(\S+)\s*\}\s*,\s*{\s*(\S+)\s*,\s*(\S+)\s*\}\s*,\s*(\w+)\s*,\s*\"?([\.\w]+)\"?\s*,\s*\"?([\.\w]+)\"?\s*,\s*(\d+)\s*\}/iop)
+        #               $1                $2                 $3            $4            $5                 $6             $7             $8             $9                $10         $11              $12              $13         $14              $15         $16         $17              $18         $19                  $20         $21                  $22         $23                  $24         $25              $26              $27                   $28             $29
+    elsif (/\{\s*(PROC_CLASS_\w+)\s*,\s*"(\w+)"\s*,\s*\{\s*"(\w+)"\s*,\s*"(\w+)"\s*,\s*"(\w+)"\s*}\s*,\s*([\w-]+)\s*,\s*([\w-]+)\s*,\s*([\w-]+)\s*,\s*([\w-]+)\s*,\s*\{\s*(\S+)\s*,\s*(\S+)\s*\}\s*,\s*(\S+)\s*,\s*\{\s*(\S+)\s*,\s*(\S+)\s*\}\s*,\s*(\S+)\s*,\s*(\S+)\s*,\s*(\S+)\s*,\s*\{\s*(\S+)\s*,\s*(\S+)\s*\}\s*,\s*{\s*(\S+)\s*,\s*(\S+)\s*\}\s*,\s*{\s*(\S+)\s*,\s*(\S+)\s*\}\s*,\s*{\s*(\S+)\s*,\s*(\S+)\s*\}\s*,\s*(\w+)\s*,\s*\"?([\.\w]+)\"?\s*,\s*\"?([\.\w]+)\"?\s*,\s*(.+)\s*\}/iop)
       {
       my ($class, $long_name, $middle_name, $short_name, $coff, $header, $script) = ($1, $3, $4, $5, str2dec($6), $27, $28);
         # Maybe there is a comment at the end of the line.
@@ -2228,7 +2230,7 @@ sub extract_px_struct()
                IDLOCS_MASK  => str2dec($26),
                HEADER       => $header,
                SCRIPT       => $script,
-               P16E_FLAGS   => str2dec($29),
+               CPU_FLAGS    => $29,
                COMMENT      => ''
                };
 
@@ -2359,7 +2361,7 @@ EOT
       printf "idlocs_mask : 0x%04X\n", $_->{IDLOCS_MASK};
       print  "header      : $_->{HEADER}\n";
       print  "script      : $_->{SCRIPT}\n";
-      print  "pic16e_flags: $_->{P16E_FLAGS}\n";
+      print  "cpu_flags   : $_->{CPU_FLAGS}\n";
       }
     else
       {
@@ -2474,8 +2476,8 @@ sub create_one_px_row($$)
   $line .= sprintf('%-19s, ', (($i ne 'NULL') ? "\"$i\"" : $i));
   $i = $Row->{SCRIPT};
   $line .= sprintf('%-20s, ', (($i ne 'NULL') ? "\"$i\"" : $i));
-  $i = $Row->{P16E_FLAGS};
-  $line .= sprintf('%i },', $i);
+  $i = $Row->{CPU_FLAGS};
+  $line .= sprintf('%s },', $i);
 
   $line = "/*$line*/" if ($Row->{IGNORED});
 

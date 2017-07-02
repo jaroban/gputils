@@ -8276,6 +8276,11 @@ opcode_init(int Stage)
             gp_sym_annotate_symbol(sym, (void *)&op_sx_mode);
           }
         }
+        else if ((IS_PIC14E_CORE) || (IS_PIC14EX_CORE)) {
+          if (state.processor->cpu_flags & CPU_NO_OPTION_INSN) {
+            gp_sym_remove_symbol(state.stBuiltin, "option");
+          }
+        }
         else if ((IS_PIC12E_CORE) || (IS_PIC12I_CORE)) {
           gp_sym_remove_symbol(state.stBuiltin, "return");
           for (i = 0; i < num_op_16c5xx_enh; i++) {
@@ -8291,7 +8296,7 @@ opcode_init(int Stage)
       }
 
       break;
-    }
+    } /* case 2: */
   }
 }
 

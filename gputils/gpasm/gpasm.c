@@ -367,10 +367,10 @@ _pic16e_lister(pic_processor_t Processor)
   if ((addr0 > 0) && (addr1 >= addr0)) {
     printf("configrange 0x%06X 0x%06X\n", addr0, addr1);
     gp_cfg_brief_device(dev, "configword  ", class->addr_digits, class->config_digits,
-                        (Processor->pic16e_flags & PIC16E_FLAG_J_SUBFAMILY) ? true : false);
+                        (Processor->cpu_flags & CPU_18FJ_FAMILY) ? true : false);
   }
 
-  if (Processor->pic16e_flags & PIC16E_FLAG_HAVE_EXTINST) {
+  if (Processor->cpu_flags & CPU_HAVE_EXTINST) {
     printf("XINST       1\n");
   }
 

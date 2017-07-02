@@ -35,6 +35,7 @@ typedef struct gp_coffsymbol {
 extern gp_object_t *gp_coffgen_new_object(const char *File_name);
 extern void gp_coffgen_transfer_object_data(gp_object_t *Receiver, gp_object_t *Sender);
 extern gp_boolean gp_coffgen_update_all_object_id(gp_object_t *Object);
+extern size_t gp_coffgen_number_of_symbols(const gp_object_t *Object);
 
     /*................................*/
 

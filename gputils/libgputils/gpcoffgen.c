@@ -121,6 +121,26 @@ gp_coffgen_update_all_object_id(gp_object_t *Object)
 
 /*------------------------------------------------------------------------------------------------*/
 
+/* Returns the real number of symbols in this object. */
+
+size_t
+gp_coffgen_number_of_symbols(const gp_object_t* Object)
+{
+  const gp_symbol_t* symbol;
+  size_t             num;
+
+  num    = 0;
+  symbol = Object->symbol_list.first;
+  while (symbol != NULL) {
+    num   += 1 + symbol->aux_list.num_nodes;
+    symbol = symbol->next;
+  }
+
+  return num;
+}
+
+/*------------------------------------------------------------------------------------------------*/
+
 /* Find a "Name" section from the given starting section. */
 
 gp_section_t *
