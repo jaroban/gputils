@@ -55,7 +55,6 @@ static struct option longopts[] =
   { NULL,        no_argument, NULL, '\0'}
 };
 
-static char          filename[PATH_MAX];
 static FILE         *code_file;
 static DirBlockInfo *main_dir;
 
@@ -86,8 +85,9 @@ int
 main(int argc, char *argv[])
 {
   int             c;
-  gp_boolean      usage = false;
+  gp_boolean      usage;
   int             display_flags;
+  char           *file_name;
 
   char            processor_name[COD_DIR_PROCESSOR_LENGTH + 1];
   pic_processor_t processor_info;
@@ -95,6 +95,8 @@ main(int argc, char *argv[])
 
   gp_init();
 
+  usage         = false;
+  file_name     = NULL;
   display_flags = DISPLAY_NOTHING;
   while ((c = getopt_long(argc, argv, GET_OPTIONS, longopts, NULL)) != EOF) {
     switch (c) {
@@ -142,7 +144,7 @@ main(int argc, char *argv[])
   }
 
   if ((optind + 1) == argc) {
-    strncpy(filename, argv[optind], sizeof(filename));
+    file_name = GP_Strdup(argv[optind]);
   }
   else {
     usage = true;
@@ -156,11 +158,13 @@ main(int argc, char *argv[])
     _show_usage();
   }
 
-  code_file = fopen(filename, "rb");
+  code_file = fopen(file_name, "rb");
   if (code_file == NULL) {
-    perror(filename);
+    perror(file_name);
     exit(1);
   }
+
+  free(file_name);
 
   /* Start off by reading the directory block. */
   main_dir = read_directory(code_file);

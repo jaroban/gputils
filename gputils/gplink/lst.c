@@ -41,35 +41,50 @@ static const gp_section_t *line_section;
 static void
 _open_source(const char *Name, gp_symbol_t *Symbol)
 {
-  char            file_name[PATH_MAX + 1];
+  char           *full_name;
   list_context_t *new;
   int             i;
+  int             len;
   const char     *p;
 
   assert(Name != NULL);
 
+  full_name = NULL;
   new = GP_Malloc(sizeof(*new));
   new->f = fopen(Name, "rt");
   if (new->f == NULL) {
     /* Try searching include pathes. */
     for (i = 0; i < state.num_paths; i++) {
-      snprintf(file_name, sizeof(file_name), "%s" PATH_SEPARATOR_STR "%s", state.paths[i], Name);
-      new->f = fopen(file_name, "rb");
+      len = snprintf(NULL, 0, "%s" PATH_SEPARATOR_STR "%s", state.paths[i], Name);
+      assert(len > 0);
+
+      ++len;
+      full_name = GP_Realloc(full_name, (size_t)len);
+      snprintf(full_name, (size_t)len, "%s" PATH_SEPARATOR_STR "%s", state.paths[i], Name);
+
+      new->f = fopen(full_name, "rb");
       if (new->f != NULL) {
-        Name = file_name;
+        Name = full_name;
         break;
       }
     }
+
     if (new->f == NULL) {
       /* The path may belong to a build procedure other than this. */
       p = strrchr(Name, PATH_SEPARATOR_CHAR);
 
       if (p != NULL) {
         for (i = 0; i < state.num_paths; i++) {
-          snprintf(file_name, sizeof(file_name), "%s%s", state.paths[i], p);
-          new->f = fopen(file_name, "rb");
+          len = snprintf(NULL, 0, "%s%s", state.paths[i], p);
+          assert(len > 0);
+
+          ++len;
+          full_name = GP_Realloc(full_name, (size_t)len);
+          snprintf(full_name, (size_t)len, "%s%s", state.paths[i], p);
+
+          new->f = fopen(full_name, "rb");
           if (new->f != NULL) {
-            Name = file_name;
+            Name = full_name;
             break;
           }
         }
@@ -87,6 +102,10 @@ _open_source(const char *Name, gp_symbol_t *Symbol)
     if (getenv("GPUTILS_WARN_MISSING_SRC") != NULL) {
       gp_warning("Cannot find source file: \"%s\"", Name);
     }
+  }
+
+  if (full_name != NULL) {
+    free(full_name);
   }
 
   new->symbol      = Symbol;

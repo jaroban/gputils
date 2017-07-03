@@ -79,17 +79,28 @@ file_add(unsigned int Type, const char *Name)
 void
 file_search_paths(source_context_t *Context, const char *Name)
 {
-  char tryname[PATH_MAX + 1];
-  int  i;
+  char *full_name;
+  int   i;
+  int   len;
 
+  full_name = NULL;
   for (i = 0; i < state.num_paths; i++) {
-    snprintf(tryname, sizeof(tryname), "%s" PATH_SEPARATOR_STR "%s", state.paths[i], Name);
-    Context->f = fopen(tryname, "rt");
+    len = snprintf(NULL, 0, "%s" PATH_SEPARATOR_STR "%s", state.paths[i], Name);
+    assert(len > 0);
 
+    ++len;
+    full_name = GP_Realloc(full_name, (size_t)len);
+    snprintf(full_name, (size_t)len, "%s" PATH_SEPARATOR_STR "%s", state.paths[i], Name);
+
+    Context->f = fopen(full_name, "rt");
     if (Context->f != NULL) {
-      Context->name = GP_Strdup(tryname);
+      Context->name = GP_Strdup(full_name);
       break;
     }
+  }
+
+  if (full_name != NULL) {
+    free(full_name);
   }
 }
 

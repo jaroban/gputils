@@ -478,19 +478,24 @@ gplink_open_coff(const char *Name)
   gp_object_t  *object;
   gp_archive_t *archive;
   FILE         *coff;
-  char          file_name[PATH_MAX + 1];
+  char         *full_name;
+  int           i;
+  int           len;
 
-  strncpy(file_name, Name, sizeof(file_name));
+  full_name = GP_Strdup(Name);
 
-  coff = fopen(file_name, "rb");
-  if ((coff == NULL) && (strchr(file_name, PATH_SEPARATOR_CHAR) == 0)) {
+  coff = fopen(full_name, "rb");
+  if ((coff == NULL) && (strchr(full_name, PATH_SEPARATOR_CHAR) == NULL)) {
     /* If no PATH_SEPARATOR_CHAR in name, try searching include pathes. */
-    int i;
-
     for (i = 0; i < state.num_paths; i++) {
-      snprintf(file_name, sizeof(file_name), "%s" PATH_SEPARATOR_STR "%s", state.paths[i], Name);
-      coff = fopen(file_name, "rb");
+      len = snprintf(NULL, 0, "%s" PATH_SEPARATOR_STR "%s", state.paths[i], Name);
+      assert(len > 0);
 
+      ++len;
+      full_name = GP_Realloc(full_name, (size_t)len);
+      snprintf(full_name, (size_t)len, "%s" PATH_SEPARATOR_STR "%s", state.paths[i], Name);
+
+      coff = fopen(full_name, "rb");
       if (coff != NULL) {
         break;
       }
@@ -504,32 +509,34 @@ gplink_open_coff(const char *Name)
 
   /* FIXME: Three files are opened, surely one is sufficent. */
 
-  switch (gp_identify_coff_file(file_name)) {
+  switch (gp_identify_coff_file(full_name)) {
     case GP_COFF_OBJECT_V2:
     case GP_COFF_OBJECT:
       /* read the object */
-      object = gp_read_coff(file_name);
-      /*object_append(object, file_name);*/
+      object = gp_read_coff(full_name);
+      /*object_append(object, full_name);*/
       _object_append(object);
       break;
 
     case GP_COFF_ARCHIVE:
       /* read the archive */
-      archive = gp_archive_read(file_name);
-      _archive_append(archive, file_name);
+      archive = gp_archive_read(full_name);
+      _archive_append(archive, full_name);
       break;
 
     case GP_COFF_SYS_ERR:
-      gp_error("Can't open file \"%s\".", file_name);
+      gp_error("Can't open file \"%s\".", full_name);
       break;
 
     case GP_COFF_UNKNOWN:
-      gp_error("\"%s\" is not a valid coff object or archive.", file_name);
+      gp_error("\"%s\" is not a valid coff object or archive.", full_name);
       break;
 
     default:
       assert(0);
   }
+
+  free(full_name);
 }
 
 /*------------------------------------------------------------------------------------------------*/

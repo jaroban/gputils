@@ -1,5 +1,13 @@
+2017-07-03  Molnar Karoly  <molnarkaroly@users.sourceforge.net>
+  * gpasm/file.c,
+    gplink/gplink.c,
+    gplink/lst.c,
+    gputils/gpvc.c:
+    Applied patch: "#71 Eliminate PATH_MAX"
+    Thanks to Philipp Klaus Krause.
+
 2017-07-02  Molnar Karoly  <molnarkaroly@users.sourceforge.net>
-    libgputils/gpcoffgen.c,
+  * libgputils/gpcoffgen.c,
     libgputils/gpcoffgen.h,
     libgputils/gpwriteobj.c,
     libgputils/gpwriteobj.h:
