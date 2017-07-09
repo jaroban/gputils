@@ -121,26 +121,6 @@ gp_coffgen_update_all_object_id(gp_object_t *Object)
 
 /*------------------------------------------------------------------------------------------------*/
 
-/* Returns the real number of symbols in this object. */
-
-size_t
-gp_coffgen_number_of_symbols(const gp_object_t* Object)
-{
-  const gp_symbol_t* symbol;
-  size_t             num;
-
-  num    = 0;
-  symbol = Object->symbol_list.first;
-  while (symbol != NULL) {
-    num   += 1 + symbol->aux_list.num_nodes;
-    symbol = symbol->next;
-  }
-
-  return num;
-}
-
-/*------------------------------------------------------------------------------------------------*/
-
 /* Find a "Name" section from the given starting section. */
 
 gp_section_t *
@@ -366,7 +346,7 @@ gp_coffgen_del_section_symbols(gp_object_t *Object, gp_section_t *Section)
     list   = list->next;
 
     if (symbol->section == Section) {
-      gp_coffgen_del_symbol(Object, symbol);
+      gp_coffgen_del_symbol(Object, symbol, true);
     }
   }
 }
@@ -752,8 +732,10 @@ gp_coffgen_move_reserve_symbol(gp_object_t *Object, gp_symbol_t *Symbol)
 /* Delete the symbol from the object. */
 
 gp_boolean
-gp_coffgen_del_symbol(gp_object_t *Object, gp_symbol_t *Symbol)
+gp_coffgen_del_symbol(gp_object_t *Object, gp_symbol_t *Symbol, gp_boolean Touch_number)
 {
+  unsigned int n_deleted;
+
   if (Object->symbol_list.first == NULL) {
     return false;
   }
@@ -765,7 +747,13 @@ gp_coffgen_del_symbol(gp_object_t *Object, gp_symbol_t *Symbol)
   }
 
   gp_list_node_remove(&Object->symbol_list, Symbol);
-  Object->num_symbols -= 1 + gp_coffgen_free_symbol(Symbol);
+
+  n_deleted = 1 + gp_coffgen_free_symbol(Symbol);
+
+  if (Touch_number) {
+    Object->num_symbols -= n_deleted;
+  }
+
   return true;
 }
 

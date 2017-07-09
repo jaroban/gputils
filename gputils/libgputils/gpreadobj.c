@@ -648,7 +648,7 @@ _clean_symbol_table(gp_object_t *Object)
       for (i = 0; i < curr_symbol->aux_list.num_nodes; ++i) {
         aux_symbol  = next_symbol;
         next_symbol = next_symbol->next;
-        gp_coffgen_del_symbol(Object, aux_symbol);
+        gp_coffgen_del_symbol(Object, aux_symbol, false);
       }
     }
     curr_symbol = curr_symbol->next;

@@ -161,8 +161,6 @@ _add_name(const char *Name, uint8_t *Table, FILE *Fp)
 static void
 _write_file_header(const gp_object_t *Object, FILE *Fp)
 {
-  uint32_t num_symbols;
-
   /* 'f_magic'  -- magic number */
   gp_fputl16((Object->isnew ? MICROCHIP_MAGIC_v2 : MICROCHIP_MAGIC_v1), Fp);
   /* 'f_nscns'  -- number of sections */
@@ -172,9 +170,7 @@ _write_file_header(const gp_object_t *Object, FILE *Fp)
   /* 'f_symptr' -- file ptr to symtab */
   gp_fputl32(Object->symbol_ptr, Fp);
   /* 'f_nsyms'  -- # symtab entries */
-/*  gp_fputl32(Object->num_symbols, Fp);*/
-  num_symbols = (uint32_t)gp_coffgen_number_of_symbols(Object);
-  gp_fputl32(num_symbols, Fp);
+  gp_fputl32(Object->num_symbols, Fp);
   /* 'f_opthdr' -- sizeof(opt hdr) */
   gp_fputl16((Object->isnew ? OPT_HDR_SIZ_v2: OPT_HDR_SIZ_v1), Fp);
   /* 'f_flags'  -- flags */

@@ -35,7 +35,6 @@ typedef struct gp_coffsymbol {
 extern gp_object_t *gp_coffgen_new_object(const char *File_name);
 extern void gp_coffgen_transfer_object_data(gp_object_t *Receiver, gp_object_t *Sender);
 extern gp_boolean gp_coffgen_update_all_object_id(gp_object_t *Object);
-extern size_t gp_coffgen_number_of_symbols(const gp_object_t *Object);
 
     /*................................*/
 
@@ -74,7 +73,7 @@ extern gp_symbol_t *gp_coffgen_add_symbol(gp_object_t *Object, const char *Name,
 extern gp_aux_t *gp_coffgen_add_aux(gp_object_t *Object, gp_symbol_t *Symbol);
 extern gp_aux_t *gp_coffgen_make_block_aux(gp_symbol_t *Symbol, unsigned int Num_auxsyms);
 extern gp_symbol_t *gp_coffgen_move_reserve_symbol(gp_object_t *Object, gp_symbol_t *Symbol);
-extern gp_boolean gp_coffgen_del_symbol(gp_object_t *Object, gp_symbol_t *Symbol);
+extern gp_boolean gp_coffgen_del_symbol(gp_object_t *Object, gp_symbol_t *Symbol, gp_boolean Touch_number);
 extern gp_symbol_t **gp_coffgen_make_symbol_array(const gp_object_t *Object, int (*Cmp)(const void *, const void *));
 extern const char *gp_coffgen_symbol_type_to_str(uint8_t Type);
 extern const char *gp_coffgen_symbol_derived_type_to_str(uint32_t Type);

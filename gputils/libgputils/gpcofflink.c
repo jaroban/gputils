@@ -218,7 +218,7 @@ gp_cofflink_clean_table(gp_object_t *Object, symbol_table_t *Symbols)
 
     if (gp_coffgen_is_external_symbol(symbol)) {
       gp_debug("  removed symbol \"%s\"", symbol->name);
-      gp_coffgen_del_symbol(Object, symbol);
+      gp_coffgen_del_symbol(Object, symbol, true);
     }
 
     symbol = next;
@@ -276,7 +276,7 @@ gp_cofflink_combine_overlay(gp_object_t *Object, gp_boolean Remove_symbol)
 
         /* Remove the section symbol. */
         if (Remove_symbol) {
-          gp_coffgen_del_symbol(Object, second->symbol);
+          gp_coffgen_del_symbol(Object, second->symbol, true);
         }
 
         /* Update the symbol table */

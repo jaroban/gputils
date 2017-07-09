@@ -92,7 +92,7 @@ _conditional_remove(gp_symbol_t *Symbol)
       gp_message("removing symbol \"%s\"", Symbol->name);
     }
 
-    gp_coffgen_del_symbol(state.object, Symbol);
+    gp_coffgen_del_symbol(state.object, Symbol, true);
   }
 }
 
