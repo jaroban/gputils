@@ -28,7 +28,6 @@ Boston, MA 02111-1307, USA.  */
 #include "gpmsg.h"
 #include "directive.h"
 #include "coff.h"
-#include "symbol_list.h"
 
 #define STR_INHX8M                  "inhx8m"
 #define STR_INHX8S                  "inhx8s"
@@ -670,11 +669,12 @@ void
 set_global(const char *Name, gpasmVal Value, enum gpasmValTypes Type, gp_boolean Proc_dependent,
            gp_boolean Has_no_value)
 {
-  symbol_t     *sym;
-  variable_t   *var;
-  unsigned int  flags;
-  int           section_number;
-  unsigned int  class;
+  symbol_t*    sym;
+  variable_t*  var;
+  unsigned int flags;
+  int          section_number;
+  unsigned int class;
+  char*        coff_name;
 
   /* Search the entire stack (i.e. include macro's local symbol tables) for the symbol.
      If not found, then add it to the global symbol table.  */
@@ -702,8 +702,6 @@ set_global(const char *Name, gpasmVal Value, enum gpasmValTypes Type, gp_boolean
     gp_sym_annotate_symbol(sym, var);
 
     if (set_symbol_attr(&section_number, &class, Type)) {
-      /* Gives to the list the properties of this prospective symbol. */
-      symbol_list_add_symbol(sym, Name, state.obj.symbol_num, section_number, class, state.byte_addr);
       /* Increment the index into the coff symbol table for the relocations. */
       state.obj.symbol_num++;
     }
@@ -729,6 +727,13 @@ set_global(const char *Name, gpasmVal Value, enum gpasmValTypes Type, gp_boolean
     }
     else if (var->value != Value) {
       gpmsg_verror(GPE_DIFFLAB, NULL, Name);
+    }
+
+    coff_name = coff_local_name(Name);
+    coff_add_sym(coff_name, Value, var->type, state.obj.section_num);
+
+    if (coff_name != NULL) {
+      free(coff_name);
     }
   }
 }

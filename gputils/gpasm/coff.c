@@ -89,15 +89,11 @@ _new_config_section(const char *Name, unsigned int Address, unsigned int Flags, 
   state.obj.flags = Flags;
 
   if (!state.obj.enabled) {
-    symbol_list_add_symbol(NULL, Name, state.obj.symbol_num - 2, state.obj.section_num, C_SECTION,
-                           state.byte_addr);
     state.byte_addr = Address;
     return;
   }
 
   assert(state.obj.object != NULL);
-
-  symbol_list_flush_symbols(Name);
 
   state.obj.section                 = gp_coffgen_add_section(state.obj.object, Name, Data);
   state.obj.section->address        = Address;
@@ -199,8 +195,6 @@ coff_cleanup_before_eof(void)
   /* store data from the last section */
   coff_close_section();
 
-  symbol_list_flush_symbols(NULL);
-
   /* update relocation symbol pointers */
   _update_reloc_ptr();
 
@@ -248,15 +242,11 @@ coff_new_section(const char *Name, unsigned int Address, unsigned int Flags)
   state.obj.flags = Flags;
 
   if (!state.obj.enabled) {
-    symbol_list_add_symbol(NULL, Name, state.obj.symbol_num - 2, state.obj.section_num, C_SECTION,
-                           state.byte_addr);
     state.byte_addr = Address;
     return;
   }
 
   assert(state.obj.object != NULL);
-
-  symbol_list_flush_symbols(Name);
 
   /* store data from the last section */
   coff_close_section();
@@ -446,7 +436,6 @@ coff_add_file_sym(const char *File_name, gp_boolean Is_include)
   state.obj.symbol_num += 2;
 
   if (!state.obj.enabled) {
-    symbol_list_add_symbol(NULL, ".file", state.obj.symbol_num - 2, 0, C_FILE, state.byte_addr);
     return NULL;
   }
 
@@ -481,11 +470,8 @@ coff_add_eof_sym(void)
   state.obj.symbol_num++;
 
   if (!state.obj.enabled) {
-    symbol_list_add_symbol(NULL, ".eof", state.obj.symbol_num - 1, 0, C_EOF, state.byte_addr);
     return;
   }
-
-  symbol_list_flush_symbols(".eof");
 
   /* add .eof symbol */
   symbol = gp_coffgen_add_symbol(state.obj.object, ".eof", N_DEBUG);
@@ -508,12 +494,8 @@ coff_add_list_sym(void)
   state.obj.symbol_num++;
 
   if (!state.obj.enabled) {
-    symbol_list_add_symbol(NULL, ".list", state.obj.symbol_num - 1, state.obj.section_num, C_LIST,
-                           state.byte_addr);
     return;
   }
-
-  symbol_list_flush_symbols(".list");
 
   /* add .list symbol */
   symbol = gp_coffgen_add_symbol(state.obj.object, ".list", N_DEBUG);
@@ -537,12 +519,8 @@ coff_add_nolist_sym(void)
   state.obj.symbol_num++;
 
   if (!state.obj.enabled) {
-    symbol_list_add_symbol(NULL, ".nolist", state.obj.symbol_num - 1, state.obj.section_num, C_LIST,
-                           state.byte_addr);
     return;
   }
-
-  symbol_list_flush_symbols(".nolist");
 
   /* add .nolist symbol */
   symbol = gp_coffgen_add_symbol(state.obj.object, ".nolist", N_DEBUG);
@@ -563,12 +541,8 @@ coff_add_direct_sym(uint8_t Command, const char *String)
   state.obj.symbol_num += 2;
 
   if (!state.obj.enabled) {
-    symbol_list_add_symbol(NULL, ".direct", state.obj.symbol_num - 2, state.obj.section_num, C_NULL,
-                           state.byte_addr);
     return;
   }
-
-  symbol_list_flush_symbols(".direct");
 
   /* add .direct symbol */
   symbol = gp_coffgen_add_symbol(state.obj.object, ".direct", state.obj.section_num);
@@ -593,12 +567,8 @@ coff_add_ident_sym(const char *String)
 
   state.obj.symbol_num += 2;
   if (!state.obj.enabled) {
-    symbol_list_add_symbol(NULL, ".ident", state.obj.symbol_num - 2, state.obj.section_num, C_NULL,
-                           state.byte_addr);
     return;
   }
-
-  symbol_list_flush_symbols(".ident");
 
   /* add .ident symbol */
   symbol = gp_coffgen_add_symbol(state.obj.object, ".ident", N_DEBUG);

@@ -2210,7 +2210,7 @@ _do_db(gpasmVal Value, const char *Name, int Arity, pnode_t *Parms)
       org = gp_processor_insn_from_byte_p(state.processor, begin_byte_addr);
 
       if ((gp_processor_is_config_org(state.processor, org) < 0) &&
-          (gp_processor_is_idlocs_org(state.processor, org) < 0) && 
+          (gp_processor_is_idlocs_org(state.processor, org) < 0) &&
           (gp_processor_is_eeprom_org(state.processor, org) < 0)) {
         if ((state.mode == MODE_ABSOLUTE) || !(SECTION_FLAGS & (STYP_DATA | STYP_BPACK))) {
           if ((state.byte_addr - begin_byte_addr) & 1) {
@@ -2488,7 +2488,6 @@ _do_def(gpasmVal Value, const char *Name, int Arity, pnode_t *Parms)
 
   if ((state.pass == 2) && (new_class || new_type)) {
     /* Up to this point creates each symbol. */
-    symbol_list_flush_symbols(symbol_name);
     coff_symbol = gp_coffgen_find_symbol(state.obj.object, symbol_name);
     assert(coff_symbol != NULL);
 
@@ -2579,8 +2578,6 @@ _do_dim(gpasmVal Value, const char *Name, int Arity, pnode_t *Parms)
 
     if (eval_enforce_simple(p)) {
       symbol_name = PnSymbol(p);
-      /* Up to this point creates each symbol. */
-      symbol_list_flush_symbols(symbol_name);
       /* lookup the symbol */
       coff_symbol = gp_coffgen_find_symbol(state.obj.object, symbol_name);
 
@@ -4746,8 +4743,6 @@ _do_type(gpasmVal Value, const char *Name, int Arity, pnode_t *Parms)
 
     if (eval_enforce_simple(p)) {
       symbol_name = PnSymbol(p);
-      /* Up to this point creates each symbol. */
-      symbol_list_flush_symbols(symbol_name);
       coff_symbol = gp_coffgen_find_symbol(state.obj.object, symbol_name);
 
       if (coff_symbol == NULL) {

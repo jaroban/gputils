@@ -22,8 +22,6 @@ Boston, MA 02111-1307, USA.  */
 #ifndef __GPASM_H__
 #define __GPASM_H__
 
-#include "symbol_list.h"
-
 #define GPASM_VERSION_STRING        ("gpasm-" VERSION " #" @REVISION@ " (" __DATE__ ")")
 
 /* This symbol will get placed into the symbol table for the 16bit cores
@@ -363,7 +361,6 @@ extern struct gpasm_state {
     gp_symbol_t  *debug_file;           /*   Debug information for high level langs. */
     unsigned int  debug_line;
     gp_boolean    newcoff;
-    symbol_list_t symbol_fifo;
   } obj;
 
   source_context_list_t  src_list;      /* The stack of source files. */

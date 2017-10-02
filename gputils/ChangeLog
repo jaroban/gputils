@@ -1,3 +1,17 @@
+2017-10-02  Molnar Karoly  <molnarkaroly@users.sourceforge.net>
+  * gpasm/Makefile.am,
+    gpasm/Makefile.in,
+    gpasm/coff.c,
+    gpasm/directive.c,
+    gpasm/gpasm.c,
+    gpasm/gpasm.h.in,
+    gpasm/symbol_list.c,
+    gpasm/symbol_list.h,
+    gpasm/util.c:
+    I dropped the entire symbol FIFO.
+    Fixed bug: "#305 warning: Relocation symbol ".file" ..."
+    Thanks to Gál Zsolt.
+
 2017-07-10  Molnar Karoly  <molnarkaroly@users.sourceforge.net>
   * gputils/gpstrip.c,
     libgputils/gpcoffgen.c,
