@@ -206,7 +206,7 @@ gp_cod_write_code(proc_class_t Class, const MemBlock_t *Mem, DirBlockInfo *Main)
 
     for (i = mem_base; (i - mem_base) <= I_MEM_MAX; i += 2) {
       if (((i - mem_base) < I_MEM_MAX) &&
-          (Class->i_memory_get(Mem, i, &insn, NULL, NULL) == W_USED_ALL)) {
+          (Class->i_memory_get(Mem, i, &insn, NULL, NULL))) {
         gp_cod_emit_opcode(dbi, i, insn);
 
         if (!used_flag) {
