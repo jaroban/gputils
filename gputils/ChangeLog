@@ -1,3 +1,29 @@
+2018-10-15  Molnar Karoly  <molnarkaroly@users.sourceforge.net>
+  * header/Makefile.am,
+    header/Makefile.in,
+    header/p18f24q10.inc,
+    header/p18f25q10.inc,
+    header/p18f26q10.inc,
+    header/p18f45q10.inc,
+    header/p18f46q10.inc,
+    libgputils/gpcfg-table.c,
+    libgputils/gpcfg.h,
+    libgputils/gpprocessor.c,
+    libgputils/gpreg-table.c,
+    libgputils/gpregister.h,
+    lkr/Makefile.am,
+    lkr/Makefile.in,
+    lkr/18f24q10_g.lkr,
+    lkr/18f25q10_g.lkr,
+    lkr/18f26q10_g.lkr,
+    lkr/18f45q10_g.lkr,
+    lkr/18f46q10_g.lkr:
+    Added patch: "#72 Add PIC18F Q10 devices"
+    Thanks to Jacques Gagnon.
+
+  * doc/gpdasm_sample.ulist:
+    Fixed a typo.
+
 2018-07-20  Molnar Karoly  <molnarkaroly@users.sourceforge.net>
   * libgputils/gpcod.c:
     Fixed bug: "#310 gplink 1.5.0 not generating correct .cod files"

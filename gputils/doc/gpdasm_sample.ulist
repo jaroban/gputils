@@ -113,6 +113,6 @@ Program_ID = 0     ; 0 and not 0x2100 (case of the pic12f683) !!!
 
 String0 = 0x20 + 0 * STEP # 6   ; STEP <== From the GLOBAL area.
 String1 = 0x20 + 1 * STEP # 6
-String2 = String2 + STEP # 6
+String2 = String1 + STEP # 6
 String3 = 0x20 + 3 * STEP # 6
 String4 = 0x20 + 4 * STEP # 6

@@ -1,8 +1,8 @@
-#!/usr/bin/perl -w
+#!/usr/bin/env perl
 
 =back
 
-   Copyright (C) 2012-2017 Molnar Karoly <molnarkaroly@users.sf.net>
+   Copyright (C) 2012-2018 Molnar Karoly <molnarkaroly@users.sf.net>
 
     This file is part of gputils.
 
@@ -1041,7 +1041,7 @@ sub read_config_bits($$$)
   {
   my ($Info, $Mcu, $Configs) = @_;
   my $addr = 0;
-  my $config_count = 0;
+  my $directive_count = 0;
   my $switch_count = 0;
   my $switch_name;
   my $setting_count = 0;
@@ -1086,17 +1086,69 @@ sub read_config_bits($$$)
 
     if ($fields[0] eq 'PART_INFO_TYPE')
       {
-        # <PART_INFO_TYPE><f220><PIC10F220><16c5x><0><0><ff><1><1f><0><0><0><1>
-        # <PART_INFO_TYPE><f527><PIC16F527><16c5ie><0><2><3ff><4><1f><0><0><3f><1>
-        # <PART_INFO_TYPE><e529><PIC12F529T39A><16c5xe><0><3><5ff><8><1f><0><0><3f><1>
-        # <PART_INFO_TYPE><6628><PIC16F628><16xxxx><0><1><7ff><4><7f><7f><0><0><1>
-        # <PART_INFO_TYPE><a829><PIC16LF1829><16Exxx><2><4><1fff><20><7f><ff><0><0><2>
-        # <PART_INFO_TYPE><8857><PIC16F18857><16EXxx><2><10><7fff><40><7f><0><0><ff><5>
-        # <PART_INFO_TYPE><1330><PIC18F1330><18xxxx><6><1><1fff><10><ff><7f><7f><0><c>
+        #
+        # Old format
+        #
+        #        0          1        2            3     4  5   6     7   8   9   10  11  12
+        #        |          |        |            |     |  |   |     |   |   |   |   |   |
+        #        V          V        V            V     V  V   V     V   V   V   V   V   V
+        # <PART_INFO_TYPE><f220><PIC10F220>    <16c5x> <0><0> <ff>  <1> <1f><0> <0> <0> <1>
+        # <PART_INFO_TYPE><f527><PIC16F527>    <16c5ie><0><2> <3ff> <4> <1f><0> <0> <3f><1>
+        # <PART_INFO_TYPE><e529><PIC12F529T39A><16c5xe><0><3> <5ff> <8> <1f><0> <0> <3f><1>
+        # <PART_INFO_TYPE><6628><PIC16F628>    <16xxxx><0><1> <7ff> <4> <7f><7f><0> <0> <1>
+        # <PART_INFO_TYPE><a829><PIC16LF1829>  <16Exxx><2><4> <1fff><20><7f><ff><0> <0> <2>
+        # <PART_INFO_TYPE><8857><PIC16F18857>  <16EXxx><2><10><7fff><40><7f><0> <0> <ff><5>
+        # <PART_INFO_TYPE><1330><PIC18F1330>   <18xxxx><6><1> <1fff><10><ff><7f><7f><0> <c>
+        #
+        #  0: Microchip info ID
+        #  1: Device COFF ID
+        #  2: Device Name
+        #  3: Device Family
+        #  4: Feature Bitmask: 0x04 -- Have XINST
+        #  5: Number of the ROM/FLASH pages (in hexadecimal)
+        #  6: Last address of ROM/FLASH (in hexadecimal)
+        #  7: Number of RAM Banks (in hexadecimal)
+        #  8: Size of RAM Banks (in hexadecimal)
+        #  9: Size of EEPROM (in hexadecimal)
+        # 10: Split offset of Access Bank in pic18f family (in hexadecimal)
+        # 11: Size of FlashData (in hexadecimal)
+        # 12: Number of Config Registers
+        #
+
+        #
+        # New format
+        #
+        #        0          1        2            3     4  5   6     7   8   9    10    11      12 13
+        #        |          |        |            |     |  |   |     |   |   |    |     |       |  |
+        #        V          V        V            V     V  V   V     V   V   V    V     V       V  V
+        # <PART_INFO_TYPE><f220><PIC10F220>    <16c5x> <0><0> <ff>  <1> <1f><0> <0-0> <0-0>    <0><1>
+        # <PART_INFO_TYPE><f527><PIC16F527>    <16c5ie><0><2> <3ff> <4> <1f><0> <0-0> <0-0>    <0><1>
+        # <PART_INFO_TYPE><e529><PIC12F529T39A><16c5xe><0><3> <5ff> <8> <1f><0> <0-0> <0-0>    <0><1>
+        # <PART_INFO_TYPE><6628><PIC16F628>    <16xxxx><0><1> <7ff> <4> <7f><7f><0-0> <0-0>    <0><1>
+        # <PART_INFO_TYPE><a829><PIC16LF1829>  <16Exxx><2><4> <1fff><20><7f><ff><0-0> <0-0>    <0><2>
+        # <PART_INFO_TYPE><8857><PIC16F18857>  <16EXxx><2><10><7fff><40><7f><ff><0-0> <0-0>    <0><5>
+        # <PART_INFO_TYPE><1330><PIC18F1330>   <18xxxx><6><1> <1fff><10><ff><7f><0-7f><f80-fff><0><c>
+        # <PART_INFO_TYPE><a2a8><PIC18F25Q10>  <18xxxx><6><1> <7fff><10><ff><ff><0-5f><f60-fff><0><c>
+        #
+        #  0: Microchip info ID
+        #  1: Device COFF ID
+        #  2: Device Name
+        #  3: Device Family
+        #  4: Feature Bitmask: 0x04 -- Have XINST
+        #  5: Number of the ROM/FLASH pages (in hexadecimal)
+        #  6: Last address of ROM/FLASH (in hexadecimal)
+        #  7: Number of RAM Banks (in hexadecimal)
+        #  8: Size of RAM Banks (in hexadecimal)
+        #  9: Size of EEPROM/FlashData (in hexadecimal)
+        # 10: Address Range of PIC18F Access RAM Low
+        # 11: Address Range of PIC18F Access RAM High (SFR)
+        # 12: ???
+        # 13: Number of Config Registers
+        #
 
       if (lc($fields[2]) eq $Mcu)
         {
-        $config_count = hex($fields[12]);
+        $directive_count = hex $fields[13];
         $switch_count = 0;
         $setting_count = 0;
         $config_mask = str2class($fields[3])->{CONF_MASK};
@@ -1122,11 +1174,11 @@ sub read_config_bits($$$)
         # <CONFIGREG_INFO_TYPE><2008><0><ffff><0>
         # <CONFIGREG_INFO_TYPE><300001><0><7><3>
 
-          die "Too much the number of \"CONFIGREG_INFO_TYPE\"!\n" if ($config_count <= 0);
+          die "Too much the number of \"CONFIGREG_INFO_TYPE\"!\n" if ($directive_count <= 0);
 
-          $switch_count = hex($fields[4]);
-          $addr = hex($fields[1]);
-          --$config_count;
+          $switch_count = hex $fields[4];
+          $addr = hex $fields[1];
+          --$directive_count;
           } # when ('CONFIGREG_INFO_TYPE')
 
         when ('SWITCH_INFO_TYPE')
@@ -1143,12 +1195,12 @@ sub read_config_bits($$$)
           $switch_info = {
                          HEAD => $switch_name,
                          BITS => [],
-                         MASK => hex($fields[3]),
+                         MASK => hex $fields[3],
                          EXPL => (defined($fields[2]) ? $fields[2] : '')
                          };
 
-          $setting_count = hex($fields[4]);
-          push(@{$Configs->{$addr}}, $switch_info);
+          $setting_count = hex $fields[4];
+          push @{$Configs->{$addr}}, $switch_info;
           --$switch_count;
           } # when ('SWITCH_INFO_TYPE')
 
@@ -1160,7 +1212,7 @@ sub read_config_bits($$$)
         # <SETTING_VALUE_TYPE><2><><10>
 
           die "Too much the number of \"SETTING_VALUE_TYPE\"!\n" if ($setting_count <= 0);
-          die "There is no actual \"SWITCH_INFO_TYPE\"!\n" if (! defined($switch_info));
+          die "There is no actual \"SWITCH_INFO_TYPE\"!\n" unless defined $switch_info;
 
           my $setting = {
                         NAME  => $fields[1],
@@ -1168,17 +1220,17 @@ sub read_config_bits($$$)
                         EXPL  => (defined($fields[2]) ? $fields[2] : '')
                         };
 
-          push(@{$switch_info->{BITS}}, $setting);
+          push @{$switch_info->{BITS}}, $setting;
           --$setting_count;
 
         # All information is together.
-          last if (! $setting_count && ! $switch_count && ! $config_count);
+          last if (! $setting_count && ! $switch_count && ! $directive_count);
           } # when ('SETTING_VALUE_TYPE')
         } # given ($fields[0])
       } # if ($state == ST_LISTEN)
     } # while (<$in>)
 
-  close($in);
+  close $in;
   }
 
 #-------------------------------------------------------------------------------
@@ -1873,7 +1925,7 @@ sub read_all_mcu_info_from_mplabx()
         # <PART_INFO_TYPE><8857><PIC16F18857><16EXxx><2><10><7fff><40><7f><0><0><ff><5>
         # <PART_INFO_TYPE><1330><PIC18F1330><18xxxx><6><1><1fff><10><ff><7f><7f><0><c>
 
-    if (/^<PART_INFO_TYPE><(\w+)><(\w+)><(\w+)><(\w+)><(\w+)><(\w+)><(\w+)><(\w+)><(\w+)><(\w+)><(\w+)><(\w+)>/io)
+    if (/^<PART_INFO_TYPE><(\w+)><(\w+)><(\w+)><(\w+)><(\w+)><(\w+)><(\w+)><(\w+)><(\w+)><(\w+)-(\w+)><(\w+)-(\w+)><(\w+)><(\w+)>/io)
       {
       if (defined($info))
         {
@@ -1896,7 +1948,7 @@ sub read_all_mcu_info_from_mplabx()
 
       my $scl = $3;
       my ($coff,  $name,   $class, $pages, $rom)     = (hex($1), lc($2),  str2class($scl), hex($5),  hex($6));
-      my ($banks, $eeprom, $split, $fdata, $configs) = (hex($7), hex($9), hex($10),        hex($11), hex($12));
+      my ($banks, $eeprom, $split, $fdata, $configs) = (hex($7), hex($9), hex($11),        hex($14), hex($15));
 
       $name =~ s/^pic//o;
 

@@ -1,8 +1,8 @@
-#!/usr/bin/perl -w
+#!/usr/bin/env perl
 
 =back
 
-    Copyright (C) 2014-2017 Molnar Karoly <molnarkaroly@users.sf.net>
+    Copyright (C) 2014-2018 Molnar Karoly <molnarkaroly@users.sf.net>
 
     This file is part of gputils.
 
@@ -641,23 +641,75 @@ sub read_device_informations()
     s/\r$//o;
     s/^<|>$//go;
 
-    my @fields = split('><', $_, -1);
+    my @fields = split '><', $_, -1;
 
     next if (@fields < 3);
 
     if ($fields[0] eq 'PART_INFO_TYPE')
       {
-      # <PART_INFO_TYPE><f220><PIC10F220><16c5x><0><0><ff><1><1f><0><0><0><1>
-      # <PART_INFO_TYPE><f527><PIC16F527><16c5ie><0><2><3ff><4><1f><0><0><3f><1>
-      # <PART_INFO_TYPE><e529><PIC12F529T39A><16c5xe><0><3><5ff><8><1f><0><0><3f><1>
-      # <PART_INFO_TYPE><6628><PIC16F628><16xxxx><0><1><7ff><4><7f><7f><0><0><1>
-      # <PART_INFO_TYPE><a829><PIC16LF1829><16Exxx><2><4><1fff><20><7f><ff><0><0><2>
-      # <PART_INFO_TYPE><8857><PIC16F18857><16EXxx><2><10><7fff><40><7f><0><0><ff><5>
-      # <PART_INFO_TYPE><1330><PIC18F1330><18xxxx><6><1><1fff><10><ff><7f><7f><0><c>
+        #
+        # Old format
+        #
+        #        0          1        2            3     4  5   6     7   8   9   10  11  12
+        #        |          |        |            |     |  |   |     |   |   |   |   |   |
+        #        V          V        V            V     V  V   V     V   V   V   V   V   V
+        # <PART_INFO_TYPE><f220><PIC10F220>    <16c5x> <0><0> <ff>  <1> <1f><0> <0> <0> <1>
+        # <PART_INFO_TYPE><f527><PIC16F527>    <16c5ie><0><2> <3ff> <4> <1f><0> <0> <3f><1>
+        # <PART_INFO_TYPE><e529><PIC12F529T39A><16c5xe><0><3> <5ff> <8> <1f><0> <0> <3f><1>
+        # <PART_INFO_TYPE><6628><PIC16F628>    <16xxxx><0><1> <7ff> <4> <7f><7f><0> <0> <1>
+        # <PART_INFO_TYPE><a829><PIC16LF1829>  <16Exxx><2><4> <1fff><20><7f><ff><0> <0> <2>
+        # <PART_INFO_TYPE><8857><PIC16F18857>  <16EXxx><2><10><7fff><40><7f><0> <0> <ff><5>
+        # <PART_INFO_TYPE><1330><PIC18F1330>   <18xxxx><6><1> <1fff><10><ff><7f><7f><0> <c>
+        #
+        #  0: Microchip info ID
+        #  1: Device COFF ID
+        #  2: Device Name
+        #  3: Device Family
+        #  4: Feature Bitmask: 0x04 -- Have XINST
+        #  5: Number of the ROM/FLASH pages (in hexadecimal)
+        #  6: Last address of ROM/FLASH (in hexadecimal)
+        #  7: Number of RAM Banks (in hexadecimal)
+        #  8: Size of RAM Banks (in hexadecimal)
+        #  9: Size of EEPROM (in hexadecimal)
+        # 10: Split offset of Access Bank in pic18f family (in hexadecimal)
+        # 11: Size of FlashData (in hexadecimal)
+        # 12: Number of Config Registers
+        #
+
+        #
+        # New format
+        #
+        #        0          1        2            3     4  5   6     7   8   9    10    11      12 13
+        #        |          |        |            |     |  |   |     |   |   |    |     |       |  |
+        #        V          V        V            V     V  V   V     V   V   V    V     V       V  V
+        # <PART_INFO_TYPE><f220><PIC10F220>    <16c5x> <0><0> <ff>  <1> <1f><0> <0-0> <0-0>    <0><1>
+        # <PART_INFO_TYPE><f527><PIC16F527>    <16c5ie><0><2> <3ff> <4> <1f><0> <0-0> <0-0>    <0><1>
+        # <PART_INFO_TYPE><e529><PIC12F529T39A><16c5xe><0><3> <5ff> <8> <1f><0> <0-0> <0-0>    <0><1>
+        # <PART_INFO_TYPE><6628><PIC16F628>    <16xxxx><0><1> <7ff> <4> <7f><7f><0-0> <0-0>    <0><1>
+        # <PART_INFO_TYPE><a829><PIC16LF1829>  <16Exxx><2><4> <1fff><20><7f><ff><0-0> <0-0>    <0><2>
+        # <PART_INFO_TYPE><8857><PIC16F18857>  <16EXxx><2><10><7fff><40><7f><ff><0-0> <0-0>    <0><5>
+        # <PART_INFO_TYPE><1330><PIC18F1330>   <18xxxx><6><1> <1fff><10><ff><7f><0-7f><f80-fff><0><c>
+        # <PART_INFO_TYPE><a2a8><PIC18F25Q10>  <18xxxx><6><1> <7fff><10><ff><ff><0-5f><f60-fff><0><c>
+        #
+        #  0: Microchip info ID
+        #  1: Device COFF ID
+        #  2: Device Name
+        #  3: Device Family
+        #  4: Feature Bitmask: 0x04 -- Have XINST
+        #  5: Number of the ROM/FLASH pages (in hexadecimal)
+        #  6: Last address of ROM/FLASH (in hexadecimal)
+        #  7: Number of RAM Banks (in hexadecimal)
+        #  8: Size of RAM Banks (in hexadecimal)
+        #  9: Size of EEPROM/FlashData (in hexadecimal)
+        # 10: Address Range of PIC18F Access RAM Low
+        # 11: Address Range of PIC18F Access RAM High (SFR)
+        # 12: ???
+        # 13: Number of Config Registers
+        #
 
       if ($fields[2] =~ /^$pic_name_mask$/io)
         {
-        ($mcu_name, $class_name, $directive_count) = (uc($fields[2]), $fields[3], hex($fields[12]));
+        ($mcu_name, $class_name, $directive_count) = (uc $fields[2], $fields[3], hex $fields[13]);
         $switch_count  = 0;
         $option_count  = 0;
         $debug_present = FALSE;
@@ -665,7 +717,7 @@ sub read_device_informations()
         my $tr = $class_features_by_mpasmx{$class_name};
 
         $mcu_name =~ s/^PICRF/RF/o;
-        die "Unknown class of $mcu_name MCU!" if (! defined($tr));
+        die "Unknown class of $mcu_name MCU!" unless defined $tr;
 
         $digits = $tr->{DIR_DIGITS};
 
@@ -706,17 +758,17 @@ sub read_device_informations()
 
           my ($dir_default, $dir_subst);
 
-          ($directive_addr, $dir_default, $switch_count) = (hex($fields[1]), hex($fields[3]), hex($fields[4]));
+          ($directive_addr, $dir_default, $switch_count) = (hex $fields[1], hex $fields[3], hex $fields[4]);
 
           if ($switch_count <= 0)
             {
             printf STDERR "Database error in descriptor of $mcu_name at 0x%06X: This CONFIGREG_INFO_TYPE empty!\n", $directive_addr;
             $dir_subst = $missed_directive_substitutions{$mcu_name};
 
-            if (defined($dir_subst))
+            if (defined $dir_subst)
               {
               $mcu_features->{DIR_SUBST} = $dir_subst;
-              push(@insufficient_mcus, $mcu_name);
+              push @insufficient_mcus, $mcu_name;
               print STDERR "  The possible substitution: $dir_subst->{SUBST_MCU}\n";
               }
             else
@@ -740,7 +792,7 @@ sub read_device_informations()
               };
 
             $directive_mask = 0;
-            push(@{$mcu_features->{DIRECTIVES}}, $directive);
+            push @{$mcu_features->{DIRECTIVES}}, $directive;
             }
 
           --$directive_count;
@@ -763,7 +815,7 @@ sub read_device_informations()
 
           my ($sw_name, $sw_mask);
 
-          ($sw_name, $sw_mask, $option_count) = ($fields[1], hex($fields[3]), hex($fields[4]));
+          ($sw_name, $sw_mask, $option_count) = ($fields[1], hex $fields[3], hex $fields[4]);
 
           # Microchip bug of the 18f47k40 and 18lf47k40 devices: nDEBUG, nXINST
           $sw_name =~ s/^n//o;
@@ -789,7 +841,7 @@ sub read_device_informations()
               };
 
             $debug_present = TRUE if ($sw_name eq 'DEBUG');
-            push(@{$directive->{SWITCHES}}, $switch_info);
+            push @{$directive->{SWITCHES}}, $switch_info;
             $directive_mask |= $sw_mask;
             }
 
@@ -833,9 +885,9 @@ sub read_device_informations()
           # <SETTING_VALUE_TYPE><2><><10>
 
           die "Too much the number of \"SETTING_VALUE_TYPE\"!\n" if ($option_count <= 0);
-          die "There is no actual \"SWITCH_INFO_TYPE\"!\n" if (! defined($switch_info));
+          die "There is no actual \"SWITCH_INFO_TYPE\"!\n" unless defined $switch_info;
 
-          my ($opt_name, $opt_value) = ($fields[1], hex($fields[3]));
+          my ($opt_name, $opt_value) = ($fields[1], hex $fields[3]);
           my $sw_name = $switch_info->{SW_NAME};
 
           if ($opt_name =~ /^reserved$/io)
@@ -854,7 +906,7 @@ sub read_device_informations()
             STRUCT_NAME => sprintf("${mcu_name}_${sw_name}_${opt_name}_%0*X", $digits, $opt_value)
             };
 
-          push(@{$switch_info->{OPTIONS}}, $option);
+          push @{$switch_info->{OPTIONS}}, $option;
           --$option_count;
 
           if ($option_count == 0)
@@ -867,10 +919,10 @@ sub read_device_informations()
           } # when ('SETTING_VALUE_TYPE')
         } # given ($fields[0])
 
-      if ($directive_count == 0 && $switch_count == 0 && $option_count == 0)
+      if (($directive_count == 0) && ($switch_count == 0) && ($option_count == 0))
         {
         # All information is together.
-        die "The $mcu_name MCU already exist!" if (defined($mcus_by_names{$mcu_name}));
+        die "The $mcu_name MCU already exist!" if defined $mcus_by_names{$mcu_name};
 
         $mcus_by_names{$mcu_name} = $mcu_features;
         $state = ST_WAIT;
@@ -1232,7 +1284,7 @@ sub print_device_table()
 sub print_license()
   {
   print $out_handler <<EOT
-/*  Copyright (C) 2014-2017 Molnar Karoly
+/*  Copyright (C) 2014-2018 Molnar Karoly
 
 This file is part of gputils.
 
@@ -1259,7 +1311,7 @@ EOT
 
 sub print_header()
   {
-  my $guard = '__' . uc($output) . '_H__';
+  my $guard = 'g__' . uc($output) . '_H__';
 
   print $out_handler <<EOT
 
@@ -1280,16 +1332,16 @@ EOT
 
 /* A directive value. */
 typedef struct {
-  const char *name;                         /* Name of the value. */
+  const char* name;                         /* Name of the value. */
   uint16_t    value;                        /* The value. */
 } $cfg_option_t;
 
 /* A directive, i.e., FOSC. */
 typedef struct {
-  const char             *name;             /* Name of the directive. */
+  const char*             name;             /* Name of the directive. */
   uint16_t                mask;             /* Mask of words in the config address that apply to its value. */
   unsigned int            option_count;     /* Number of possible values. */
-  const $cfg_option_t **options;          /* Array of addresses of values. */
+  const ${cfg_option_t}** options;          /* Array of addresses of values. */
 } $cfg_directive_t;
 
 /* One particular configuration address, i.e., 0x300001. */
@@ -1297,22 +1349,22 @@ typedef struct {
   unsigned int              address;        /* The address. */
   uint16_t                  def_value;      /* Its default value. */
   unsigned int              directive_count;/* Count of relevant directives. */
-  const $cfg_directive_t *directives;     /* Array of directives. */
+  const ${cfg_directive_t}* directives;     /* Array of directives. */
 } $cfg_addr_t;
 
 /* A device - that is, a collection of configuration addresses. */
 typedef struct {
-  const char          *name;                /* Name of the device. */
+  const char*          name;                /* Name of the device. */
   unsigned int         address_count;       /* Number of configuration addresses. */
-  const $cfg_addr_t *addresses;           /* Array of configuration addresses. */
+  const ${cfg_addr_t}* addresses;           /* Array of configuration addresses. */
 } $cfg_device_t;
 
 \#define GP_CFG_ADDR_HIT_MAX         16
 \#define GP_CFG_ADDR_PACK_MAX        16
 
 typedef struct {
-  const $cfg_directive_t *directive;
-  const $cfg_option_t    *option;
+  const ${cfg_directive_t}* directive;
+  const ${cfg_option_t}*    option;
 } $cfg_addr_hit_pair_t;
 
 typedef struct {
@@ -1331,29 +1383,29 @@ typedef struct {
 extern const $cfg_device_t ${name_head}devices[];
 extern const int             ${name_head}device_count;
 
-extern const $cfg_device_t *${name_head}find_pic(const char *Pic);
+extern const ${cfg_device_t}* ${name_head}find_pic(const char* Pic);
 
-extern const $cfg_device_t *${name_head}find_pic_multi_name(const char *const *Pics, unsigned int Count);
+extern const ${cfg_device_t}* ${name_head}find_pic_multi_name(const char* const* Pics, unsigned int Count);
 
-extern void ${name_head}real_config_boundaries(const $cfg_device_t *Device, int *Address_low, int *Address_high);
+extern void ${name_head}real_config_boundaries(const ${cfg_device_t}* Device, int* Address_low, int* Address_high);
 
-extern const $cfg_directive_t *${name_head}find_directive(const $cfg_device_t *Device, const char *Directive,
-                                                       unsigned int *Out_config_addr, uint16_t *Out_def_value);
+extern const ${cfg_directive_t}* ${name_head}find_directive(const ${cfg_device_t}* Device, const char* Directive,
+                                                       unsigned int* Out_config_addr, uint16_t* Out_def_value);
 
-extern void ${name_head}brief_device(const $cfg_device_t *Device, const char *Head, int Addr_digits,
+extern void ${name_head}brief_device(const ${cfg_device_t}* Device, const char* Head, int Addr_digits,
                                 int Word_digits, gp_boolean Pic18J);
 
-extern void ${name_head}full_list_device(const $cfg_device_t *Device, const char *Head, int Addr_digits,
+extern void ${name_head}full_list_device(const ${cfg_device_t}* Device, const char* Head, int Addr_digits,
                                     int Word_digits);
 
-extern const $cfg_option_t *${name_head}find_option(const $cfg_directive_t *Directive, const char *Option);
+extern const ${cfg_option_t}* ${name_head}find_option(const ${cfg_directive_t}* Directive, const char* Option);
 
-extern const $cfg_addr_t *${name_head}find_config(const $cfg_device_t *Device, unsigned int Address);
+extern const ${cfg_addr_t}* ${name_head}find_config(const ${cfg_device_t}* Device, unsigned int Address);
 
-extern uint16_t ${name_head}get_default(const $cfg_device_t *Device, unsigned int Address);
+extern uint16_t ${name_head}get_default(const ${cfg_device_t}* Device, unsigned int Address);
 
-extern unsigned int ${name_head}decode_directive(const $cfg_device_t *Device, unsigned int Address, unsigned int Value,
-                                            $cfg_addr_hit_t *Hit);
+extern unsigned int ${name_head}decode_directive(const ${cfg_device_t}* Device, unsigned int Address, unsigned int Value,
+                                            ${cfg_addr_hit_t}* Hit);
 
 \#endif /* $guard */
 EOT

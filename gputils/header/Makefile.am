@@ -387,17 +387,6 @@ HEADER_FILES = \
 	p16lf1519.inc \
 	p16lf1526.inc \
 	p16lf1527.inc \
-	p16lf15324.inc \
-	p16lf15325.inc \
-	p16lf15344.inc \
-	p16lf15345.inc \
-	p16lf15354.inc \
-	p16lf15355.inc \
-	p16lf15356.inc \
-	p16lf15375.inc \
-	p16lf15376.inc \
-	p16lf15385.inc \
-	p16lf15386.inc \
 	p16lf1554.inc \
 	p16lf1559.inc \
 	p16lf1566.inc \
@@ -460,6 +449,17 @@ HEADER_FILES = \
 	p16lf1939.inc \
 	p16lf1946.inc \
 	p16lf1947.inc \
+	p16lf15324.inc \
+	p16lf15325.inc \
+	p16lf15344.inc \
+	p16lf15345.inc \
+	p16lf15354.inc \
+	p16lf15355.inc \
+	p16lf15356.inc \
+	p16lf15375.inc \
+	p16lf15376.inc \
+	p16lf15385.inc \
+	p16lf15386.inc \
 	p16lf18313.inc \
 	p16lf18323.inc \
 	p16lf18324.inc \
@@ -512,6 +512,7 @@ HEADER_FILES = \
 	p18f24k22.inc \
 	p18f24k40.inc \
 	p18f24k50.inc \
+	p18f24q10.inc \
 	p18f25j10.inc \
 	p18f25j11.inc \
 	p18f25j50.inc \
@@ -520,6 +521,7 @@ HEADER_FILES = \
 	p18f25k40.inc \
 	p18f25k50.inc \
 	p18f25k80.inc \
+	p18f25q10.inc \
 	p18f26j11.inc \
 	p18f26j13.inc \
 	p18f26j50.inc \
@@ -528,6 +530,7 @@ HEADER_FILES = \
 	p18f26k22.inc \
 	p18f26k40.inc \
 	p18f26k80.inc \
+	p18f26q10.inc \
 	p18f27j13.inc \
 	p18f27j53.inc \
 	p18f27k40.inc \
@@ -546,6 +549,7 @@ HEADER_FILES = \
 	p18f45k40.inc \
 	p18f45k50.inc \
 	p18f45k80.inc \
+	p18f45q10.inc \
 	p18f46j11.inc \
 	p18f46j13.inc \
 	p18f46j50.inc \
@@ -554,6 +558,7 @@ HEADER_FILES = \
 	p18f46k22.inc \
 	p18f46k40.inc \
 	p18f46k80.inc \
+	p18f46q10.inc \
 	p18f47j13.inc \
 	p18f47j53.inc \
 	p18f47k40.inc \

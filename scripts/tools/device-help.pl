@@ -2,7 +2,7 @@
 
 =back
 
-    Copyright (C) 2012-2017 Molnar Karoly <molnarkaroly@users.sf.net>
+    Copyright (C) 2012-2018 Molnar Karoly <molnarkaroly@users.sf.net>
 
     This file is part of gputils.
 
@@ -30,7 +30,7 @@
     of the PIC MCU-s. The data reads from the 8bit_device.info called file of MPLAB-X.
     On Linux is usually located on this path:
 
-                /opt/microchip/mplabx/v3.25/mpasmx/8bit_device.info
+                /opt/microchip/mplabx/v5.05/mpasmx/8bit_device.info
 
     Of course for the program it is necessary to the gputils source from the svn.
 
@@ -404,8 +404,7 @@ my $pic16e_mcu_number = 0;
 
                 # These addresses relative, compared to the beginning of the blocks.
                     ROM        => 0,    # Last address of ROM/FLASH.
-                    FLASHDATA  => 0,    # Last address of FLASH Data.
-                    EEPROM     => 0,    # Last address of EEPROM.
+                    EEPROM     => 0,    # Last address of EEPROM/FLASH Data.
 
                     DIR_COUNT  => 0,    # Number of Configuration bytes/words.
                     DIRECTIVES => [
@@ -1343,7 +1342,7 @@ sub find_inc_files($)
     $name =~ s/\.inc$//o;
     $n = $name;
     $name =~ s/^p//o;
-    $name = uc("pic$name");
+    $name = uc "pic$name";
 
         # Remember the name of inc file;
     $gp_mcus_by_names{$name} = $n if (defined($gp_mcus_by_names{$name}));
@@ -1401,7 +1400,7 @@ sub extract_mcu_names()
           $name !~ /^eeprom/o)
         {
         $name = "pic$name" if ($name =~ /^rf/o);        # rfXXX -> picrfXXX
-        $gp_mcus_by_names{uc($name)} = '';
+        $gp_mcus_by_names{uc $name} = '';
         }
       }
     else
@@ -1482,11 +1481,11 @@ sub read_ram_features($$$)
           }
         elsif ($line =~ /^(\w+)\s+EQU\s+([\w']+)$/io)  #'
           {
-          my ($name, $addr) = ($1, str2dec($2));
+          my ($name, $addr) = ($1, str2dec $2);
 
-          $sfr_names->{$addr} = $name if (! defined($sfr_names->{$addr}));
-          $sfr_addrs->{$name} = $addr if (! defined($sfr_names->{$name}));
-          push(@{$sfrs}, { NAME => $name, ADDR => $addr });
+          $sfr_names->{$addr} = $name unless defined $sfr_names->{$addr};
+          $sfr_addrs->{$name} = $addr unless defined $sfr_names->{$name};
+          push @{$sfrs}, { NAME => $name, ADDR => $addr };
           }
         }
 
@@ -1502,7 +1501,7 @@ sub read_ram_features($$$)
         # __MAXRAM  H'001F'
         # __MAXRAM  H'01FF'
 
-          $full_ram = hex($1);
+          $full_ram = hex $1;
           $Features->{MAX_RAM} = $full_ram;
           ++$full_ram;
           }
@@ -1520,17 +1519,17 @@ sub read_ram_features($$$)
             {
             if (/^H'([[:xdigit:]]+)'\s*-\s*H'([[:xdigit:]]+)'$/io)
               {
-              my ($s, $e) = (hex($1), hex($2));
+              my ($s, $e) = (hex $1, hex $2);
 
               swap_reverse(\$s, \$e);   # paranoia
-              push(@{$bad_ram}, { START => $s, END => $e });
+              push @{$bad_ram}, { START => $s, END => $e };
               $full_ram -= $e - $s + 1;
               }
             elsif (/^H'([[:xdigit:]]+)'$/io)
               {
-              my $s = hex($1);
+              my $s = hex $1;
 
-              push(@{$bad_ram}, { START => $s, END => $s });
+              push @{$bad_ram}, { START => $s, END => $s };
               --$full_ram;
               }
             else
@@ -1549,7 +1548,7 @@ sub read_ram_features($$$)
                          DIR_MASK => 0
                          };
 
-            push(@{$Features->{DIRECTIVES}}, $directive);
+            push @{$Features->{DIRECTIVES}}, $directive;
             }
 
           $state = INC_CONFIG;
@@ -1573,7 +1572,7 @@ sub read_ram_features($$$)
         # _WDT_256                        EQU     H'FFFB'
         # _XT_OSC                         EQU     H'FFFE'
 
-          my ($name, $value) = ($1, str2dec($2));
+          my ($name, $value) = ($1, str2dec $2);
           my $expl = '';
 
           $config_mask |= $value;
@@ -1601,11 +1600,11 @@ sub read_ram_features($$$)
                                  SW_MASK => 0xFFFF
                                  };
 
-                  push(@{$directive->{SWITCHES}}, $switch_info);
+                  push @{$directive->{SWITCHES}}, $switch_info;
                   $prev_switch_info_name = $sw_name;
                   }
 
-                push(@{$switch_info->{OPTIONS}}, { NAME => $name, VALUE => $value, EXPL => '' });
+                push @{$switch_info->{OPTIONS}}, { NAME => $name, VALUE => $value, EXPL => '' };
                 last;
                 }
               } # foreach my $sw_name (keys %pic17_conf_switch_expl)
@@ -1615,7 +1614,7 @@ sub read_ram_features($$$)
       } # given ($state)
     } # foreach (grep(! /^\s*$/o, <INC>))
 
-  close(INC);
+  close INC;
 
   $Features->{RAM_SIZE}  = $full_ram;
   $Features->{BAD_RAM}   = $bad_ram;
@@ -1644,7 +1643,7 @@ sub process_lkr_line($$)
 
   if ($Line =~ /^(\S+)\s+NAME=(\S+)\s+START=(\S+)\s+END=(\S+)/iop)
     {
-    ($section, $name, $start, $end) = ($1, $2, str2dec($3), str2dec($4));
+    ($section, $name, $start, $end) = ($1, $2, str2dec $3, str2dec $4);
     $size = $end - $start + 1;
     $tail = ${^POSTMATCH};
     $tail =~ s/^\s+//o;
@@ -1713,7 +1712,7 @@ sub process_lkr_line($$)
       {
       $Features->{GPR_SIZE} += $size;
       $index = ($start & $Features->{BANK_MASK}) >> $Features->{BANK_SHIFT};
-      push(@{$Features->{GPR_RAM}->[$index]}, { START => $start, END => $end });
+      push @{$Features->{GPR_RAM}->[$index]}, { START => $start, END => $end };
       }
     elsif ($section eq 'DATABANK')
       {
@@ -1721,14 +1720,14 @@ sub process_lkr_line($$)
 
       if ($name =~ /^sfr/io)
         {
-        push(@{$Features->{SFR_RAM}->[$index]}, { START => $start, END => $end });
+        push @{$Features->{SFR_RAM}->[$index]}, { START => $start, END => $end };
         }
       elsif ($name =~ /^([dg]pr|reg|usbport)/io)
         {
         # pic16c745
         # DATABANK   NAME=usbport    START=0x1A0             END=0x1DF          PROTECTED
 
-        push(@{$Features->{GPR_RAM}->[$index]}, { START => $start, END => $end });
+        push @{$Features->{GPR_RAM}->[$index]}, { START => $start, END => $end };
         $Features->{GPR_SIZE} += $size;
 
         if ($tail =~ /^SHADOW=(\w+):(\w+)$/io)
@@ -1740,9 +1739,9 @@ sub process_lkr_line($$)
           my ($lname, $lstart) = ($1, str2dec($2));
           my $linear = $Features->{LINEARMEM};
 
-          die "Unknown linearmem name: $lname" if (! defined($linear->{NAME}) || $linear->{NAME} ne $lname);
+          die "Unknown linearmem name: $lname" if (! defined(($linear->{NAME})) || ($linear->{NAME} ne $lname));
 
-          push(@{$linear->{SEGMENTS}}, { RSTART => $start, LSTART => $lstart, SIZE => $size });
+          push @{$linear->{SEGMENTS}}, { RSTART => $start, LSTART => $lstart, SIZE => $size };
           }
         }
       }
@@ -1766,11 +1765,11 @@ sub process_lkr_line($$)
 
           if ($name =~ /^sfr(nobnk|prod)/io)
             {
-            push(@{$Features->{SFR_RAM}->[$index]}, { START => $start, END => $end });
+            push @{$Features->{SFR_RAM}->[$index]}, { START => $start, END => $end };
             }
           else
             {
-            push(@{$Features->{MIRROR_RAM}->[$index]}, { START => $start, END => $end });
+            push @{$Features->{MIRROR_RAM}->[$index]}, { START => $start, END => $end };
             }
           }
         else
@@ -1785,7 +1784,7 @@ sub process_lkr_line($$)
           # pic17xxx
           # SHAREBANK  NAME=registers START=0x1A     END=0x1F
 
-          push(@{$Features->{COMMON_RAM}->[$index]}, { START => $start, END => $end });
+          push @{$Features->{COMMON_RAM}->[$index]}, { START => $start, END => $end };
           }
         }
       } # elsif ($section eq 'SHAREBANK')
@@ -1841,7 +1840,7 @@ sub read_ram_and_rom_features($$)
     ++$pp_line_number;
     }
 
-  close(LKR);
+  close LKR;
   }
 
 #   @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
@@ -1877,7 +1876,7 @@ sub add_missing_debug($$)
     SW_MASK => $Mask
     };
 
-  push(@{$DirRef->{SWITCHES}}, $sw_ref);
+  push @{$DirRef->{SWITCHES}}, $sw_ref;
   $DirRef->{SWITCH_COUNT} += 1;
   return $sw_ref->{SW_MASK};
   }
@@ -1911,7 +1910,7 @@ sub add_missing_directives()
       {
       if ($dir_ref->{DIR_ADDR} == $substitution->{DIR_ADDR})
         {
-        push(@{$missed_mcu->{DIRECTIVES}}, $dir_ref);
+        push @{$missed_mcu->{DIRECTIVES}}, $dir_ref;
 
         if ($missed_mcu->{DIR_COUNT} > 1)
           {
@@ -1977,37 +1976,90 @@ sub read_device_informations()
     s/\r$//o;
     s/^<|>$//go;
 
-    my @fields = split('><', $_, -1);
+    my @fields = split '><', $_, -1;
 
     $dev_info_rev = $fields[1] if ($fields[0] eq 'RES_FILE_VERSION_INFO_TYPE');
 
-    next if (@fields < 3);
+    next if (scalar @fields < 3);
 
     if ($fields[0] eq 'PART_INFO_TYPE')
       {
-        # <PART_INFO_TYPE><f220><PIC10F220><16c5x><0><0><ff><1><1f><0><0><0><1>
-        # <PART_INFO_TYPE><f527><PIC16F527><16c5ie><0><2><3ff><4><1f><0><0><3f><1>
-        # <PART_INFO_TYPE><e529><PIC12F529T39A><16c5xe><0><3><5ff><8><1f><0><0><3f><1>
-        # <PART_INFO_TYPE><6628><PIC16F628><16xxxx><0><1><7ff><4><7f><7f><0><0><1>
-        # <PART_INFO_TYPE><a829><PIC16LF1829><16Exxx><2><4><1fff><20><7f><ff><0><0><2>
-        # <PART_INFO_TYPE><8857><PIC16F18857><16EXxx><2><10><7fff><40><7f><0><0><ff><5>
-        # <PART_INFO_TYPE><1330><PIC18F1330><18xxxx><6><1><1fff><10><ff><7f><7f><0><c>
+        #
+        # Old format
+        #
+        #        0          1        2            3     4  5   6     7   8   9   10  11  12
+        #        |          |        |            |     |  |   |     |   |   |   |   |   |
+        #        V          V        V            V     V  V   V     V   V   V   V   V   V
+        # <PART_INFO_TYPE><f220><PIC10F220>    <16c5x> <0><0> <ff>  <1> <1f><0> <0> <0> <1>
+        # <PART_INFO_TYPE><f527><PIC16F527>    <16c5ie><0><2> <3ff> <4> <1f><0> <0> <3f><1>
+        # <PART_INFO_TYPE><e529><PIC12F529T39A><16c5xe><0><3> <5ff> <8> <1f><0> <0> <3f><1>
+        # <PART_INFO_TYPE><6628><PIC16F628>    <16xxxx><0><1> <7ff> <4> <7f><7f><0> <0> <1>
+        # <PART_INFO_TYPE><a829><PIC16LF1829>  <16Exxx><2><4> <1fff><20><7f><ff><0> <0> <2>
+        # <PART_INFO_TYPE><8857><PIC16F18857>  <16EXxx><2><10><7fff><40><7f><0> <0> <ff><5>
+        # <PART_INFO_TYPE><1330><PIC18F1330>   <18xxxx><6><1> <1fff><10><ff><7f><7f><0> <c>
+        #
+        #  0: Microchip info ID
+        #  1: Device COFF ID
+        #  2: Device Name
+        #  3: Device Family
+        #  4: Feature Bitmask: 0x04 -- Have XINST
+        #  5: Number of the ROM/FLASH pages (in hexadecimal)
+        #  6: Last address of ROM/FLASH (in hexadecimal)
+        #  7: Number of RAM Banks (in hexadecimal)
+        #  8: Size of RAM Banks (in hexadecimal)
+        #  9: Size of EEPROM (in hexadecimal)
+        # 10: Split offset of Access Bank in pic18f family (in hexadecimal)
+        # 11: Size of FlashData (in hexadecimal)
+        # 12: Number of Config Registers
+        #
+
+        #
+        # New format
+        #
+        #        0          1        2            3     4  5   6     7   8   9    10    11      12 13
+        #        |          |        |            |     |  |   |     |   |   |    |     |       |  |
+        #        V          V        V            V     V  V   V     V   V   V    V     V       V  V
+        # <PART_INFO_TYPE><f220><PIC10F220>    <16c5x> <0><0> <ff>  <1> <1f><0> <0-0> <0-0>    <0><1>
+        # <PART_INFO_TYPE><f527><PIC16F527>    <16c5ie><0><2> <3ff> <4> <1f><0> <0-0> <0-0>    <0><1>
+        # <PART_INFO_TYPE><e529><PIC12F529T39A><16c5xe><0><3> <5ff> <8> <1f><0> <0-0> <0-0>    <0><1>
+        # <PART_INFO_TYPE><6628><PIC16F628>    <16xxxx><0><1> <7ff> <4> <7f><7f><0-0> <0-0>    <0><1>
+        # <PART_INFO_TYPE><a829><PIC16LF1829>  <16Exxx><2><4> <1fff><20><7f><ff><0-0> <0-0>    <0><2>
+        # <PART_INFO_TYPE><8857><PIC16F18857>  <16EXxx><2><10><7fff><40><7f><ff><0-0> <0-0>    <0><5>
+        # <PART_INFO_TYPE><1330><PIC18F1330>   <18xxxx><6><1> <1fff><10><ff><7f><0-7f><f80-fff><0><c>
+        # <PART_INFO_TYPE><a2a8><PIC18F25Q10>  <18xxxx><6><1> <7fff><10><ff><ff><0-5f><f60-fff><0><c>
+        #
+        #  0: Microchip info ID
+        #  1: Device COFF ID
+        #  2: Device Name
+        #  3: Device Family
+        #  4: Feature Bitmask: 0x04 -- Have XINST
+        #  5: Number of the ROM/FLASH pages (in hexadecimal)
+        #  6: Last address of ROM/FLASH (in hexadecimal)
+        #  7: Number of RAM Banks (in hexadecimal)
+        #  8: Size of RAM Banks (in hexadecimal)
+        #  9: Size of EEPROM/FlashData (in hexadecimal)
+        # 10: Address Range of PIC18F Access RAM Low
+        # 11: Address Range of PIC18F Access RAM High (SFR)
+        # 12: ???
+        # 13: Number of Config Registers
+        #
 
       if ($fields[2] =~ /^$pic_name_mask$/io)
         {
-        ($mcu_name, $class_name, $directive_count) = (uc($fields[2]), $fields[3], hex($fields[12]));
+        ($mcu_name, $class_name, $directive_count) = (uc $fields[2], $fields[3], hex $fields[13]);
         $switch_count   = 0;
         $option_count   = 0;
         $dir_addr_min   = ULONG_MAX;
         $dir_addr_max   = 0;
         $directive_mask = 0;
         $debug_present  = FALSE;
-        $bank_num       = hex($fields[7]);
-        $split          = hex($fields[10]);
+        $bank_num       = hex $fields[7];
+        my @bounds = split '-', $fields[10];
+        $split          = hex $bounds[1];
 
         my $tr = $class_features_by_mpasmx{$class_name};
 
-        die "Unknown class of $mcu_name MCU!" if (! defined($tr));
+        die "Unknown class of $mcu_name MCU!" unless defined $tr;
 
         if ($bank_num > $tr->{BANK_MAX})
           {
@@ -2043,8 +2095,8 @@ sub read_device_informations()
           DIR_SUBST  => undef,
           ROM_SIZE   => 0,                # Size of the program memory.
 
-          COFF       => hex($fields[1]),  # Coff ID of the device. (16 bit wide)
-          PAGES      => hex($fields[5]),  # Number of the ROM/FLASH pages.
+          COFF       => hex $fields[1],   # Coff ID of the device. (16 bit wide)
+          PAGES      => hex $fields[5],   # Number of the ROM/FLASH pages.
           MAX_RAM    => 0,                # The highest address of the RAM.
           RAM_SIZE   => 0,                # Full size of the all SFR and GPR.
           GPR_SIZE   => 0,                # Full size of the all GPR.
@@ -2055,11 +2107,10 @@ sub read_device_informations()
           STD_SCRIPT => '',               # Standard linker script file name of the MCU.
 
         # These addresses relative, compared to the beginning of the blocks.
-          ROM        => hex($fields[6]),  # Last address of ROM/FLASH.
-          FLASHDATA  => hex($fields[11]), # Last address of FLASH Data.
-          EEPROM     => hex($fields[9]),  # Last address of EEPROM.
+          ROM        => hex $fields[6],   # Last address of ROM/FLASH.
+          EEPROM     => hex $fields[9],   # Last address of EEPROM.
 
-          DIR_COUNT  => hex($fields[12]), # Number of the Configuration bytes/words.
+          DIR_COUNT  => hex $fields[13],  # Number of the Configuration bytes/words.
           DIRECTIVES => [],
           CONF_MASK  => 0,                # Mask of the config words.
           BANK_MAX   => $tr->{BANK_MAX},
@@ -2084,7 +2135,7 @@ sub read_device_informations()
 
         $inc = $gp_mcus_by_names{$mcu_name};
 
-        if (defined($inc) && $inc ne '')
+        if (defined $inc && ($inc ne ''))
           {
           $lkr = $inc;
           $lkr =~ s/^p//o;
@@ -2145,7 +2196,7 @@ sub read_device_informations()
 
           my ($dir_default, $dir_subst);
 
-          ($directive_addr, $dir_default, $switch_count) = (hex($fields[1]), hex($fields[3]), hex($fields[4]));
+          ($directive_addr, $dir_default, $switch_count) = (hex $fields[1], hex $fields[3], hex $fields[4]);
 
           if ($switch_count <= 0)
             {
@@ -2170,7 +2221,7 @@ sub read_device_informations()
               };
 
             $directive_mask = 0;
-            push(@{$mcu_features->{DIRECTIVES}}, $directive);
+            push @{$mcu_features->{DIRECTIVES}}, $directive;
 
             $dir_addr_min = $directive_addr if ($dir_addr_min > $directive_addr);
             $dir_addr_max = $directive_addr if ($dir_addr_max < $directive_addr);
@@ -2188,7 +2239,7 @@ sub read_device_informations()
 
           my ($sw_name, $sw_mask);
 
-          ($sw_name, $sw_mask, $option_count) = ($fields[1], hex($fields[3]), hex($fields[4]));
+          ($sw_name, $sw_mask, $option_count) = ($fields[1], hex $fields[3], hex $fields[4]);
 
         # Microchip bug of the 18f47k40 and 18lf47k40 devices: nDEBUG, nXINST
           $sw_name =~ s/^n//o;
@@ -2208,7 +2259,7 @@ sub read_device_informations()
               };
 
             $debug_present = TRUE if ($sw_name eq 'DEBUG');
-            push(@{$directive->{SWITCHES}}, $switch_info);
+            push @{$directive->{SWITCHES}}, $switch_info;
             $directive_mask |= $sw_mask;
             }
 
@@ -2250,7 +2301,7 @@ sub read_device_informations()
           die "Too much the number of \"SETTING_VALUE_TYPE\"!\n" if ($option_count <= 0);
           die "There is no actual \"SWITCH_INFO_TYPE\"!\n" if (! defined($switch_info));
 
-          my $value = hex($fields[3]);
+          my $value = hex $fields[3];
           my $is_default = (($directive->{DIR_DEFAULT} & $switch_info->{SW_MASK}) == $value) ? TRUE : FALSE;
 
           my $option =
@@ -2261,7 +2312,7 @@ sub read_device_informations()
             DEFAULT => $is_default
             };
 
-          push(@{$switch_info->{OPTIONS}}, $option);
+          push @{$switch_info->{OPTIONS}}, $option;
           --$option_count;
 
           if ($option_count == 0)
@@ -2271,10 +2322,10 @@ sub read_device_informations()
           } # when ('SETTING_VALUE_TYPE')
         } # given ($fields[0])
 
-      if ($directive_count == 0 && $switch_count == 0 && $option_count == 0)
+      if (($directive_count == 0) && ($switch_count == 0) && ($option_count == 0))
         {
         # All information is together.
-        die "$mcu_name MCU already exist!" if (defined($mcus_by_names{$mcu_name}));
+        die "$mcu_name MCU already exist!" if defined $mcus_by_names{$mcu_name};
 
         $mcu_features->{CONF_START} = $dir_addr_min;
         $mcu_features->{CONF_END}   = $dir_addr_max;
@@ -2284,7 +2335,7 @@ sub read_device_informations()
       } # if ($state == ST_LISTEN)
     } # while (<INFO>)
 
-  close(INFO);
+  close INFO;
   }
 
 #   @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
@@ -2764,7 +2815,7 @@ sub print_common_sfr_lists($$)
     $max_y = $offs if ($max_y < $offs);
     }
 
-  $bank_array[$i]->{MAX_OFFS} = $max_y;      # This the last bank.
+  $bank_array[$i]->{MAX_OFFS} = $max_y if ($i >= 0);      # This the last bank.
 
   $max_x = @bank_array;
 
@@ -2952,19 +3003,6 @@ sub print_features($)
       }
 
     aOutl(6, '</tr>');
-    }
-
-        #------------------------------------
-
-  $i = $Features->{FLASHDATA};
-  if ($i > 0)
-    {
-    aOutl (6, '<tr class="featLine">');
-    aOutl (8, '<th class="featName">Address space of FLASH Data</th>');
-    aOutfl(8, "<td class=\"featValue\">0x%0${len}X - 0x%0${len}X&nbsp;&nbsp;(%u words)</td>",
-               $rom_size, $rom_size + $i, $i + 1);
-
-    aOutl (6, '</tr>');
     }
 
         #------------------------------------
