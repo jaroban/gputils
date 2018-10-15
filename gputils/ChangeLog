@@ -1,4 +1,8 @@
 2018-10-15  Molnar Karoly  <molnarkaroly@users.sourceforge.net>
+  * doc/gputils.lyx:
+    updated
+
+2018-10-15  Molnar Karoly  <molnarkaroly@users.sourceforge.net>
   * header/Makefile.am,
     header/Makefile.in,
     header/p18f24q10.inc,
