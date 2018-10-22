@@ -104,8 +104,8 @@ string_to_int(const char *String, int Radix)
   value = _strtoi(String, &endptr, Radix);
   if ((endptr != NULL) && ((ch = *endptr) != '\0')) {
     snprintf(buf, sizeof(buf),
-             isprint(ch) ? "Illegal character '%c' in numeric constant." :
-                           "Illegal character %#x in numeric constant.",
+             isprint((unsigned char)ch) ? "Illegal character '%c' in numeric constant." :
+                                          "Illegal character %#x in numeric constant.",
              ch);
     gpmsg_error(GPE_UNKNOWN, buf);
   }

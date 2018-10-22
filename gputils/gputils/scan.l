@@ -71,7 +71,7 @@ _bad_char(const char *Str)
             state.lset_root.file_name, yylineno);
   }
   else {
-    yyerror(isprint(*Str) ?
+    yyerror(isprint((unsigned char)*Str) ?
             "Illegal character '%c' in a numeric constant in the \"%s\".%d." :
             "Illegal character 0x%02X in a numeric constant in the \"%s\".%d.",
             *Str, state.lset_root.file_name, yylineno);

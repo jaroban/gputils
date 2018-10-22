@@ -1,3 +1,13 @@
+2018-10-22  Molnar Karoly  <molnarkaroly@users.sourceforge.net>
+  * gpasm/preprocess.c,
+    gpasm/scan.l,
+    gpasm/util.c,
+    gplink/scan.l,
+    gputils/scan.l,
+    libgputils/gpdis.c:
+    Added patch: "#73 Fix calls to <cytpe.h> macros like isprint()"
+    Thanks to Hans-Bernhard Broeker.
+
 2018-10-15  Molnar Karoly  <molnarkaroly@users.sourceforge.net>
   * doc/gputils.lyx:
     updated

@@ -112,7 +112,7 @@ _is_iden(int Ch)
 static inline void
 _skip_spaces(const char *Buf, int *Num)
 {
-  while (isspace(Buf[*Num])) {
+  while (isspace((unsigned char)Buf[*Num])) {
     ++(*Num);
   }
 }
@@ -292,7 +292,7 @@ _substitute_define(char *Buf, int Begin, int *End, int *Num, int Max_size, int L
 
         /* right trim */
         end1 = *End - 1;
-        while ((end1 >= 0) && isspace(Buf[end1])) {
+        while ((end1 >= 0) && isspace((unsigned char)Buf[end1])) {
           --end1;
         }
 

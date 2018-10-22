@@ -592,7 +592,7 @@ a'{STR_QCHAR}'           {
                                /* fall through */
                              skip_trailing:
                                /* skip trailing spaces */
-                               while ((i > 0) && isspace(buf[i - 1])) {
+                               while ((i > 0) && isspace((unsigned char)buf[i - 1])) {
                                  --i;
                                }
                                /* fall through */

@@ -47,8 +47,8 @@ _bad_char(const char *Character)
   char complaint[80];
 
   snprintf(complaint, sizeof(complaint),
-           isprint(*Character) ? "Illegal character '%c' in numeric constant." :
-                                 "Illegal character %#x in numeric constant.",
+           isprint((unsigned char)*Character) ? "Illegal character '%c' in numeric constant." :
+                                                "Illegal character %#x in numeric constant.",
            *Character);
 
   script_error(complaint, NULL);

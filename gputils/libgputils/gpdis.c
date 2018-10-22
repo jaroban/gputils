@@ -1717,7 +1717,7 @@ print_word(char *Buffer, size_t Buffer_length, size_t Current_length, uint16_t O
     if (isprint(Opcode)) {
       gp_exclamation(Buffer, Buffer_length, length, "; '%c'", bytes[0]);
     }
-    else if (isprint(bytes[0]) && isprint(bytes[1])) {
+    else if (isprint((unsigned char)bytes[0]) && isprint((unsigned char)bytes[1])) {
       gp_exclamation(Buffer, Buffer_length, length, "; '%c%c'", bytes[0], bytes[1]);
     }
   }
