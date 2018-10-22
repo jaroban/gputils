@@ -1,4 +1,12 @@
 2018-10-22  Molnar Karoly  <molnarkaroly@users.sourceforge.net>
+  * libgputils/gparchive.c:
+    Minor bugfix.
+    Thanks for the warning of Hans-Bernhard Broeker.
+
+  * configure, configure.ac:
+    Now use MPLABX_PATH_DEFAULT="/opt/microchip/mplabx/v5.05".
+
+2018-10-22  Molnar Karoly  <molnarkaroly@users.sourceforge.net>
   * gpasm/preprocess.c,
     gpasm/scan.l,
     gpasm/util.c,
