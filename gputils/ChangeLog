@@ -1,3 +1,9 @@
+2019-02-23  Molnar Karoly  <molnarkaroly@users.sourceforge.net>
+  * gpasm/directive.c:
+    Fixed bug: "#309 GPLINK error when BRA jumps to MOVLB instruction"
+    Added patch from Anonymous.
+    Thanks to Michael Widlok and Anonymous.
+
 2018-10-22  Molnar Karoly  <molnarkaroly@users.sourceforge.net>
   * libgputils/gparchive.c:
     Minor bugfix.

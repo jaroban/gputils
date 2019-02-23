@@ -5945,6 +5945,8 @@ do_insn(const char *Op_name, pnode_t *Parameters)
 
       case INSN_CLASS_LIT3: {
         /* PIC12E, PIC12I movlb */
+        gpasmVal b;
+
         if (state.processor == NULL) {
           gpmsg_verror(GPE_UNDEF_PROC, "\"%s\"", Op_name);
           return 0;
@@ -5952,12 +5954,12 @@ do_insn(const char *Op_name, pnode_t *Parameters)
 
         if (eval_enforce_arity(arity, 1)) {
           p = PnListHead(Parameters);
-          r = eval_reloc_evaluate(p, RELOC_MOVLB, NULL, NULL, true);
-          _emit_check(ins->opcode, r, PIC12E_BMSK_BANK, sym_name);
+          b = eval_reloc_evaluate(p, RELOC_MOVLB, NULL, NULL, true);
+          _emit_check(ins->opcode, b, PIC12E_BMSK_BANK, sym_name);
 
           if (!state.mpasm_compatible) {
             /* Set the selection of RAM Banks. */
-            bank_num = r & (PIC12E_MASK_MOVLB ^ PIC12_CORE_MASK);
+            bank_num = b & (PIC12E_MASK_MOVLB ^ PIC12_CORE_MASK);
             set_global(__ACTIVE_BANK_ADDR, gp_processor_addr_from_bank_num(state.processor, bank_num),
                        VAL_VARIABLE, true, false);
           }
@@ -5988,6 +5990,8 @@ do_insn(const char *Op_name, pnode_t *Parameters)
 
       case INSN_CLASS_LIT4L: {
 	/* PIC16E movlb */
+        gpasmVal b;
+
         if (state.processor == NULL) {
           gpmsg_verror(GPE_UNDEF_PROC, "\"%s\"", Op_name);
           return 0;
@@ -5997,12 +6001,12 @@ do_insn(const char *Op_name, pnode_t *Parameters)
           _check_16e_arg_types(Parameters, arity, 0);
           p = PnListHead(Parameters);
           coerce_str1(p); /* literal instructions can coerce string literals */
-          r = eval_reloc_evaluate(p, RELOC_MOVLB, NULL, NULL, true);
-          _emit_check(ins->opcode, r, PIC16E_BMSK_MOVLB, sym_name);
+          b = eval_reloc_evaluate(p, RELOC_MOVLB, NULL, NULL, true);
+          _emit_check(ins->opcode, b, PIC16E_BMSK_MOVLB, sym_name);
 
           if (!state.mpasm_compatible) {
             /* Set the selection of RAM Banks. */
-            bank_num = r & (PIC16E_MASK_MOVLB ^ PIC16_CORE_MASK);
+            bank_num = b & (PIC16E_MASK_MOVLB ^ PIC16_CORE_MASK);
             set_global(__ACTIVE_BANK_ADDR, gp_processor_addr_from_bank_num(state.processor, bank_num),
                        VAL_VARIABLE, true, false);
           }
@@ -6033,6 +6037,8 @@ do_insn(const char *Op_name, pnode_t *Parameters)
 
       case INSN_CLASS_LIT5: {
         /* PIC14E movlb */
+        gpasmVal b;
+
         if (state.processor == NULL) {
           gpmsg_verror(GPE_UNDEF_PROC, "\"%s\"", Op_name);
           return 0;
@@ -6040,12 +6046,12 @@ do_insn(const char *Op_name, pnode_t *Parameters)
 
         if (eval_enforce_arity(arity, 1)) {
           p = PnListHead(Parameters);
-          r = eval_reloc_evaluate(p, RELOC_MOVLB, NULL, NULL, true);
-          _emit_check(ins->opcode, r, PIC14E_BMSK_MOVLB, sym_name);
+          b = eval_reloc_evaluate(p, RELOC_MOVLB, NULL, NULL, true);
+          _emit_check(ins->opcode, b, PIC14E_BMSK_MOVLB, sym_name);
 
           if (!state.mpasm_compatible) {
             /* Set the selection of RAM Banks. */
-            bank_num = r & PIC14E_BMSK_MOVLB;
+            bank_num = b & PIC14E_BMSK_MOVLB;
             set_global(__ACTIVE_BANK_ADDR, gp_processor_addr_from_bank_num(state.processor, bank_num),
                        VAL_VARIABLE, true, false);
           }
@@ -6058,6 +6064,8 @@ do_insn(const char *Op_name, pnode_t *Parameters)
 
       case INSN_CLASS_LITBSR_6: {
         /* PIC14EX movlb */
+        gpasmVal b;
+
         if (state.processor == NULL) {
           gpmsg_verror(GPE_UNDEF_PROC, "\"%s\"", Op_name);
           return 0;
@@ -6065,12 +6073,12 @@ do_insn(const char *Op_name, pnode_t *Parameters)
 
         if (eval_enforce_arity(arity, 1)) {
           p = PnListHead(Parameters);
-          r = eval_reloc_evaluate(p, RELOC_MOVLB, NULL, NULL, true);
-          _emit_check(ins->opcode, r, PIC14EX_BMSK_MOVLB, sym_name);
+          b = eval_reloc_evaluate(p, RELOC_MOVLB, NULL, NULL, true);
+          _emit_check(ins->opcode, b, PIC14EX_BMSK_MOVLB, sym_name);
 
           if (!state.mpasm_compatible) {
             /* Set the selection of RAM Banks. */
-            bank_num = r & PIC14EX_BMSK_MOVLB;
+            bank_num = b & PIC14EX_BMSK_MOVLB;
             set_global(__ACTIVE_BANK_ADDR, gp_processor_addr_from_bank_num(state.processor, bank_num),
                        VAL_VARIABLE, true, false);
           }
