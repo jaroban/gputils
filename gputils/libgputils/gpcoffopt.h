@@ -4,6 +4,12 @@
 
     Copyright (C) 2016 Molnar Karoly
 
+   Experimental pagesel and banksel removal.
+   Copyright (C) 2017 Gonzalo Pérez de Olaguer Córdoba <salo@gpoc.es>
+
+   Experimental PCALLW removal.
+   Copyright (C) 2017 Gonzalo Pérez de Olaguer Córdoba <salo@gpoc.es>
+
 This file is part of gputils.
 
 gputils is free software; you can redistribute it and/or modify
@@ -28,5 +34,8 @@ extern void gp_coffopt_remove_weak(gp_object_t *Object);
 extern void gp_coffopt_remove_dead_sections(gp_object_t *Object, int Pass, gp_boolean Enable_cinit_wanings);
 extern void gp_coffopt_remove_unnecessary_pagesel(gp_object_t *Object);
 extern void gp_coffopt_remove_unnecessary_banksel(gp_object_t *Object);
+extern void gp_coffopt_remove_unnecessary_pagesel_experimental(gp_object_t *Object);
+extern void gp_coffopt_remove_unnecessary_banksel_experimental(gp_object_t *Object);
+extern void gp_coffopt_remove_unnecessary_pcallw_experimental(gp_object_t *Object);
 
 #endif

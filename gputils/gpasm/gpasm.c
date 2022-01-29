@@ -2,7 +2,10 @@
    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005
    James Bowman, Craig Franklin
 
-    Copyright (C) 2014-2016 Molnar Karoly
+   Copyright (C) 2014-2016 Molnár Károly
+
+   Dump COFF file contents option.
+   Copyright (C) 2019 Gonzalo Pérez de Olaguer Córdoba <salo@gpoc.es>
 
 This file is part of gputils.
 
@@ -56,6 +59,9 @@ typedef struct {
 enum {
   OPT_MPASM_COMPATIBLE = 0x100,
   OPT_STRICT_OPTIONS
+#ifdef GPUTILS_DEBUG
+  , OPT_DUMP_COFF
+#endif
 };
 
 static struct option longopts[] =
@@ -93,6 +99,9 @@ static struct option longopts[] =
   { "mpasm-compatible",          no_argument,       NULL, OPT_MPASM_COMPATIBLE },
   { "preprocess",                required_argument, NULL, 'P' },
   { "macro-dereference",         no_argument,       NULL, 'X' },
+#ifdef GPUTILS_DEBUG
+  { "dump-coff",                 no_argument,       NULL, OPT_DUMP_COFF },
+#endif
   { NULL,                        no_argument,       NULL, '\0' }
 };
 
@@ -110,6 +119,9 @@ _show_usage(void)
   printf("  -C, --old-coff                 Use old Microchip COFF format.\n");
   printf("  -d, --debug                    Output debug messages.\n");
   printf("  -D SYM=VAL, --define SYM=VAL   Define SYM with value VAL.\n");
+#ifdef GPUTILS_DEBUG
+  printf("      --dump-coff                Dump COFF file contents.\n");
+#endif
   printf("  -e [ON|OFF], --expand [ON|OFF] Macro expansion.\n");
   printf("  -f, --full-address             Show full address in .lst file at the memory map region.\n");
   printf("  -g, --debug-info               Use debug directives for COFF.\n");
@@ -854,6 +866,12 @@ process_args(int argc, char *argv[])
       case OPT_MPASM_COMPATIBLE:
         state.mpasm_compatible = true;
         break;
+
+#ifdef GPUTILS_DEBUG
+      case OPT_DUMP_COFF:
+        gp_dump_coff = true;
+        break;
+#endif
 
       case OPT_STRICT_OPTIONS:
         break;

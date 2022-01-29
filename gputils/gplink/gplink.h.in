@@ -2,7 +2,13 @@
    Copyright (C) 2001, 2002, 2003, 2004, 2005
    Craig Franklin
 
-    Copyright (C) 2015-2016 Molnar Karoly
+   Copyright (C) 2015-2016 Molnár Károly
+
+   Experimental pagesel and banksel removal.
+   Copyright (C) 2017 Gonzalo Pérez de Olaguer Córdoba <salo@gpoc.es>
+
+   Experimental PCALLW removal.
+   Copyright (C) 2017 Gonzalo Pérez de Olaguer Córdoba <salo@gpoc.es>
 
 This file is part of gputils.
 
@@ -85,6 +91,9 @@ extern struct gplink_state {
     gp_boolean   weak_symbols;
     unsigned int pagesel;
     unsigned int banksel;
+    gp_boolean   experimental_banksel;
+    gp_boolean   experimental_pagesel;
+    gp_boolean   experimental_pcallw;
   } optimize;
 
   enum outfile

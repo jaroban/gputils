@@ -2,7 +2,10 @@
    Copyright (C) 2001, 2002, 2003, 2004, 2005
    Craig Franklin
 
-    Copyright (C) 2016 Molnar Karoly
+   Copyright (C) 2016 Molnár Károly
+
+   Report missing symbols in gp_cofflink_clean_table.
+   Copyright (C) 2019 Gonzalo Pérez de Olaguer Córdoba <salo@gpoc.es>
 
 This file is part of gputils.
 
@@ -191,17 +194,26 @@ gp_cofflink_clean_table(gp_object_t *Object, symbol_table_t *Symbols)
         /* This is an external symbol defined elsewhere. */
         sym = gp_sym_get_symbol(Symbols, symbol->name);
         if (sym == NULL) {
-          gp_error("Non-existent external symbol - \"%s\" - used in \"%s\" section.", symbol->name, section->name);
+          gp_error("External symbol \"%s\" in section \"%s\" not found.", symbol->name, section->name);
+          goto _continue;
         }
-        else {
-          var    = (const gp_coffsymbol_t *)gp_sym_get_symbol_annotation(sym);
-          assert(!(var == NULL));
-          symbol = var->symbol;
-          assert(!(symbol == NULL));
-          relocation->symbol = symbol;
+
+        var = (const gp_coffsymbol_t *)gp_sym_get_symbol_annotation(sym);
+        if (var == NULL) {
+          gp_error("External symbol \"%s\" in section \"%s\" not annotated.", symbol->name, section->name);
+          goto _continue;
         }
+
+        if (var->symbol == NULL) {
+          gp_error("External symbol \"%s\" in section \"%s\" not provided.", symbol->name, section->name);
+          goto _continue;
+        }
+
+        symbol = var->symbol;
+        relocation->symbol = symbol;
       }
 
+_continue:
       relocation = relocation->next;
     }
 

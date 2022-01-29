@@ -2,6 +2,10 @@
    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005
    James Bowman, Craig Franklin
 
+   Increased size of struct gpasm_state.obj.new_sect_name (80 -> 200).
+   (SDCC sometimes creates quite long names).
+   Copyright (C) 2019 Gonzalo Pérez de Olaguer Córdoba <salo@gpoc.es>
+
 This file is part of gputils.
 
 gputils is free software; you can redistribute it and/or modify
@@ -353,7 +357,7 @@ extern struct gpasm_state {
     gp_section_t *section;              /*   Current section. */
     int           section_num;          /*   Current section number. */
     gp_boolean    enabled;              /*   True if object file is enabled. */
-    char          new_sect_name[80];    /*   new section name */
+    char          new_sect_name[200];   /*   new section name */
     unsigned int  new_sect_addr;        /*   new section adress */
     unsigned int  new_sect_flags;       /*   new section flags */
     unsigned int  symbol_num;           /*   Current symbol number. */

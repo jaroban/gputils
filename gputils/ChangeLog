@@ -1,3 +1,25 @@
+2022-01-29  Molnar Karoly  <molnarkaroly@users.sourceforge.net>
+  * gpasm/gpasm.c,
+    gpasm/gpasm.h.in,
+    gplink/gplink.c,
+    gplink/gplink.h.in,
+    gplink/map.c,
+    gputils/gpstrip.c,
+    libgputils/gpcofflink.c,
+    libgputils/gpcoffopt.c,
+    libgputils/gpcoffopt.h,
+    libgputils/gpwriteobj.c,
+    libgputils/gpwriteobj.h:
+    Added a big patchset from Gonzalo Pérez de Olaguer Córdoba:
+      gpasm-increase-section-name-length
+      add-dump-coff-option
+      gpcofflink-report-missing-symbols
+      gplink-force-map-symbols
+      gplink-experimental-removal-optimizations
+      gplink-experimental-banksel-and-pagesel-removal
+      gplink-experimental-pcallw-removal
+    Thanks for this.
+
 2019-02-23  Molnar Karoly  <molnarkaroly@users.sourceforge.net>
   * gpasm/directive.c:
     Fixed bug: "#309 GPLINK error when BRA jumps to MOVLB instruction"

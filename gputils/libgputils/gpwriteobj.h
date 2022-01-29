@@ -2,6 +2,9 @@
    Copyright (C) 2003, 2004, 2005
    Craig Franklin
 
+   Dump COFF file contents option.
+   Copyright (C) 2019 Gonzalo Pérez de Olaguer Córdoba <salo@gpoc.es>
+
 This file is part of gputils.
 
 gputils is free software; you can redistribute it and/or modify
@@ -21,6 +24,10 @@ Boston, MA 02111-1307, USA.  */
 
 #ifndef __GPWRITEOBJ_H__
 #define __GPWRITEOBJ_H__
+
+#ifdef GPUTILS_DEBUG
+extern gp_boolean gp_dump_coff;
+#endif
 
 extern gp_boolean gp_writeobj_write_coff(gp_object_t *Object, int Num_errors);
 

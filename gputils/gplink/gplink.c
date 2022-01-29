@@ -2,7 +2,16 @@
    Copyright (C) 2001, 2002, 2003, 2004, 2005
    Craig Franklin
 
-    Copyright (C) 2015-2016 Molnar Karoly
+   Copyright (C) 2015-2016 Molnár Károly
+
+   Dump COFF file contents option.
+   Copyright (C) 2019 Gonzalo Pérez de Olaguer Córdoba <salo@gpoc.es>
+
+   Experimental pagesel and banksel removal.
+   Copyright (C) 2017 Gonzalo Pérez de Olaguer Córdoba <salo@gpoc.es>
+
+   Experimental PCALLW removal.
+   Copyright (C) 2017 Gonzalo Pérez de Olaguer Córdoba <salo@gpoc.es>
 
 This file is part of gputils.
 
@@ -40,40 +49,49 @@ struct gplink_state state;
 static gp_boolean   processor_mismatch_warning;
 static gp_boolean   enable_cinit_wanings;
 
-#define GET_OPTIONS "a:b:cCdf:hI:jlmo:O:p:qrs:S:t:u:vw"
+#define GET_OPTIONS "a:b:BcCdf:hI:jlmo:O:p:Pqrs:S:t:u:vwW"
 
 enum {
   OPT_MPLINK_COMPATIBLE = 0x100,
   OPT_STRICT_OPTIONS
+#ifdef GPUTILS_DEBUG
+  , OPT_DUMP_COFF
+#endif
 };
 
 static struct option longopts[] =
 {
-  { "hex-format",         required_argument, NULL, 'a' },
-  { "optimize-banksel",   required_argument, NULL, 'b' },
-  { "object",             no_argument,       NULL, 'c' },
-  { "no-cinit-warnings",  no_argument,       NULL, 'C' },
-  { "debug",              no_argument,       NULL, 'd' },
-  { "fill",               required_argument, NULL, 'f' },
-  { "help",               no_argument,       NULL, 'h' },
-  { "include",            required_argument, NULL, 'I' },
-  { "no-save-local",      no_argument,       NULL, 'j' },
-  { "no-list",            no_argument,       NULL, 'l' },
-  { "map",                no_argument,       NULL, 'm' },
-  { "output",             required_argument, NULL, 'o' },
-  { "optimize",           required_argument, NULL, 'O' },
-  { "optimize-pagesel",   required_argument, NULL, 'p' },
-  { "quiet",              no_argument,       NULL, 'q' },
-  { "use-shared",         no_argument,       NULL, 'r' },
-  { "script",             required_argument, NULL, 's' },
-  { "stack",              required_argument, NULL, 't' },
-  { "strict",             required_argument, NULL, 'S' },
-  { "strict-options",     no_argument,       NULL, OPT_STRICT_OPTIONS },
-  { "macro",              required_argument, NULL, 'u' },
-  { "version",            no_argument,       NULL, 'v' },
-  { "processor-mismatch", no_argument,       NULL, 'w' },
-  { "mplink-compatible",  no_argument,       NULL, OPT_MPLINK_COMPATIBLE },
-  { NULL,                 no_argument,       NULL, '\0'}
+  { "hex-format",           required_argument, NULL, 'a' },
+  { "optimize-banksel",     required_argument, NULL, 'b' },
+  { "experimental-banksel", no_argument,       NULL, 'B' },
+  { "object",               no_argument,       NULL, 'c' },
+  { "no-cinit-warnings",    no_argument,       NULL, 'C' },
+  { "debug",                no_argument,       NULL, 'd' },
+  { "fill",                 required_argument, NULL, 'f' },
+  { "help",                 no_argument,       NULL, 'h' },
+  { "include",              required_argument, NULL, 'I' },
+  { "no-save-local",        no_argument,       NULL, 'j' },
+  { "no-list",              no_argument,       NULL, 'l' },
+  { "map",                  no_argument,       NULL, 'm' },
+  { "output",               required_argument, NULL, 'o' },
+  { "optimize",             required_argument, NULL, 'O' },
+  { "optimize-pagesel",     required_argument, NULL, 'p' },
+  { "experimental-pagesel", no_argument,       NULL, 'P' },
+  { "quiet",                no_argument,       NULL, 'q' },
+  { "use-shared",           no_argument,       NULL, 'r' },
+  { "script",               required_argument, NULL, 's' },
+  { "stack",                required_argument, NULL, 't' },
+  { "strict",               required_argument, NULL, 'S' },
+  { "strict-options",       no_argument,       NULL, OPT_STRICT_OPTIONS },
+  { "macro",                required_argument, NULL, 'u' },
+  { "version",              no_argument,       NULL, 'v' },
+  { "processor-mismatch",   no_argument,       NULL, 'w' },
+  { "experimental-pcallw",  no_argument,       NULL, 'W' },
+  { "mplink-compatible",    no_argument,       NULL, OPT_MPLINK_COMPATIBLE },
+#ifdef GPUTILS_DEBUG
+  { "dump-coff",            no_argument,       NULL, OPT_DUMP_COFF },
+#endif
+  { NULL,                   no_argument,       NULL, '\0'}
 };
 
 /*------------------------------------------------------------------------------------------------*/
@@ -85,10 +103,14 @@ _show_usage(void)
   printf("Options: [defaults in brackets after descriptions]\n");
   printf("  -a FMT, --hex-format FMT       Select hex file format.\n");
   printf("  -b OPT, --optimize-banksel OPT Remove unnecessary Banksel directives. [0]\n");
+  printf("  -B, --experimental-banksel     Use experimental Banksel removal.\n");
   printf("  -c, --object                   Output executable object file.\n");
   printf("  -C, --no-cinit-warnings        Disable this warnings of _cinit section with -O2 option:\n"
          "                                   \"Relocation symbol _cinit has no section.\"\n");
   printf("  -d, --debug                    Output debug messages.\n");
+#ifdef GPUTILS_DEBUG
+  printf("      --dump-coff                Dump COFF file contents.\n");
+#endif
   printf("  -f VALUE, --fill VALUE         Fill unused program memory with value.\n");
   printf("  -h, --help                     Show this usage message.\n");
   printf("  -I DIR, --include DIR          Specify include directory.\n");
@@ -99,6 +121,7 @@ _show_usage(void)
   printf("  -o FILE, --output FILE         Alternate name of output file.\n");
   printf("  -O OPT, --optimize OPT         Optimization level. [1]\n");
   printf("  -p OPT, --optimize-pagesel OPT Remove unnecessary Pagesel directives. [0]\n");
+  printf("  -P, --experimental-pagesel     Use experimental Pagesel removal.\n");
   printf("  -q, --quiet                    Quiet.\n");
   printf("  -r, --use-shared               Use shared memory if necessary.\n");
   printf("  -s FILE, --script FILE         Linker script.\n");
@@ -112,6 +135,7 @@ _show_usage(void)
   printf("  -u, --macro symbol[=value]     Add macro value for script.\n");
   printf("  -v, --version                  Show version.\n");
   printf("  -w, --processor-mismatch       Disable \"processor mismatch\" warning.\n");
+  printf("  -W, --experimental-pcallw      Remove unnecessary PCALLW stubs created by SDCC.\n");
   printf("\n");
 #ifdef USE_DEFAULT_PATHS
   if (gp_lkr_path != NULL) {
@@ -712,18 +736,26 @@ _process_args(int Argc, char *Argv[])
         break;
       }
 
-      case 'c':
+      case 'B': {
+        state.optimize.experimental_banksel = true;
+        break;
+      }
+
+      case 'c': {
         state.obj_file = OUT_NORMAL;
         break;
+      }
 
-      case 'C':
+      case 'C': {
         enable_cinit_wanings = false;
         break;
+      }
 
-      case 'd':
+      case 'd': {
         gp_debug_disable = false;
         yydebug = 1;
         break;
+      }
 
       case 'f': {
         state.fill_value = strtol(optarg, &pc, 16);
@@ -741,25 +773,30 @@ _process_args(int Argc, char *Argv[])
       }
 
       case '?':
-      case 'h':
+      case 'h': {
         usage = true;
         break;
+      }
 
-      case 'I':
+      case 'I': {
         gplink_add_path(optarg);
         break;
+      }
 
-      case 'j':
+      case 'j': {
         state.cod.no_save_local = true;
         break;
+      }
 
-      case 'l':
+      case 'l': {
         state.lst_file = OUT_SUPPRESS;
         break;
+      }
 
-      case 'm':
+      case 'm': {
         state.map_file = OUT_NORMAL;
         break;
+      }
 
       case 'o': {
         strncpy(state.base_file_name, optarg, sizeof(state.base_file_name));
@@ -771,9 +808,10 @@ _process_args(int Argc, char *Argv[])
         break;
       }
 
-      case 'O':
+      case 'O': {
         /* do nothing */
         break;
+      }
 
       case 'p': {
         state.optimize.pagesel = (unsigned int)strtol(optarg, &pc, 10);
@@ -784,13 +822,20 @@ _process_args(int Argc, char *Argv[])
         break;
       }
 
-      case 'q':
+      case 'P': {
+        state.optimize.experimental_pagesel = true;
+        break;
+      }
+
+      case 'q': {
         gp_quiet = true;
         break;
+      }
 
-      case 'r':
+      case 'r': {
         gp_relocate_to_shared = true;
         break;
+      }
 
       case 's': {
         fn = GP_Malloc(sizeof(srcfns_t));
@@ -830,26 +875,43 @@ _process_args(int Argc, char *Argv[])
         break;
       }
 
-      case 'u':
+      case 'u': {
         _parse_define(optarg, script_add_symbol_value);
         break;
+      }
 
-      case 'v':
+      case 'v': {
         fprintf(stderr, "%s\n", GPLINK_VERSION_STRING);
         exit(0);
         break;
+      }
 
-      case 'w':
+      case 'w': {
         processor_mismatch_warning = false;
         break;
+      }
 
-      case OPT_MPLINK_COMPATIBLE:
+      case 'W': {
+        state.optimize.experimental_pcallw = true;
+        break;
+      }
+
+      case OPT_MPLINK_COMPATIBLE: {
         state.mplink_compatible = true;
         break;
+      }
 
-      case OPT_STRICT_OPTIONS:
+#ifdef GPUTILS_DEBUG
+      case OPT_DUMP_COFF: {
+        gp_dump_coff = true;
+        break;
+      }
+#endif
+
+      case OPT_STRICT_OPTIONS: {
         /* do nothing */
         break;
+      }
     } /* switch (c) */
 
     if (usage) {
@@ -1054,12 +1116,46 @@ _linker(void)
 
   gp_cofflink_update_table(state.object, state.class->org_to_byte_shift);
 
-  if (state.optimize.pagesel > 0) {
-    gp_coffopt_remove_unnecessary_pagesel(state.object);
+  /* remove unnecessary pcallw stubs (created by the SDCC compiler)
+   *
+   * current implementation requires this to be done after
+   * sections have been relocated.
+   */
+  if (state.optimize.experimental_pcallw) {
+    gp_coffopt_remove_unnecessary_pcallw_experimental(state.object);
   }
 
-  if (state.optimize.banksel > 0) {
-    gp_coffopt_remove_unnecessary_banksel(state.object);
+  /* after pagesel removal has been done sections cannot be moved
+   * across pages, so it is better to do pagesel removal last.
+   */
+
+  if (state.optimize.experimental_banksel || state.optimize.experimental_pagesel) {
+    if (state.optimize.banksel > 0) {
+      if (state.optimize.experimental_banksel) {
+        gp_coffopt_remove_unnecessary_banksel_experimental(state.object);
+      }
+      else {
+        gp_coffopt_remove_unnecessary_banksel(state.object);
+      }
+    }
+
+    if (state.optimize.pagesel > 0) {
+      if (state.optimize.experimental_pagesel) {
+        gp_coffopt_remove_unnecessary_pagesel_experimental(state.object);
+      }
+      else {
+        gp_coffopt_remove_unnecessary_pagesel(state.object);
+      }
+    }
+  }
+  else {
+    if (state.optimize.pagesel > 0) {
+      gp_coffopt_remove_unnecessary_pagesel(state.object);
+    }
+
+    if (state.optimize.banksel > 0) {
+      gp_coffopt_remove_unnecessary_banksel(state.object);
+    }
   }
 
   gp_coffgen_make_linenum_array(state.object);

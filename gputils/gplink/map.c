@@ -2,7 +2,10 @@
    Copyright (C) 2003, 2004, 2005
    Craig Franklin
 
-    Copyright (C) 2016 Molnar Karoly
+   Copyright (C) 2016 Molnár Károly
+
+   Report symbols in map indeed on errors.
+   Copyright (C) 2019 Gonzalo Pérez de Olaguer Córdoba <salo@gpoc.es>
 
 This file is part of gputils.
 
@@ -286,6 +289,7 @@ _write_symbols(void)
   struct syms_s     *syms;
   const gp_symbol_t *sm;
   int                num_syms;
+  int                max_syms;
   int                i;
   file_stack_t      *stack = NULL;
   gp_symbol_t       *symbol = NULL;
@@ -293,6 +297,7 @@ _write_symbols(void)
   syms = GP_Malloc(sizeof(struct syms_s) * state.object->num_symbols);
 
   num_syms = 0;
+  max_syms = state.object->num_symbols;
   symbol   = state.object->symbol_list.first;
   while (symbol != NULL) {
     if (symbol->class == C_FILE) {
@@ -302,6 +307,11 @@ _write_symbols(void)
       stack = _pop_file(stack);
     }
     else if ((symbol->section_number > N_UNDEF) && (symbol->class != C_SECTION)) {
+      if (num_syms >= max_syms) {
+        max_syms += 100;
+        syms = GP_Realloc(syms, sizeof(struct syms_s) * max_syms);
+      }
+
       if (stack == NULL) {
         /* the symbol is not between a .file/.eof pair */
         syms[num_syms].file = NULL;
@@ -317,9 +327,13 @@ _write_symbols(void)
 
       syms[num_syms].symbol = symbol;
       ++num_syms;
-      assert(num_syms <= state.object->num_symbols);
     }
     symbol = symbol->next;
+  }
+
+  if (num_syms > state.object->num_symbols) {
+    gp_warning("number of symbols found (%d) is greater than expected(%d)",
+               num_syms, state.object->num_symbols);
   }
 
   qsort(syms, num_syms, sizeof(struct syms_s), _cmp_name);

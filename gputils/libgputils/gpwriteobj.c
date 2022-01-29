@@ -2,7 +2,10 @@
    Copyright (C) 2003, 2004, 2005
    Craig Franklin
 
-    Copyright (C) 2017 Molnar Karoly
+   Copyright (C) 2017 Molnár Károly
+
+   Dump COFF file contents option.
+   Copyright (C) 2019 Gonzalo Pérez de Olaguer Córdoba <salo@gpoc.es>
 
 This file is part of gputils.
 
@@ -23,6 +26,10 @@ Boston, MA 02111-1307, USA.  */
 
 #include "stdhdr.h"
 #include "libgputils.h"
+
+#ifdef GPUTILS_DEBUG
+gp_boolean gp_dump_coff = false;
+#endif
 
 /* String table offsets are 16 bits so this coff has a limit on the maximum string table size. */
 #define MAX_STRING_TABLE      0xffff
@@ -260,8 +267,10 @@ _write_section_data(pic_processor_t Processor, const gp_section_t *Section, FILE
   end = org + Section->size;
 
 #ifdef GPUTILS_DEBUG
-  printf("section \"%s\"\nsize= %li\ndata:\n", Section->name, Section->size);
-  gp_mem_i_print(Section->data, Processor);
+  if (gp_dump_coff) {
+    printf("section \"%s\"\nsize= %li\ndata:\n", Section->name, Section->size);
+    gp_mem_i_print(Section->data, Processor);
+  }
 #else
   (void)Processor;
 #endif

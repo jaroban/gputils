@@ -2,20 +2,23 @@
    Copyright (C) 2005
    Craig Franklin
 
-    Copyright (C) 2016 Molnar Karoly
+   Copyright (C) 2016 Molnár Károly
+
+   Dump COFF file contents option.
+   Copyright (C) 2019 Gonzalo Pérez de Olaguer Córdoba <salo@gpoc.es>
 
 This file is part of gputils.
- 
+
 gputils is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2, or (at your option)
 any later version.
- 
+
 gputils is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
- 
+
 You should have received a copy of the GNU General Public License
 along with gputils; see the file COPYING.  If not, write to
 the Free Software Foundation, 59 Temple Place - Suite 330,
@@ -31,6 +34,9 @@ gp_boolean verbose;
 
 enum {
   OPT_STRICT_OPTIONS = 0x100
+#ifdef GPUTILS_DEBUG
+  , OPT_DUMP_COFF
+#endif
 };
 
 #define GET_OPTIONS "ghk:n:o:pr:suvVx"
@@ -50,6 +56,9 @@ static struct option longopts[] =
   { "version",        no_argument,       NULL, 'v' },
   { "verbose",        no_argument,       NULL, 'V' },
   { "discard-all",    no_argument,       NULL, 'x' },
+#ifdef GPUTILS_DEBUG
+  { "dump-coff",      no_argument,       NULL, OPT_DUMP_COFF },
+#endif
   { NULL,             no_argument,       NULL, '\0'}
 };
 
@@ -60,6 +69,9 @@ _show_usage(void)
 {
   printf("Usage: gpstrip [options] file(s)\n");
   printf("Options: [defaults in brackets after descriptions]\n");
+#ifdef GPUTILS_DEBUG
+  printf("      --dump-coff                       Dump COFF file contents.\n");
+#endif
   printf("  -g, --strip-debug                     Strip debug symbols.\n");
   printf("  -h, --help                            Show this usage message.\n");
   printf("  -k SYMBOL, --keep-symbol SYMBOL       Keep symbol.\n");
@@ -158,9 +170,9 @@ _strip_all(void)
       gp_list_delete(&section->line_number_list);
       /* Remove the relocations, they should already be removed. */
       gp_list_delete(&section->relocation_list);
-    
+
       section = section->next;
-    }  
+    }
 
     /* remove all symbols */
     state.object->num_symbols = 0;
@@ -184,7 +196,7 @@ _strip_debug(void)
   while (section != NULL) {
     /* remove the line numbers */
     gp_list_delete(&section->line_number_list);
-    
+
     section = section->next;
   }
 
@@ -211,7 +223,7 @@ _strip_unneeded(void)
   while (list != NULL) {
     symbol = list;
     list   = list->next;
-    
+
     /* If the symbol has a relocation or is global it can't be removed. */
     if (!gp_coffgen_symbol_has_reloc(symbol, COFF_SYM_RELOC_ALL) && !gp_coffgen_is_global_symbol(symbol)) {
       _conditional_remove(symbol);
@@ -231,7 +243,7 @@ _discard_all(void)
   while (list != NULL) {
     symbol = list;
     list   = list->next;
-    
+
     if (!gp_coffgen_is_global_symbol(symbol)) {
       _conditional_remove(symbol);
     }
@@ -240,7 +252,7 @@ _discard_all(void)
 
 /*------------------------------------------------------------------------------------------------*/
 
-static void 
+static void
 _add_name(symbol_table_t *Table, const char *Name)
 {
   const symbol_t *sym;
@@ -347,6 +359,12 @@ int main(int argc, char *argv[])
         fprintf(stderr, "%s\n", GPSTRIP_VERSION_STRING);
         exit(0);
 
+#ifdef GPUTILS_DEBUG
+      case OPT_DUMP_COFF:
+        gp_dump_coff = true;
+        break;
+#endif
+
       case OPT_STRICT_OPTIONS:
         /* do nothing */
         break;
@@ -363,7 +381,7 @@ int main(int argc, char *argv[])
   for ( ; optind < argc; optind++) {
     state.input_file = argv[optind];
 
-    if ((gp_identify_coff_file(state.input_file) != GP_COFF_OBJECT_V2) && 
+    if ((gp_identify_coff_file(state.input_file) != GP_COFF_OBJECT_V2) &&
         (gp_identify_coff_file(state.input_file) != GP_COFF_OBJECT)) {
       gp_error("\"%s\" is not a valid object file", state.input_file);
       exit(1);
@@ -374,7 +392,7 @@ int main(int argc, char *argv[])
     if (state.object != NULL) {
       _remove_sections();
       _remove_symbols();
-    
+
       if (state.strip_all) {
         _strip_all();
       }
@@ -414,7 +432,7 @@ int main(int argc, char *argv[])
         /* FIXME: need to update the output file dates */
         state.object->time = (long)time(NULL);
       }
-    
+
       if (gp_num_errors == 0) {
         /* no errors have occured so write the file */
         if (!gp_writeobj_write_coff(state.object, 0)) {
