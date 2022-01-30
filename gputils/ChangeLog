@@ -1,4 +1,8 @@
 2022-01-30  Molnar Karoly  <molnarkaroly@users.sourceforge.net>
+  * man/gplink.1.in:
+    Updated the command line options.
+
+2022-01-30  Molnar Karoly  <molnarkaroly@users.sourceforge.net>
   * doc/gputils.lyx:
     Updated the documentation.
 

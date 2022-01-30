@@ -1,4 +1,4 @@
-.TH GPLINK 1 "2016-08-07" "@PACKAGE_NAME@-@PACKAGE_VERSION@" "Linux user's manual"
+.TH GPLINK 1 "2022-01-30" "@PACKAGE_NAME@-@PACKAGE_VERSION@" "Linux user's manual"
 .SH NAME
 gplink \- GNU PIC linker
 .SH SYNOPSIS
@@ -25,6 +25,9 @@ option controls which hex file format is used.  The default is inhx32.
 .TP
 .BR "\-b OPT", " \-\-optimize\-banksel OPT"
 Remove unnecessary Banksel directives. [0]
+.TP
+.BR "\-B", " \-\-experimental\-banksel"
+Use experimental Banksel removal.
 .TP
 .BR "\-c", " \-\-object"
 Output an executable object.
@@ -67,6 +70,9 @@ Optimization level.  Default value is 1.
 .BR "\-p OPT", " \-\-optimize\-pagesel OPT"
 Remove unnecessary Pagesel directives. [0]
 .TP
+.BR "\-P", " \-\-experimental\-pagesel"
+Use experimental Pagesel removal.
+.TP
 .BR "\-q", " \-\-quiet"
 Suppress anything sent to standard output.
 .TP
@@ -101,6 +107,9 @@ Show the version information and exit.
 .TP
 .BR "\-w", " \-\-processor\-mismatch"
 Disable "processor mismatch" warning.
+.TP
+.BR "\-W", " \-\-experimental\-pcallw"
+Remove unnecessary PCALLW stubs created by SDCC.
 .SH SEE ALSO
 .BR gputils (1)
 .SH AUTHOR
