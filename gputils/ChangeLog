@@ -1,4 +1,9 @@
 2022-01-30  Molnar Karoly  <molnarkaroly@users.sourceforge.net>
+  * gpasm/parse.y:
+    Added patch: "#76 Parser doesn't allow more than one unary operator"
+    Thanks to Schelte Bron.
+
+2022-01-30  Molnar Karoly  <molnarkaroly@users.sourceforge.net>
   * gputils/gpasm/util.c:
     Added patch: "#75 Prevent globals/externals from being created in .idlocs coff section"
     Thanks to Robert Nee.
