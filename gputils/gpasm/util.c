@@ -702,6 +702,7 @@ set_global(const char *Name, gpasmVal Value, enum gpasmValTypes Type, gp_boolean
     gp_sym_annotate_symbol(sym, var);
 
     if (set_symbol_attr(&section_number, &class, Type)) {
+      var->coff_section_num = section_number;
       /* Increment the index into the coff symbol table for the relocations. */
       state.obj.symbol_num++;
     }
@@ -730,7 +731,7 @@ set_global(const char *Name, gpasmVal Value, enum gpasmValTypes Type, gp_boolean
     }
 
     coff_name = coff_local_name(Name);
-    coff_add_sym(coff_name, Value, var->type, state.obj.section_num);
+    coff_add_sym(coff_name, Value, var->type, var->coff_section_num);
 
     if (coff_name != NULL) {
       free(coff_name);

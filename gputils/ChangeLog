@@ -1,3 +1,8 @@
+2022-01-30  Molnar Karoly  <molnarkaroly@users.sourceforge.net>
+  * gputils/gpasm/util.c:
+    Added patch: "#75 Prevent globals/externals from being created in .idlocs coff section"
+    Thanks to Robert Nee.
+
 2022-01-29  Molnar Karoly  <molnarkaroly@users.sourceforge.net>
   * gpasm/gpasm.c,
     gpasm/gpasm.h.in,
@@ -11,6 +16,7 @@
     libgputils/gpwriteobj.c,
     libgputils/gpwriteobj.h:
     Added a big patchset from Gonzalo Pérez de Olaguer Córdoba:
+      "#74 patches needed to support sdcc pic14 backend"
       gpasm-increase-section-name-length
       add-dump-coff-option
       gpcofflink-report-missing-symbols
