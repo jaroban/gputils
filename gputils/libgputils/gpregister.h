@@ -1,8 +1,8 @@
 
-#ifndef __GPREGISTER_H__
-#define __GPREGISTER_H__
+#ifndef g__GPREGISTER_H__
+#define g__GPREGISTER_H__
 
-/* This file is generated automatically by the build-register-db.pl, 2016-01-17 10:12:31 UTC. */
+/* This file is generated automatically by the build-register-db.pl, 2022-01-20 16:03:16 UTC. */
 
 typedef struct {
   const char   *name;
@@ -33,4 +33,4 @@ extern const char *gp_register_find_reg_name(const gp_register_table_t *Mcu, uns
 extern const gp_bit_t *gp_register_find_bit(const gp_register_t *Reg, unsigned int Address);
 extern const char *gp_register_find_bit_name(const gp_register_t *Reg, unsigned int Address);
 
-#endif /* __GPREGISTER_H__ */
+#endif /* g__GPREGISTER_H__ */

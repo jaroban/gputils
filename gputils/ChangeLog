@@ -1,4 +1,21 @@
 2022-01-30  Molnar Karoly  <molnarkaroly@users.sourceforge.net>
+  * header/Makefile.am,
+    header/Makefile.in,
+    header/p16f184...inc,
+    header/p16lf184...inc,
+    libgputils/gpcfg.h,
+    libgputils/gpcfg-table.c,
+    libgputils/gpprocessor.c,
+    libgputils/gpregister.h,
+    libgputils/gpreg-table.c,
+    lkr/16f184.._g.lkr,
+    lkr/16lf184.._g.lkr,
+    lkr/Makefile.am,
+    lkr/Makefile.in:
+    Added patch: "#77 Add PIC16F184XX devices"
+    Thanks to Schelte Bron.
+
+2022-01-30  Molnar Karoly  <molnarkaroly@users.sourceforge.net>
   * gpasm/parse.y:
     Added patch: "#76 Parser doesn't allow more than one unary operator"
     Thanks to Schelte Bron.
