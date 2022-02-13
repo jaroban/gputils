@@ -1,3 +1,10 @@
+2022-02-13  Molnar Karoly  <molnarkaroly@users.sourceforge.net>
+  * lkr/12f1571_g.lkr,
+    lkr/12lf1571_g.lkr,
+    libgputils/gpprocessor.c:
+    Fixed bug: "#316 incorrect linear_ram_addrs"
+    Thanks to Ben Tesch.
+
 2022-01-30  Molnar Karoly  <molnarkaroly@users.sourceforge.net>
   * man/gplink.1.in:
     Updated the command line options.
