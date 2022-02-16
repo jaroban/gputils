@@ -1,15 +1,5 @@
 // File: 12lf1571_g.lkr
 // Generic linker script for the PIC12LF1571 processor
-//// Begin: Added in gputils
-//=========================================================================
-//
-//      Gputils Specific Revision History
-//
-//=========================================================================
-//
-//      13 Feb 2022  Changed the LINEARMEM END value from 0x206F to 0x207F.
-//
-//// End: Added in gputils
 
 LIBPATH .
 
@@ -18,10 +8,7 @@ CODEPAGE   NAME=.idlocs    START=0x8000            END=0x8003         PROTECTED
 CODEPAGE   NAME=.devid     START=0x8006            END=0x8006         PROTECTED 
 CODEPAGE   NAME=.config    START=0x8007            END=0x8008         PROTECTED 
 
-//// Begin: Changed in gputils
-////LINEARMEM  NAME=linear0    START=0x2000            END=0x206F         PROTECTED
-LINEARMEM  NAME=linear0    START=0x2000            END=0x207F         PROTECTED
-//// End: Changed in gputils
+LINEARMEM  NAME=linear0    START=0x2000            END=0x206F         PROTECTED
 
 DATABANK   NAME=sfr0       START=0x0               END=0x1F           PROTECTED
 DATABANK   NAME=sfr1       START=0x80              END=0x9F           PROTECTED

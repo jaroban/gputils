@@ -1,3 +1,10 @@
+2022-02-16  Molnar Karoly  <molnarkaroly@users.sourceforge.net>
+  * lkr/12f1571_g.lkr,
+    lkr/12lf1571_g.lkr,
+    libgputils/gpprocessor.c:
+    Rejected this bug report: "#316 incorrect linear_ram_addrs"
+    The relevant page of the datasheet contains misleading information.
+
 2022-02-13  Molnar Karoly  <molnarkaroly@users.sourceforge.net>
   * lkr/12f1571_g.lkr,
     lkr/12lf1571_g.lkr,
