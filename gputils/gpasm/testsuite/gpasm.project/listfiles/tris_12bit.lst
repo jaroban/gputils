@@ -1,0 +1,173 @@
+MPASM 5.81  /HOME/PROG/MűHELY/FEJLESZTéS/M   2-19-2022  11:51:23         PAGE  1
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                      00001         LIST    P=16F59
+                      00002         INCLUDE "p16f59.inc"
+                      00001         LIST
+                      00002 
+                      00003 ;==========================================================================
+                      00004 ; Build date : Jul 23 2018
+                      00005 ;  MPASM PIC16F59 processor include
+                      00006 ; 
+                      00007 ;  (c) Copyright 1999-2018 Microchip Technology, All rights reserved
+                      00008 ;==========================================================================
+                      00009 
+                      00225         LIST
+                      00003 
+0000                  00004         org     0
+                      00005 
+0000   0005           00006         tris    PORTA
+0001   0006           00007         tris    PORTB
+0002   0007           00008         tris    PORTC
+0003   0008           00009         tris    PORTD
+0004   0009           00010         tris    PORTE
+                      00011 
+                      00012         end
+MPASM 5.81  /HOME/PROG/MűHELY/FEJLESZTéS/M   2-19-2022  11:51:23         PAGE  2
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+C                                 00000000
+DC                                00000001
+F                                 00000001
+FSR                               00000004
+INDF                              00000000
+NOT_PD                            00000003
+NOT_TO                            00000004
+PA0                               00000005
+PA1                               00000006
+PA2                               00000007
+PCL                               00000002
+PORTA                             00000005
+PORTB                             00000006
+PORTC                             00000007
+PORTD                             00000008
+PORTE                             00000009
+PS0                               00000000
+PS1                               00000001
+PS2                               00000002
+PSA                               00000003
+RA0                               00000000
+RA1                               00000001
+RA2                               00000002
+RA3                               00000003
+RB0                               00000000
+RB1                               00000001
+RB2                               00000002
+RB3                               00000003
+RB4                               00000004
+RB5                               00000005
+RB6                               00000006
+RB7                               00000007
+RC0                               00000000
+RC1                               00000001
+RC2                               00000002
+RC3                               00000003
+RC4                               00000004
+RC5                               00000005
+RC6                               00000006
+RC7                               00000007
+RD0                               00000000
+RD1                               00000001
+RD2                               00000002
+RD3                               00000003
+RD4                               00000004
+RD5                               00000005
+RD6                               00000006
+RD7                               00000007
+RE4                               00000004
+RE5                               00000005
+RE6                               00000006
+RE7                               00000007
+STATUS                            00000003
+MPASM 5.81  /HOME/PROG/MűHELY/FEJLESZTéS/M   2-19-2022  11:51:23         PAGE  3
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+T0CKI                             00000004
+T0CS                              00000005
+T0SE                              00000004
+TMR0                              00000001
+TRISA0                            00000000
+TRISA1                            00000001
+TRISA2                            00000002
+TRISA3                            00000003
+TRISA4                            00000004
+TRISB0                            00000000
+TRISB1                            00000001
+TRISB2                            00000002
+TRISB3                            00000003
+TRISB4                            00000004
+TRISB5                            00000005
+TRISB6                            00000006
+TRISB7                            00000007
+TRISC0                            00000000
+TRISC1                            00000001
+TRISC2                            00000002
+TRISC3                            00000003
+TRISC4                            00000004
+TRISC5                            00000005
+TRISC6                            00000006
+TRISC7                            00000007
+TRISD0                            00000000
+TRISD1                            00000001
+TRISD2                            00000002
+TRISD3                            00000003
+TRISD4                            00000004
+TRISD5                            00000005
+TRISD6                            00000006
+TRISD7                            00000007
+TRISE4                            00000004
+TRISE5                            00000005
+TRISE6                            00000006
+TRISE7                            00000007
+W                                 00000000
+Z                                 00000002
+_CONFIG                           00000FFF
+_CP_OFF                           00000FFF
+_CP_ON                            00000FF7
+_HS_OSC                           00000FFE
+_IDLOC0                           00000800
+_IDLOC1                           00000801
+_IDLOC2                           00000802
+_IDLOC3                           00000803
+_LP_OSC                           00000FFC
+_OSC_HS                           00000FFE
+_OSC_LP                           00000FFC
+_OSC_RC                           00000FFF
+_OSC_XT                           00000FFD
+_RC_OSC                           00000FFF
+MPASM 5.81  /HOME/PROG/MűHELY/FEJLESZTéS/M   2-19-2022  11:51:23         PAGE  4
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+_WDT_OFF                          00000FFB
+_WDT_ON                           00000FFF
+_XT_OSC                           00000FFD
+__16F59                           00000001
+
+
+MEMORY USAGE MAP ('X' = Used,  '-' = Unused)
+
+0000 : XXXXX----------- ---------------- ---------------- ----------------
+
+All other memory blocks unused.
+
+Program Memory Words Used:     5
+Program Memory Words Free:  2043
+
+
+Errors   :     0
+Warnings :     0 reported,     0 suppressed
+Messages :     0 reported,     0 suppressed
+
+

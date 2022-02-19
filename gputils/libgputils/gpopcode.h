@@ -263,10 +263,10 @@ enum insn_class {
 #define PIC12_INSN_SWAPF        0x380
 #define PIC12_MASK_SWAPF        0xFC0
 
-    /* tris  : 0000 0000 0fff
-               1111 1111 1000 <-- instruction mask */
+    /* tris  : 0000 0000 ffff     ffff is 5..9 for ports A..E
+               1111 1111 0000 <-- instruction mask */
 #define PIC12_INSN_TRIS         0x000
-#define PIC12_MASK_TRIS         0xFF8
+#define PIC12_MASK_TRIS         0xFF0
 #define PIC12_BMSK_TRIS         (PIC12_MASK_TRIS ^ PIC12_CORE_MASK)
 
     /* xorlw : 1111 kkkk kkkk
