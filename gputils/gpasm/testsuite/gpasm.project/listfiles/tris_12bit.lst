@@ -1,4 +1,4 @@
-MPASM 5.81  /HOME/PROG/MűHELY/FEJLESZTéS/M   2-19-2022  11:51:23         PAGE  1
+MPASM 5.81  /ASM/SOURCE   2-19-2022  11:51:23         PAGE  1
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -26,7 +26,7 @@ LOC  OBJECT CODE     LINE SOURCE TEXT
 0004   0009           00010         tris    PORTE
                       00011 
                       00012         end
-MPASM 5.81  /HOME/PROG/MűHELY/FEJLESZTéS/M   2-19-2022  11:51:23         PAGE  2
+MPASM 5.81  /ASM/SOURCE   2-19-2022  11:51:23         PAGE  2
 
 
 SYMBOL TABLE
@@ -85,7 +85,7 @@ RE5                               00000005
 RE6                               00000006
 RE7                               00000007
 STATUS                            00000003
-MPASM 5.81  /HOME/PROG/MűHELY/FEJLESZTéS/M   2-19-2022  11:51:23         PAGE  3
+MPASM 5.81  /ASM/SOURCE   2-19-2022  11:51:23         PAGE  3
 
 
 SYMBOL TABLE
@@ -144,7 +144,7 @@ _OSC_LP                           00000FFC
 _OSC_RC                           00000FFF
 _OSC_XT                           00000FFD
 _RC_OSC                           00000FFF
-MPASM 5.81  /HOME/PROG/MűHELY/FEJLESZTéS/M   2-19-2022  11:51:23         PAGE  4
+MPASM 5.81  /ASM/SOURCE   2-19-2022  11:51:23         PAGE  4
 
 
 SYMBOL TABLE

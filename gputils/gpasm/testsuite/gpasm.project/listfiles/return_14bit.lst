@@ -1,0 +1,39 @@
+MPASM 5.81  /ASM/SOURCE   2-19-2022  14:55:02         PAGE  1
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                      00001         LIST    P=16F887
+                      00002 
+0000                  00003         org     0
+                      00004 
+0000   3400           00005         retlw   0
+0001   34FF           00006         retlw   0FFh
+0002   0008           00007         return
+                      00008 
+                      00009         end
+MPASM 5.81  /ASM/SOURCE   2-19-2022  14:55:02         PAGE  2
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+__16F887                          00000001
+
+
+MEMORY USAGE MAP ('X' = Used,  '-' = Unused)
+
+0000 : XXX------------- ---------------- ---------------- ----------------
+
+All other memory blocks unused.
+
+Program Memory Words Used:     3
+Program Memory Words Free:  8189
+
+
+Errors   :     0
+Warnings :     0 reported,     0 suppressed
+Messages :     0 reported,     0 suppressed
+
+

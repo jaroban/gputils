@@ -291,6 +291,8 @@ _get_warning(int Code)
       return "Use of this instruction is not recommended:";
     case GPW_WORD_ALIGNED:
       return "Destination address must be word aligned.";
+    case GPW_SUBSTITUTING_RETURN:
+      return "Substituting RETLW 0 for RETURN pseudo-op.";
     case GPW_INVALID_ROM:
       return "Invalid ROM location specified.";
 

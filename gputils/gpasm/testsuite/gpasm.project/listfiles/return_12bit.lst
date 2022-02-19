@@ -1,0 +1,40 @@
+MPASM 5.81  /ASM/SOURCE   2-19-2022  14:46:13         PAGE  1
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                      00001         LIST    P=10F202
+                      00002 
+0000                  00003         org     0
+                      00004 
+0000   0800           00005         retlw   0
+0001   08FF           00006         retlw   0FFh
+Warning[227]: Substituting RETLW 0 for RETURN pseudo-op
+0002   0800           00007         return
+                      00008 
+                      00009         end
+MPASM 5.81  /ASM/SOURCE   2-19-2022  14:46:13         PAGE  2
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+__10F202                          00000001
+
+
+MEMORY USAGE MAP ('X' = Used,  '-' = Unused)
+
+0000 : XXX------------- ---------------- ---------------- ----------------
+
+All other memory blocks unused.
+
+Program Memory Words Used:     3
+Program Memory Words Free:   509
+
+
+Errors   :     0
+Warnings :     1 reported,     0 suppressed
+Messages :     0 reported,     0 suppressed
+
+

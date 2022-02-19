@@ -7732,7 +7732,7 @@ do_insn(const char *Op_name, pnode_t *Parameters)
            PIC14E  (brw, callw, reset)
            PIC16   (clrwdt, nop, retfie, return, sleep)
            PIC16E  (clrwdt, daw, halt, nop, pop, push, reset, sleep, trap, tret)
-           PIX16EX callw */
+           PIC16EX callw */
         if (state.processor == NULL) {
           gpmsg_verror(GPE_UNDEF_PROC, "\"%s\"", Op_name);
           return 0;
@@ -7740,6 +7740,10 @@ do_insn(const char *Op_name, pnode_t *Parameters)
 
         if (arity != 0) {
           gpmsg_vwarning(GPW_EXTRANEOUS, NULL);
+        }
+
+        if ((icode == ICODE_RETURN) && (class->core_mask == PIC12_CORE_MASK)){
+          gpmsg_vwarning(GPW_SUBSTITUTING_RETURN, NULL);
         }
 
         if ((icode == ICODE_OPTION) && (class->core_mask != PIC12_CORE_MASK)){

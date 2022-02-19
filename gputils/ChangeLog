@@ -1,4 +1,20 @@
 2022-02-19  Molnar Karoly  <molnarkaroly@users.sourceforge.net>
+  * gpasm/directive.c,
+    gpasm/gpmsg.c,
+    gpasm/gpmsg.h,
+    gpasm/testsuite/gpasm.project/asmfiles/return_12bit.asm,
+    gpasm/testsuite/gpasm.project/asmfiles/return_14bit.asm,
+    gpasm/testsuite/gpasm.project/asmfiles/return_16bit.asm,
+    gpasm/testsuite/gpasm.project/hexfiles/return_12bit.hex,
+    gpasm/testsuite/gpasm.project/hexfiles/return_14bit.hex,
+    gpasm/testsuite/gpasm.project/hexfiles/return_16bit.hex,
+    gpasm/testsuite/gpasm.project/listfiles/return_12bit.lst,
+    gpasm/testsuite/gpasm.project/listfiles/return_14bit.lst,
+    gpasm/testsuite/gpasm.project/listfiles/return_16bit.lst:
+    Fixed bug: "#315 gpasm allows RETURN for 10F202"
+    Thanks to Kurt Deitrick for the bugreport.
+
+2022-02-19  Molnar Karoly  <molnarkaroly@users.sourceforge.net>
   * libgputils/gpopcode.h,
     gpasm/testsuite/gpasm.project/asmfiles/tris_12bit.asm,
     gpasm/testsuite/gpasm.project/hexfiles/tris_12bit.hex,
