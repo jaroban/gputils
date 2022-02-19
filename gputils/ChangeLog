@@ -1,3 +1,10 @@
+2022-02-19  Molnar Karoly  <molnarkaroly@users.sourceforge.net>
+  * gpasm/directive.c,
+    gpasm/testsuite/regression/source/elif.asm:
+    Fixed bug: "#318 ELIF is not ELSE IF, bug or unusual name?"
+    Thanks to Anders Andersson for the bugreport.
+    Thanks to Robert Pearce for the patch.
+
 2022-02-16  Molnar Karoly  <molnarkaroly@users.sourceforge.net>
   * lkr/12f1571_g.lkr,
     lkr/12lf1571_g.lkr,

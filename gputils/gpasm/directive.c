@@ -3720,8 +3720,11 @@ _do_elif(gpasmVal Value, const char *Name, int Arity, pnode_t *Parms)
 
   _enter_elif();
 
-  /* Only evaluate the conditional elif it matters... */
-  if (state.astack->upper_enabled) {
+  /* Only evaluate the conditional if it matters... */
+  if (state.astack->before_else_enabled) {
+    state.astack->enabled = false;
+  }
+  else if (state.astack->upper_enabled) {
     if (eval_enforce_arity(Arity, 1)) {
       p = PnListHead(Parms);
       state.astack->enabled              = eval_maybe_evaluate(p);
@@ -3790,8 +3793,11 @@ _do_elifdef(gpasmVal Value, const char *Name, int Arity, pnode_t *Parms)
 
   _enter_elif();
 
-  /* Only evaluate the conditional elifdef it matters... */
-  if (state.astack->upper_enabled) {
+  /* Only evaluate the conditional if it matters... */
+  if (state.astack->before_else_enabled) {
+    state.astack->enabled = false;
+  }
+  else if (state.astack->upper_enabled) {
     if (eval_enforce_arity(Arity, 1)) {
       p = PnListHead(Parms);
 
@@ -3867,8 +3873,11 @@ _do_elifndef(gpasmVal Value, const char *Name, int Arity, pnode_t *Parms)
 
   _enter_elif();
 
-  /* Only evaluate the conditional elifndef it matters... */
-  if (state.astack->upper_enabled) {
+  /* Only evaluate the conditional if it matters... */
+  if (state.astack->before_else_enabled) {
+    state.astack->enabled = false;
+  }
+  else if (state.astack->upper_enabled) {
     if (eval_enforce_arity(Arity, 1)) {
       p = PnListHead(Parms);
 
