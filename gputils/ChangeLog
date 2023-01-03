@@ -1,3 +1,8 @@
+2023-01-03  Molnar Karoly  <molnarkaroly@users.sourceforge.net>
+  * gpasm/directive.c:
+    Applied patch: "#78 Regression in 1.5.2 relative to 1.5.0"
+    Thanks to Roy Rankin for the patch.
+
 2022-02-19  Molnar Karoly  <molnarkaroly@users.sourceforge.net>
   * gpasm/directive.c,
     gpasm/gpmsg.c,

@@ -128,6 +128,19 @@ _resolve_meta_chars(char *Dst, int Max_size, const char *Src, int Size)
           --Max_size;
           break;
 
+        // special characters
+        case '0': // (NULL)
+        case 'a': // (bell)
+        case 'b': // (backspace)
+        case 't': // (tab)
+        case 'n': // (newline)
+        case 'v': // (vertical tab)
+        case 'f': // (form feed)
+        case 'r': // (return)
+          *d++ = '\\';
+          *d++ = ch;
+          break;
+
         default: {
           *d++ = ch;
           --Max_size;
