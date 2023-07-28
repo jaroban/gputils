@@ -1,0 +1,7 @@
+(no author) = no_author <no_author@example.com>
+borutr = Borut Ražem <borut.razem@gmail.com>
+craigfranklin = Craig Franklin <craigfranklin@users.sourceforge.net>
+kohtala = Marko Kohtala <marko.kohtala@gmail.com> 
+merc64 = David Barnett <daviebdawg@gmail.com>
+molnarkaroly = Molnár Károly <molnarkaroly@users.sf.net>
+sdattalo = Scott Dattalo <scott@dattalo.com>

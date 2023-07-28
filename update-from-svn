@@ -1,0 +1,2 @@
+#!/usr/bin/env bash
+svn2git https://svn.code.sf.net/p/gputils/code --notags --nobranches --authors authors.txt
