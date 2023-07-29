@@ -1,0 +1,10 @@
+*.Po
+*.o
+*.a
+Makefile
+*.1
+config.h
+config.log
+config.status
+gputils.spec
+stamp-h1
